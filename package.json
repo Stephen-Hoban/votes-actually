@@ -1,0 +1,21 @@
+{
+  "name": "votes-actually",
+  "version": "1.0.0",
+  "description": "Bluesky bots that post congressional vote analysis",
+  "type": "module",
+  "scripts": {
+    "fetch-votes": "tsx src/fetchVotes.ts",
+    "refresh-cache": "tsx src/refreshCache.ts",
+    "refresh-members": "tsx src/refreshCache.ts -- --members",
+    "refresh-census": "tsx src/refreshCache.ts -- --census"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "xml2js": "^0.6.0"
+  }
+}
