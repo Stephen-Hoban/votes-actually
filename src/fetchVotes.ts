@@ -20,8 +20,14 @@ import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
 import { parseStringPromise } from "xml2js";
+import { postToBluesky } from "./bluesky.js";
+import { loadSeenVotes, saveSeenVotes } from "./seenVotes.js";
 
 dotenv.config();
+
+const SHOULD_POST = process.argv.includes("--post");
+const SHOULD_WATCH = process.argv.includes("--watch");
+const POLL_INTERVAL_MS = Number(process.env.POLL_INTERVAL_MINUTES ?? 15) * 60 * 1000;
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -60,6 +66,7 @@ interface MemberDistrict {
 }
 
 interface VoteResult {
+  id: string;
   chamber: "Senate" | "House";
   voteNumber: string;
   date: string;
@@ -137,6 +144,14 @@ function extractText(val: unknown): string {
     if ("#text" in obj && typeof obj["#text"] === "string") return obj["#text"].trim();
   }
   return String(val).trim();
+}
+
+// The House XML uses "Yea"/"Nay" for bill votes but "Aye"/"No" for votes on
+// resolutions (procedural/rule votes). Normalize both to "Yea"/"Nay".
+function normalizeHouseVote(voteCast: string): "Yea" | "Nay" | null {
+  if (voteCast === "Yea" || voteCast === "Aye") return "Yea";
+  if (voteCast === "Nay" || voteCast === "No") return "Nay";
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -269,6 +284,7 @@ async function fetchSenateVotes(
     }
 
     results.push({
+      id: `senate-${congressNum}-${senateSession}-${voteNum}`,
       chamber: "Senate",
       voteNumber: String(v.vote_number),
       date: extractText(rc.vote_date),
@@ -361,9 +377,9 @@ async function fetchHouseVotes(
       const leg = member.legislator as Record<string, unknown>;
       const attrs = leg?.$ as Record<string, string> | undefined;
       const bioguide = attrs?.["name-id"] ?? "";
-      const voteCast = extractText(member.vote);
+      const voteCast = normalizeHouseVote(extractText(member.vote));
 
-      if (!bioguide || (voteCast !== "Yea" && voteCast !== "Nay")) continue;
+      if (!bioguide || !voteCast) continue;
 
       const memberInfo = memberDistricts.get(bioguide);
       if (!memberInfo) { unmatched++; continue; }
@@ -381,6 +397,7 @@ async function fetchHouseVotes(
     }
 
     results.push({
+      id: `house-${houseYear}-${paddedNum}`,
       chamber: "House",
       voteNumber: extractText(meta["rollcall-num"]),
       date: extractText(meta["action-date"]),
@@ -415,6 +432,17 @@ function formatPct(n: number): string {
   return `${(n * 100).toFixed(1)}%`;
 }
 
+function buildPopulationPost(v: VoteResult): string {
+  return (
+    `${v.chamber} Vote: ${v.question}\n` +
+    (v.description ? `${v.description}\n` : "") +
+    `Result: ${v.result} (${v.yeas}-${v.nays})\n\n` +
+    `🇺🇸 Population represented:\n` +
+    `✅ YES: ${formatPop(v.populationYea)} (${formatPct(v.pctYea)})\n` +
+    `❌  NO: ${formatPop(v.populationNay)} (${formatPct(v.pctNay)})`
+  );
+}
+
 function printVoteResult(v: VoteResult): void {
   console.log("─".repeat(60));
   console.log(`${v.chamber.toUpperCase()} VOTE #${v.voteNumber}  |  ${v.date}`);
@@ -427,24 +455,50 @@ function printVoteResult(v: VoteResult): void {
   console.log(`   ❌  NO: ${formatPop(v.populationNay)} people (${formatPct(v.pctNay)} of US pop)`);
   console.log();
 
-  const post =
-    `${v.chamber} Vote: ${v.question}\n` +
-    (v.description ? `${v.description}\n` : "") +
-    `Result: ${v.result} (${v.yeas}-${v.nays})\n\n` +
-    `🇺🇸 Population represented:\n` +
-    `✅ YES: ${formatPop(v.populationYea)} (${formatPct(v.pctYea)})\n` +
-    `❌  NO: ${formatPop(v.populationNay)} (${formatPct(v.pctNay)})`;
-
+  const post = buildPopulationPost(v);
   console.log(`📱 Sample Bluesky post (${post.length} chars):`);
   console.log(post);
   console.log();
 }
 
 // ---------------------------------------------------------------------------
+// Posting (dedupe against already-seen votes)
+// ---------------------------------------------------------------------------
+
+async function postNewVotes(allVotes: VoteResult[]): Promise<void> {
+  const botId = "population";
+  const seen = loadSeenVotes(botId);
+  let postedCount = 0;
+  let skippedCount = 0;
+
+  for (const v of allVotes) {
+    if (seen.has(v.id)) {
+      skippedCount++;
+      continue;
+    }
+    try {
+      await postToBluesky(botId, buildPopulationPost(v));
+      seen.add(v.id);
+      postedCount++;
+      console.log(`  ✅ Posted ${v.chamber} vote #${v.voteNumber} to Bluesky.`);
+    } catch (err) {
+      console.error(`  ❌ Failed to post ${v.chamber} vote #${v.voteNumber}:`, err);
+    }
+  }
+
+  saveSeenVotes(botId, seen);
+  console.log(`\n📬 Posting summary: ${postedCount} new, ${skippedCount} already posted before.\n`);
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
-async function main(): Promise<void> {
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function runOnce(): Promise<void> {
   console.log("=".repeat(60));
   console.log("  Congress Vote Bots — Fetch Latest Votes");
   console.log("=".repeat(60));
@@ -502,9 +556,26 @@ async function main(): Promise<void> {
     printVoteResult(v);
   }
 
+  if (SHOULD_POST) {
+    await postNewVotes(allVotes);
+  }
+
   console.log("=".repeat(60));
   console.log(`  Done. Processed ${allVotes.length} votes.`);
   console.log("=".repeat(60));
+}
+
+async function main(): Promise<void> {
+  await runOnce();
+
+  if (SHOULD_WATCH) {
+    const minutes = POLL_INTERVAL_MS / 60000;
+    console.log(`\n👀 Watching for new votes every ${minutes} minute(s). Press Ctrl+C to stop.\n`);
+    for (;;) {
+      await sleep(POLL_INTERVAL_MS);
+      await runOnce();
+    }
+  }
 }
 
 main().catch((err) => {

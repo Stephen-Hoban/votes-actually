@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "fetch-votes": "tsx src/fetchVotes.ts",
+    "post-votes": "tsx src/fetchVotes.ts --post",
+    "watch-votes": "tsx src/fetchVotes.ts --post --watch",
     "refresh-cache": "tsx src/refreshCache.ts",
     "refresh-members": "tsx src/refreshCache.ts -- --members",
     "refresh-census": "tsx src/refreshCache.ts -- --census"
@@ -13,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@atproto/api": "^0.19.19",
     "dotenv": "^16.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
