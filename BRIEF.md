@@ -38,6 +38,42 @@ the script exits with a clear error message directing you to run the refresh.
 
 ---
 
+## Testing
+
+**Goal:** Catch silent calculation errors before they're posted publicly and irreversibly
+(added 2026-07-13, prompted by the Aye/No resolution-vote bug above — it produced 0%
+population with no error, and would have shipped a wrong post if undetected).
+
+The population/percentage calculation logic is pure and framework-free, split out of
+`fetchVotes.ts` into `src/voteCalculations.ts` specifically so it can be unit tested without
+network or filesystem access (`fetchVotes.ts` itself runs its pipeline on import, so it can't
+be imported safely in a test).
+
+### Key files
+```
+src/voteCalculations.ts       — pure calc/formatting functions (imported by fetchVotes.ts)
+src/voteCalculations.test.ts  — vitest unit tests (22 tests)
+```
+
+### npm scripts
+```
+npm test    — run the test suite once (vitest run)
+```
+
+### Coverage
+- `normalizeHouseVote` — Yea/Nay (bills) and Aye/No (resolutions) both normalize correctly
+- `calculateSenatePopulation` / `calculateHousePopulation` — correct sums, plus edge cases:
+  unmatched members (missing from `member-districts.json`), unmatched districts (missing
+  from Census cache), non-voting codes (Present), missing bioguide IDs
+- `computeCongressSession` — Congress/session rollover at year boundaries
+- `formatPop`, `formatPct`, `buildPopulationPost` — output formatting, including the exact
+  Bluesky post string
+
+Not covered yet: the XML-fetching/parsing layer in `fetchVotes.ts` itself (would need
+recorded HTTP fixtures) — deferred until it becomes a real pain point.
+
+---
+
 ## Data sources & rationale
 
 | Data | Source | Why |
@@ -83,6 +119,11 @@ population: 748,052
 - Denominator = total 50-state population
 - District populations are roughly equal by design (~760K per district)
 - 1 unmatched member per vote is expected — likely a non-voting delegate (DC, PR, etc.)
+- **Vote code varies by vote type:** the House XML's per-member `<vote>` value is `Yea`/`Nay`
+  for bill votes but `Aye`/`No` for votes on resolutions (procedural/rule votes, e.g. "On
+  Agreeing to the Resolution"). `fetchVotes.ts`'s `normalizeHouseVote()` treats both pairs
+  the same. Matching only `Yea`/`Nay` silently produces 0 population represented on
+  resolution votes with no warning (fixed 2026-07-08; verified against roll #231).
 
 ---
 
@@ -115,17 +156,32 @@ No more manual updates needed at the start of each session/year/Congress.
 ### Steps
 - ✅ Fix `HOUSE_YEAR` and `SENATE_SESSION` hardcoded values — replaced with auto-detection
 - ✅ Set up Bluesky account for the population bot (subdomain handle, DNS TXT verified)
+- ✅ Format posts per bot persona — population bot done (`buildPopulationPost()` in `fetchVotes.ts`); other personas still need their own post-formatting functions
+- ✅ Add vote polling loop — `--watch` flag (`npm run watch-votes`) re-runs the fetch/post cycle on an interval (`POLL_INTERVAL_MINUTES`, default 15) instead of a separate cron-triggered process
+- ✅ Store seen vote IDs to avoid duplicate posts — `src/seenVotes.ts`, local JSON per bot (`data/seen-votes-{botid}.json`), Supabase migration still open for later
 - Set up remaining Bluesky accounts as each bot is built (one per bot persona)
-- Add vote polling loop — detect new votes since last run by storing last seen vote number
-- Format posts per bot persona — population bot first
-- Store seen vote IDs to avoid duplicate posts (local JSON to start, Supabase later)
-- Deploy to Railway or Render with cron schedule (free tier to start, upgradeable)
+- Deploy to Railway or Render running `npm run watch-votes` as a long-lived process (free tier to start, upgradeable)
+
+**Status (2026-07-13):** Posting, dedupe, and polling are implemented, live-tested against `@population.votesactually.com`, and merged to `main` via [PR #1](https://github.com/Stephen-Hoban/votes-actually/pull/1). Not yet deployed anywhere.
+
+### Key files (added Phase 2)
+```
+src/bluesky.ts    — postToBluesky(botId, text): login/session persistence, posts, keyed per bot
+src/seenVotes.ts  — loadSeenVotes/saveSeenVotes(botId): per-bot dedupe store
+```
+
+### npm scripts (added Phase 2)
+```
+npm run post-votes    — fetch-votes + post any new votes to Bluesky (one-shot)
+npm run watch-votes   — same, but loops forever on POLL_INTERVAL_MINUTES (default 15)
+```
 
 ### Bluesky setup notes
-- Use `@atproto/api` npm package for posting
+- Use `@atproto/api` npm package for posting (`src/bluesky.ts`)
 - Domain verification: add DNS TXT record per Bluesky's instructions per subdomain handle
-- Rate limits: persist session to disk after login to avoid hitting login rate limits
-- One Bluesky account per bot (separate credentials per persona)
+- Rate limits: persist session to disk after login to avoid hitting login rate limits — session stored per bot at `data/bluesky-session-{botid}.json`
+- One Bluesky account per bot (separate credentials per persona). Env vars are namespaced per bot ID: `BLUESKY_{BOTID}_HANDLE` / `BLUESKY_{BOTID}_APP_PASSWORD` (e.g. `BLUESKY_POPULATION_HANDLE`). Adding a new bot persona is just new `.env` entries — no code changes needed.
+- The Bluesky login API rejects a leading `@` on the handle (though `@handle` is the normal display form) — `bluesky.ts` strips it automatically, so `.env` can be written either way.
 
 ### Bot family (population bot first, others to follow — see BotList.md)
 | Bot handle | What it posts |
