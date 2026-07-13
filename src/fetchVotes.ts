@@ -22,6 +22,19 @@ import * as path from "path";
 import { parseStringPromise } from "xml2js";
 import { postToBluesky } from "./bluesky.js";
 import { loadSeenVotes, saveSeenVotes } from "./seenVotes.js";
+import {
+  StatePop,
+  DistrictPop,
+  MemberDistrict,
+  VoteResult,
+  extractText,
+  computeCongressSession,
+  calculateSenatePopulation,
+  calculateHousePopulation,
+  formatPop,
+  formatPct,
+  buildPopulationPost,
+} from "./voteCalculations.js";
 
 dotenv.config();
 
@@ -39,49 +52,6 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const DISTRICT_POP_FILE = path.join(DATA_DIR, "district-populations.json");
 const MEMBER_DISTRICT_FILE = path.join(DATA_DIR, "member-districts.json");
 const STATE_POP_FILE = path.join(DATA_DIR, "state-populations.json");
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface StatePop {
-  name: string;
-  abbr: string;
-  population: number;
-  fips: string;
-}
-
-interface DistrictPop {
-  stateAbbr: string;
-  district: string;
-  population: number;
-}
-
-interface MemberDistrict {
-  districtKey: string;
-  name: string;
-  state: string;
-  district: number;
-  party: string;
-}
-
-interface VoteResult {
-  id: string;
-  chamber: "Senate" | "House";
-  voteNumber: string;
-  date: string;
-  question: string;
-  description: string;
-  result: string;
-  yeas: number;
-  nays: number;
-  populationYea: number;
-  populationNay: number;
-  totalUsPopulation: number;
-  pctYea: number;
-  pctNay: number;
-  url: string;
-}
 
 // ---------------------------------------------------------------------------
 // Cache loading
@@ -132,40 +102,8 @@ function loadMemberDistricts(): Map<string, MemberDistrict> {
 }
 
 // ---------------------------------------------------------------------------
-// Helper: safely extract a string from an xml2js parsed value
+// Auto-detection: House year (Congress/session detection is in voteCalculations.ts)
 // ---------------------------------------------------------------------------
-
-function extractText(val: unknown): string {
-  if (!val) return "";
-  if (typeof val === "string") return val.trim();
-  if (typeof val === "object") {
-    const obj = val as Record<string, unknown>;
-    if ("_" in obj && typeof obj._ === "string") return obj._.trim();
-    if ("#text" in obj && typeof obj["#text"] === "string") return obj["#text"].trim();
-  }
-  return String(val).trim();
-}
-
-// The House XML uses "Yea"/"Nay" for bill votes but "Aye"/"No" for votes on
-// resolutions (procedural/rule votes). Normalize both to "Yea"/"Nay".
-function normalizeHouseVote(voteCast: string): "Yea" | "Nay" | null {
-  if (voteCast === "Yea" || voteCast === "Aye") return "Yea";
-  if (voteCast === "Nay" || voteCast === "No") return "Nay";
-  return null;
-}
-
-// ---------------------------------------------------------------------------
-// Auto-detection: Congress number, Senate session, House year
-// ---------------------------------------------------------------------------
-
-// A Congress spans two years starting in odd-numbered years (e.g. 119th = 2025-2026).
-// Session 1 is the first (odd) year, Session 2 is the second (even) year.
-function computeCongressSession(date: Date): { congress: number; session: number } {
-  const year = date.getFullYear();
-  const congress = Math.floor((year - 1789) / 2) + 1;
-  const session = year % 2 === 1 ? 1 : 2;
-  return { congress, session };
-}
 
 async function urlExists(url: string): Promise<boolean> {
   const resp = await fetch(url, {
@@ -270,18 +208,15 @@ async function fetchSenateVotes(
     const membersRaw = (rc.members as Record<string, unknown>)?.member;
     const members: unknown[] = Array.isArray(membersRaw) ? membersRaw : [membersRaw];
 
-    let popYea = 0;
-    let popNay = 0;
-
-    for (const m of members) {
+    const memberVotes = members.map((m) => {
       const member = m as Record<string, unknown>;
-      const stateAbbr = extractText(member.state);
-      const voteCast = extractText(member.vote_cast);
-      const statePop = statePops.get(stateAbbr);
-      if (!statePop) continue;
-      if (voteCast === "Yea") popYea += statePop.population;
-      else if (voteCast === "Nay") popNay += statePop.population;
-    }
+      return {
+        state: extractText(member.state),
+        voteCast: extractText(member.vote_cast),
+      };
+    });
+
+    const { popYea, popNay } = calculateSenatePopulation(memberVotes, statePops);
 
     results.push({
       id: `senate-${congressNum}-${senateSession}-${voteNum}`,
@@ -367,30 +302,21 @@ async function fetchHouseVotes(
     const recordedRaw = voteData["recorded-vote"];
     const members: unknown[] = Array.isArray(recordedRaw) ? recordedRaw : [recordedRaw];
 
-    let popYea = 0;
-    let popNay = 0;
-    let matched = 0;
-    let unmatched = 0;
-
-    for (const m of members) {
+    const memberVotes = members.map((m) => {
       const member = m as Record<string, unknown>;
       const leg = member.legislator as Record<string, unknown>;
       const attrs = leg?.$ as Record<string, string> | undefined;
-      const bioguide = attrs?.["name-id"] ?? "";
-      const voteCast = normalizeHouseVote(extractText(member.vote));
+      return {
+        bioguide: attrs?.["name-id"] ?? "",
+        voteCast: extractText(member.vote),
+      };
+    });
 
-      if (!bioguide || !voteCast) continue;
-
-      const memberInfo = memberDistricts.get(bioguide);
-      if (!memberInfo) { unmatched++; continue; }
-
-      const districtPop = districtPops.get(memberInfo.districtKey);
-      if (!districtPop) { unmatched++; continue; }
-
-      matched++;
-      if (voteCast === "Yea") popYea += districtPop.population;
-      else popNay += districtPop.population;
-    }
+    const { popYea, popNay, matched, unmatched } = calculateHousePopulation(
+      memberVotes,
+      memberDistricts,
+      districtPops
+    );
 
     if (unmatched > 0) {
       console.warn(`  ⚠️  Roll #${rollNum}: ${matched} matched, ${unmatched} unmatched (likely delegates).`);
@@ -421,27 +347,6 @@ async function fetchHouseVotes(
 // ---------------------------------------------------------------------------
 // Display
 // ---------------------------------------------------------------------------
-
-function formatPop(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-  return n.toString();
-}
-
-function formatPct(n: number): string {
-  return `${(n * 100).toFixed(1)}%`;
-}
-
-function buildPopulationPost(v: VoteResult): string {
-  return (
-    `${v.chamber} Vote: ${v.question}\n` +
-    (v.description ? `${v.description}\n` : "") +
-    `Result: ${v.result} (${v.yeas}-${v.nays})\n\n` +
-    `🇺🇸 Population represented:\n` +
-    `✅ YES: ${formatPop(v.populationYea)} (${formatPct(v.pctYea)})\n` +
-    `❌  NO: ${formatPop(v.populationNay)} (${formatPct(v.pctNay)})`
-  );
-}
 
 function printVoteResult(v: VoteResult): void {
   console.log("─".repeat(60));
