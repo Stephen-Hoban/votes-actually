@@ -10,6 +10,7 @@
     "refresh-cache": "tsx src/refreshCache.ts",
     "refresh-members": "tsx src/refreshCache.ts -- --members",
     "refresh-census": "tsx src/refreshCache.ts -- --census",
+    "render-start": "test -f data/state-populations.json || npm run refresh-cache; npm run watch-votes",
     "test": "vitest run"
   },
   "keywords": [],
