@@ -1,0 +1,20 @@
+services:
+  - type: worker
+    name: population-bot
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm run render-start
+    disk:
+      name: population-bot-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
+    envVars:
+      - key: CENSUS_API_KEY
+        sync: false
+      - key: BLUESKY_POPULATION_HANDLE
+        sync: false
+      - key: BLUESKY_POPULATION_APP_PASSWORD
+        sync: false
+      - key: POLL_INTERVAL_MINUTES
+        value: "15"

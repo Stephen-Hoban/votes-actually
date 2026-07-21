@@ -160,7 +160,7 @@ No more manual updates needed at the start of each session/year/Congress.
 - ✅ Add vote polling loop — `--watch` flag (`npm run watch-votes`) re-runs the fetch/post cycle on an interval (`POLL_INTERVAL_MINUTES`, default 15) instead of a separate cron-triggered process
 - ✅ Store seen vote IDs to avoid duplicate posts — `src/seenVotes.ts`, local JSON per bot (`data/seen-votes-{botid}.json`), Supabase migration still open for later
 - Set up remaining Bluesky accounts as each bot is built (one per bot persona)
-- Deploy to Railway or Render running `npm run watch-votes` as a long-lived process (free tier to start, upgradeable)
+- ✅ Deploy config for population bot — `render.yaml` Blueprint (Background Worker + 1GB persistent disk mounted at `data/`, `npm run render-start` as start command). Render's free plan doesn't support Background Workers or disks, so this runs on the Starter plan (~$7/mo + ~$0.25/mo disk). Not yet connected/deployed on Render itself — that's a manual step (connect repo, fill in secret env vars, confirm plan).
 
 **Status (2026-07-13):** Posting, dedupe, and polling are implemented, live-tested against `@population.votesactually.com`, and merged to `main` via [PR #1](https://github.com/Stephen-Hoban/votes-actually/pull/1). Not yet deployed anywhere.
 
