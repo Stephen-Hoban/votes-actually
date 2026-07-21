@@ -75,7 +75,9 @@ async function refreshStatePopulations(): Promise<void> {
     `https://api.census.gov/data/2022/acs/acs5?get=NAME,B01003_001E` +
     `&for=state:*&key=${CENSUS_API_KEY}`;
 
-  const resp = await fetch(url);
+  const resp = await fetch(url, {
+    headers: { "User-Agent": "votes-actually (educational project)" },
+  });
   if (!resp.ok) throw new Error(`Census API error: ${resp.status} ${resp.statusText}`);
 
   const data = (await resp.json()) as string[][];
@@ -123,7 +125,9 @@ async function refreshDistrictPopulations(): Promise<void> {
     `https://api.census.gov/data/2022/acs/acs5?get=NAME,B01003_001E` +
     `&for=congressional%20district:*&in=state:*&key=${CENSUS_API_KEY}`;
 
-  const resp = await fetch(url);
+  const resp = await fetch(url, {
+    headers: { "User-Agent": "votes-actually (educational project)" },
+  });
   if (!resp.ok) throw new Error(`Census API (districts) error: ${resp.status} ${resp.statusText}`);
 
   // Columns: [NAME, B01003_001E, state, congressional district]
@@ -163,7 +167,9 @@ async function refreshDistrictPopulations(): Promise<void> {
 async function refreshMemberDistricts(): Promise<void> {
   console.log("👥 Fetching member→district map from congress-legislators...");
 
-  const resp = await fetch(LEGISLATORS_URL);
+  const resp = await fetch(LEGISLATORS_URL, {
+    headers: { "User-Agent": "votes-actually (educational project)" },
+  });
   if (!resp.ok) throw new Error(`Legislators fetch error: ${resp.status} ${resp.statusText}`);
 
   const legislators = (await resp.json()) as Array<{
