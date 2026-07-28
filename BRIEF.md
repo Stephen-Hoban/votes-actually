@@ -52,7 +52,7 @@ be imported safely in a test).
 ### Key files
 ```
 src/voteCalculations.ts       — pure calc/formatting functions (imported by fetchVotes.ts)
-src/voteCalculations.test.ts  — vitest unit tests (22 tests)
+src/voteCalculations.test.ts  — vitest unit tests (36 tests)
 ```
 
 ### npm scripts
@@ -67,7 +67,12 @@ npm test    — run the test suite once (vitest run)
   from Census cache), non-voting codes (Present), missing bioguide IDs
 - `computeCongressSession` — Congress/session rollover at year boundaries
 - `formatPop`, `formatPct`, `buildPopulationPost` — output formatting, including the exact
-  Bluesky post string
+  Bluesky post string, description shortening, and bill-link facet placement
+- `graphemeLength` / `fitsInPost` / `truncateToGraphemes` — grapheme-cluster-aware length
+  checks (see "Bluesky post length & bill links" below)
+- `buildBillUrl` — congress.gov URL mapping for all House/Senate bill/resolution types,
+  including the ordinal-suffix edge case (11th/12th/13th vs. 21st/22nd/23rd)
+- `selectRecentSenateVotes` — Senate vote list ordering (see below)
 
 Not covered yet: the XML-fetching/parsing layer in `fetchVotes.ts` itself (would need
 recorded HTTP fixtures) — deferred until it becomes a real pain point.
@@ -143,6 +148,60 @@ No more manual updates needed at the start of each session/year/Congress.
 
 ---
 
+## Bluesky post length & bill links (resolved 2026-07-27)
+
+**Problem:** Posts were getting cut off mid-content (e.g. losing the entire "❌ NO" line —
+see the [example post](https://bsky.app/profile/population.votesactually.com/post/3mr6qpz4hzn2j)
+that motivated the fix). Root cause: `truncateForBluesky()` sliced the whole post at 300 raw
+JS `.length` chars — which both mismeasures multi-codepoint emoji (e.g. 🇺🇸 is 2 codepoints/4
+UTF-16 units but 1 grapheme) and blindly cuts wherever the limit lands, with no regard for
+which content is expendable.
+
+**Fix:**
+- `graphemeLength()` / `fitsInPost()` / `truncateToGraphemes()` in `voteCalculations.ts` use
+  `Intl.Segmenter` to count/cut by grapheme cluster, matching what Bluesky actually enforces
+  (required adding `ES2022.Intl` to `tsconfig.json`'s `lib`).
+- `buildPopulationPost()` now treats the Result and Population-represented lines as fixed —
+  never truncated. Only the `description` field gets shortened (with a trailing "…") when the
+  post doesn't fit.
+- `buildPopulationPost()` returns `{ text, facets }` instead of a plain string. When a bill
+  URL is resolvable, the description text itself (full or truncated) becomes a clickable
+  Bluesky rich-text facet linking to the bill's congress.gov page — no more `Full text: <url>`
+  suffix competing for character budget. Facet byte offsets are computed with
+  `Buffer.byteLength(..., "utf-8")` since Bluesky facets index UTF-8 bytes, not JS string
+  indices.
+- `buildBillUrl(congress, rawDesignation)` maps a raw bill/resolution designation (House
+  `<legis-num>`, e.g. `"H R 5103"`; Senate `document_type`+`document_number`, e.g. `"H.R.
+  6938"`, falling back to `amendment_to_document_number` for amendment votes) to its
+  congress.gov page, e.g. `https://www.congress.gov/bill/119th-congress/house-bill/5103`.
+  Returns `""` for things with no bill page (nominations, unresolvable amendments) — those
+  posts just have no link, no crash.
+- `postToBluesky(botId, text, facets)` in `bluesky.ts` converts the generic facet shape into
+  `@atproto/api`'s `AppBskyRichtextFacet.Main` and passes it to `agent.post()`. Its own
+  `truncateForBluesky()` safety net (grapheme-aware now) still exists as a last resort and
+  logs a warning if it ever actually fires — that would mean `buildPopulationPost()`'s own
+  budget math missed a case.
+
+**Also fixed in the same commit:** the Senate vote fetcher (`fetchSenateVotes()`) was pulling
+the 5 *oldest* votes of the session instead of the 5 most recent. The Senate's
+`vote_menu_{congress}_{session}.xml` lists votes newest-first (descending `vote_number`), but
+the old code did `voteArray.slice(-VOTES_TO_SHOW).reverse()`, which assumed the opposite
+order. Combined with the seen-votes dedupe store, this meant the Senate bot had likely never
+posted anything past the first ~5 votes of a session. Fixed via
+`selectRecentSenateVotes(voteArray, count)` in `voteCalculations.ts`, which just takes the
+first `count` entries.
+
+Live-verified against real 119th Congress data before deploying: all sampled posts (bills,
+House/Senate resolutions, joint/concurrent resolutions, nominations) stayed within 300
+graphemes, and Senate votes now show the current session's latest activity instead of vote
+#1-5 from January. Confirmed again in production after deployment (2026-07-27): recent posts
+on `@population.votesactually.com` show current Senate activity (cloture motions,
+nominations), and the description text renders as an actual clickable link to congress.gov
+(e.g. the "S.J.Res. 180" post links to
+`https://www.congress.gov/bill/119th-congress/senate-joint-resolution/180`).
+
+---
+
 ## Known issues / future cleanup
 - Senate post text sometimes verbose — question field can duplicate the description field
 - 1 unmatched House member per vote (non-voting delegate) — acceptable, can be noted in posts
@@ -160,13 +219,15 @@ No more manual updates needed at the start of each session/year/Congress.
 - ✅ Add vote polling loop — `--watch` flag (`npm run watch-votes`) re-runs the fetch/post cycle on an interval (`POLL_INTERVAL_MINUTES`, default 15) instead of a separate cron-triggered process
 - ✅ Store seen vote IDs to avoid duplicate posts — `src/seenVotes.ts`, local JSON per bot (`data/seen-votes-{botid}.json`), Supabase migration still open for later
 - Set up remaining Bluesky accounts as each bot is built (one per bot persona)
-- ✅ Deploy config for population bot — `render.yaml` Blueprint (Background Worker + 1GB persistent disk mounted at `data/`, `npm run render-start` as start command). Render's free plan doesn't support Background Workers or disks, so this runs on the Starter plan (~$7/mo + ~$0.25/mo disk). Not yet connected/deployed on Render itself — that's a manual step (connect repo, fill in secret env vars, confirm plan).
+- ✅ Deploy config for population bot — `render.yaml` Blueprint (Background Worker + 1GB persistent disk mounted at `data/`, `npm run render-start` as start command). Render's free plan doesn't support Background Workers or disks, so this runs on the Starter plan (~$7/mo + ~$0.25/mo disk).
+- ✅ Deployed to Render — live and posting as of 2026-07-27 (deployed in a separate session; confirmed by checking `@population.votesactually.com` directly, e.g. recent posts ~15 min old, including current Senate cloture/nomination votes).
 
-**Status (2026-07-13):** Posting, dedupe, and polling are implemented, live-tested against `@population.votesactually.com`, and merged to `main` via [PR #1](https://github.com/Stephen-Hoban/votes-actually/pull/1). Not yet deployed anywhere.
+**Status (2026-07-27):** Population bot is deployed and live on Render, posting automatically. Posting, dedupe, polling, post-length safety, and bill linking are all implemented and verified in production. Other bot personas (net worth, age, campaign contributions) are not yet started.
 
 ### Key files (added Phase 2)
 ```
-src/bluesky.ts    — postToBluesky(botId, text): login/session persistence, posts, keyed per bot
+src/bluesky.ts    — postToBluesky(botId, text, facets?): login/session persistence, posts
+                    (with optional rich-text link facets), keyed per bot
 src/seenVotes.ts  — loadSeenVotes/saveSeenVotes(botId): per-bot dedupe store
 ```
 
