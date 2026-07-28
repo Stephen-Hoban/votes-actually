@@ -46,6 +46,20 @@ export interface VoteResult {
   pctYea: number;
   pctNay: number;
   url: string;
+  /** congress.gov URL for the bill/resolution this vote is on, or "" if it couldn't be resolved (e.g. nominations). */
+  billUrl: string;
+}
+
+/** A link over a byte range of post text, in the form Bluesky's rich-text facets expect. */
+export interface PostFacet {
+  byteStart: number;
+  byteEnd: number;
+  uri: string;
+}
+
+export interface Post {
+  text: string;
+  facets: PostFacet[];
 }
 
 export interface SenateMemberVote {
@@ -92,6 +106,57 @@ export function computeCongressSession(date: Date): { congress: number; session:
   const congress = Math.floor((year - 1789) / 2) + 1;
   const session = year % 2 === 1 ? 1 : 2;
   return { congress, session };
+}
+
+// ---------------------------------------------------------------------------
+// Senate vote list ordering
+// ---------------------------------------------------------------------------
+
+// The Senate's vote_menu XML lists votes newest-first (descending vote_number:
+// e.g. #210, #209, ... #1), unlike the House feed. Take the first N entries —
+// not the last — to get the most recent votes, already newest-first.
+export function selectRecentSenateVotes<T>(voteArray: T[], count: number): T[] {
+  return voteArray.slice(0, count);
+}
+
+// ---------------------------------------------------------------------------
+// congress.gov bill/resolution URLs
+// ---------------------------------------------------------------------------
+
+const BILL_TYPE_SLUGS: Record<string, string> = {
+  HR: "house-bill",
+  HRES: "house-resolution",
+  HJRES: "house-joint-resolution",
+  HCONRES: "house-concurrent-resolution",
+  S: "senate-bill",
+  SRES: "senate-resolution",
+  SJRES: "senate-joint-resolution",
+  SCONRES: "senate-concurrent-resolution",
+};
+
+function ordinal(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
+  }
+}
+
+// Accepts a raw bill/resolution designation as it appears in congressional
+// data, e.g. "H.R. 5103", "H R 5103", "H J RES 139", "S.Con.Res. 33".
+// Returns "" if it doesn't map to a congress.gov bill page (e.g. nominations,
+// or an amendment with no underlying bill to fall back to).
+export function buildBillUrl(congress: number, rawDesignation: string): string {
+  const normalized = rawDesignation.replace(/[.\s]/g, "").toUpperCase();
+  const match = normalized.match(/^([A-Z]+)(\d+)$/);
+  if (!match) return "";
+  const [, type, number] = match;
+  const slug = BILL_TYPE_SLUGS[type];
+  if (!slug) return "";
+  return `https://www.congress.gov/bill/${ordinal(congress)}-congress/${slug}/${number}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -144,6 +209,38 @@ export function calculateHousePopulation(
 }
 
 // ---------------------------------------------------------------------------
+// Post length checking
+//
+// Bluesky's 300-char post limit is counted in grapheme clusters, not UTF-16
+// code units or codepoints. Plain `.length` overcounts things like the 🇺🇸
+// flag (two codepoints, one grapheme) and can undercount other multi-part
+// emoji, so it's not a reliable stand-in for what Bluesky actually enforces.
+// ---------------------------------------------------------------------------
+
+export const MAX_POST_LENGTH = 300;
+
+function segmentGraphemes(text: string): string[] {
+  return Array.from(
+    new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text),
+    (s) => s.segment
+  );
+}
+
+export function graphemeLength(text: string): number {
+  return segmentGraphemes(text).length;
+}
+
+export function fitsInPost(text: string): boolean {
+  return graphemeLength(text) <= MAX_POST_LENGTH;
+}
+
+export function truncateToGraphemes(text: string, maxGraphemes: number): string {
+  if (maxGraphemes <= 0) return "";
+  const graphemes = segmentGraphemes(text);
+  return graphemes.length <= maxGraphemes ? text : graphemes.slice(0, maxGraphemes).join("");
+}
+
+// ---------------------------------------------------------------------------
 // Display / post formatting
 // ---------------------------------------------------------------------------
 
@@ -157,13 +254,65 @@ export function formatPct(n: number): string {
   return `${(n * 100).toFixed(1)}%`;
 }
 
-export function buildPopulationPost(v: VoteResult): string {
-  return (
-    `${v.chamber} Vote: ${v.question}\n` +
-    (v.description ? `${v.description}\n` : "") +
-    `Result: ${v.result} (${v.yeas}-${v.nays})\n\n` +
+// Bluesky rich-text facets index by UTF-8 byte offset, not the UTF-16 index
+// JS string ops use, so every facet boundary has to be converted.
+function utf16IndexToByteIndex(text: string, utf16Index: number): number {
+  return Buffer.byteLength(text.slice(0, utf16Index), "utf-8");
+}
+
+// When the description is too long to fit, shorten it — never the
+// Result/Population lines, which are the whole point of the post.
+function shortenDescription(description: string, budget: number): string {
+  if (budget < 2) return "";
+  return truncateToGraphemes(description, budget - 1) + "…";
+}
+
+// Every buildPopulationPost exit path funnels through here so nothing ever
+// escapes over the limit, even in pathological cases (e.g. a `question` long
+// enough that the fixed header/result/population content alone exceeds it).
+function finalizePost(voteId: string, text: string, facets: PostFacet[]): Post {
+  if (fitsInPost(text)) return { text, facets };
+  // The description boundaries (if any) are no longer reliable once the
+  // whole text is blindly sliced, so drop the link along with it.
+  console.warn(
+    `  ⚠️  Post for vote ${voteId} still exceeds ${MAX_POST_LENGTH} graphemes after shortening; truncating as a last resort.`
+  );
+  return { text: truncateToGraphemes(text, MAX_POST_LENGTH - 1) + "…", facets: [] };
+}
+
+function linkFacet(text: string, descriptionStart: number, descriptionText: string, billUrl: string): PostFacet[] {
+  if (!billUrl) return [];
+  return [
+    {
+      byteStart: utf16IndexToByteIndex(text, descriptionStart),
+      byteEnd: utf16IndexToByteIndex(text, descriptionStart + descriptionText.length),
+      uri: billUrl,
+    },
+  ];
+}
+
+export function buildPopulationPost(v: VoteResult): Post {
+  const header = `${v.chamber} Vote: ${v.question}`;
+  const resultLine = `Result: ${v.result} (${v.yeas}-${v.nays})`;
+  const popBlock =
     `🇺🇸 Population represented:\n` +
     `✅ YES: ${formatPop(v.populationYea)} (${formatPct(v.pctYea)})\n` +
-    `❌  NO: ${formatPop(v.populationNay)} (${formatPct(v.pctNay)})`
-  );
+    `❌  NO: ${formatPop(v.populationNay)} (${formatPct(v.pctNay)})`;
+
+  const withoutDescription = `${header}\n${resultLine}\n\n${popBlock}`;
+  if (!v.description) return finalizePost(v.id, withoutDescription, []);
+
+  const descriptionStart = header.length + 1; // after "header\n"
+
+  const fullDescriptionText = `${header}\n${v.description}\n${resultLine}\n\n${popBlock}`;
+  if (fitsInPost(fullDescriptionText)) {
+    return finalizePost(v.id, fullDescriptionText, linkFacet(fullDescriptionText, descriptionStart, v.description, v.billUrl));
+  }
+
+  const fixedLength = graphemeLength(withoutDescription) + 1; // +1 for the description line's own newline
+  const shortened = shortenDescription(v.description, MAX_POST_LENGTH - fixedLength);
+  if (!shortened) return finalizePost(v.id, withoutDescription, []);
+
+  const text = `${header}\n${shortened}\n${resultLine}\n\n${popBlock}`;
+  return finalizePost(v.id, text, linkFacet(text, descriptionStart, shortened, v.billUrl));
 }

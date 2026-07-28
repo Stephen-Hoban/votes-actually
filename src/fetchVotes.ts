@@ -34,6 +34,9 @@ import {
   formatPop,
   formatPct,
   buildPopulationPost,
+  buildBillUrl,
+  graphemeLength,
+  selectRecentSenateVotes,
 } from "./voteCalculations.js";
 
 dotenv.config();
@@ -172,7 +175,7 @@ async function fetchSenateVotes(
 
   const allVotes = listData.vote_summary.votes.vote;
   const voteArray: unknown[] = Array.isArray(allVotes) ? allVotes : [allVotes];
-  const recentVotes = voteArray.slice(-VOTES_TO_SHOW).reverse();
+  const recentVotes = selectRecentSenateVotes(voteArray, VOTES_TO_SHOW);
 
   const totalPop = [...statePops.values()].reduce((sum, s) => sum + s.population, 0);
   const results: VoteResult[] = [];
@@ -204,6 +207,16 @@ async function fetchSenateVotes(
 
     const question = extractText(rc.vote_question_text) || extractText(v.question) || "Unknown";
     const description = extractText(rc.vote_title) || "";
+
+    // Prefer the vote's own bill/resolution; for amendment votes (document_number
+    // is blank) fall back to the bill/resolution the amendment applies to.
+    const document = rc.document as Record<string, unknown> | undefined;
+    const documentType = extractText(document?.document_type);
+    const documentNumber = extractText(document?.document_number);
+    const amendment = rc.amendment as Record<string, unknown> | undefined;
+    const amendmentToDocument = extractText(amendment?.amendment_to_document_number);
+    const billDesignation = documentNumber ? `${documentType} ${documentNumber}` : amendmentToDocument;
+    const billUrl = billDesignation ? buildBillUrl(congressNum, billDesignation) : "";
 
     const membersRaw = (rc.members as Record<string, unknown>)?.member;
     const members: unknown[] = Array.isArray(membersRaw) ? membersRaw : [membersRaw];
@@ -237,6 +250,7 @@ async function fetchSenateVotes(
         `https://www.senate.gov/legislative/LIS/roll_call_lists/` +
         `roll_call_vote_cfm.cfm?congress=${congressNum}&session=${senateSession}` +
         `&vote=${v.vote_number}`,
+      billUrl,
     });
   }
 
@@ -299,6 +313,10 @@ async function fetchHouseVotes(
     const yeas = parseInt(extractText(byVote["yea-total"]), 10) || 0;
     const nays = parseInt(extractText(byVote["nay-total"]), 10) || 0;
 
+    const legisNum = extractText(meta["legis-num"]);
+    const voteCongress = parseInt(extractText(meta["congress"]), 10);
+    const billUrl = legisNum && voteCongress ? buildBillUrl(voteCongress, legisNum) : "";
+
     const recordedRaw = voteData["recorded-vote"];
     const members: unknown[] = Array.isArray(recordedRaw) ? recordedRaw : [recordedRaw];
 
@@ -338,6 +356,7 @@ async function fetchHouseVotes(
       pctYea: popYea / totalPop,
       pctNay: popNay / totalPop,
       url: `https://clerk.house.gov/Votes/${houseYear}${paddedNum}`,
+      billUrl,
     });
   }
 
@@ -361,8 +380,9 @@ function printVoteResult(v: VoteResult): void {
   console.log();
 
   const post = buildPopulationPost(v);
-  console.log(`📱 Sample Bluesky post (${post.length} chars):`);
-  console.log(post);
+  console.log(`📱 Sample Bluesky post (${graphemeLength(post.text)} graphemes):`);
+  console.log(post.text);
+  if (post.facets.length > 0) console.log(`   🔗 links to: ${post.facets[0].uri}`);
   console.log();
 }
 
@@ -382,7 +402,8 @@ async function postNewVotes(allVotes: VoteResult[]): Promise<void> {
       continue;
     }
     try {
-      await postToBluesky(botId, buildPopulationPost(v));
+      const post = buildPopulationPost(v);
+      await postToBluesky(botId, post.text, post.facets);
       seen.add(v.id);
       postedCount++;
       console.log(`  ✅ Posted ${v.chamber} vote #${v.voteNumber} to Bluesky.`);

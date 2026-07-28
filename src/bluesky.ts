@@ -13,11 +13,16 @@
  * (do not use your main account password).
  */
 
-import { AtpAgent, type AtpSessionData } from "@atproto/api";
+import { AtpAgent, type AppBskyRichtextFacet, type AtpSessionData } from "@atproto/api";
 import * as fs from "fs";
 import * as path from "path";
-
-const MAX_POST_LENGTH = 300;
+import {
+  fitsInPost,
+  graphemeLength,
+  truncateToGraphemes,
+  MAX_POST_LENGTH,
+  type PostFacet,
+} from "./voteCalculations.js";
 
 function envPrefix(botId: string): string {
   return `BLUESKY_${botId.toUpperCase()}_`;
@@ -75,12 +80,35 @@ async function getAgent(botId: string): Promise<AtpAgent> {
   return agent;
 }
 
+// Callers (e.g. buildPopulationPost) should already shorten text to fit.
+// This is a last-resort safety net so postToBluesky never sends something
+// Bluesky will reject or mangle — if it actually triggers, that's a sign
+// the caller's own shortening logic missed a case. Facets are dropped in
+// that case since their byte ranges are no longer trustworthy once the
+// text has been blindly sliced.
 export function truncateForBluesky(text: string): string {
-  if (text.length <= MAX_POST_LENGTH) return text;
-  return text.slice(0, MAX_POST_LENGTH - 1) + "…";
+  if (fitsInPost(text)) return text;
+  console.warn(
+    `  ⚠️  Post exceeds Bluesky's ${MAX_POST_LENGTH}-grapheme limit (${graphemeLength(text)} graphemes); truncating as a last resort.`
+  );
+  return truncateToGraphemes(text, MAX_POST_LENGTH - 1) + "…";
 }
 
-export async function postToBluesky(botId: string, text: string): Promise<void> {
+function toAtprotoFacets(text: string, facets: PostFacet[]): AppBskyRichtextFacet.Main[] {
+  if (!fitsInPost(text)) return []; // ranges aren't trustworthy once truncateForBluesky rewrites the text
+  return facets.map((f) => ({
+    index: { byteStart: f.byteStart, byteEnd: f.byteEnd },
+    features: [{ $type: "app.bsky.richtext.facet#link", uri: f.uri }],
+  }));
+}
+
+export async function postToBluesky(botId: string, text: string, facets: PostFacet[] = []): Promise<void> {
   const agent = await getAgent(botId);
-  await agent.post({ text: truncateForBluesky(text), createdAt: new Date().toISOString() });
+  const atprotoFacets = toAtprotoFacets(text, facets);
+  const finalText = truncateForBluesky(text);
+  await agent.post({
+    text: finalText,
+    facets: atprotoFacets.length > 0 ? atprotoFacets : undefined,
+    createdAt: new Date().toISOString(),
+  });
 }

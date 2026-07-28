@@ -8,11 +8,23 @@ import {
   formatPop,
   formatPct,
   buildPopulationPost,
+  buildBillUrl,
+  graphemeLength,
+  fitsInPost,
+  truncateToGraphemes,
+  selectRecentSenateVotes,
+  MAX_POST_LENGTH,
   StatePop,
   DistrictPop,
   MemberDistrict,
   VoteResult,
 } from "./voteCalculations.js";
+
+// Decodes a facet's byte range back into the substring of `text` it covers,
+// so tests can assert on readable text instead of raw byte offsets.
+function facetText(text: string, facet: { byteStart: number; byteEnd: number }): string {
+  return Buffer.from(text, "utf-8").slice(facet.byteStart, facet.byteEnd).toString("utf-8");
+}
 
 describe("normalizeHouseVote", () => {
   it("normalizes bill-vote codes", () => {
@@ -31,6 +43,27 @@ describe("normalizeHouseVote", () => {
     expect(normalizeHouseVote("Present")).toBeNull();
     expect(normalizeHouseVote("Not Voting")).toBeNull();
     expect(normalizeHouseVote("")).toBeNull();
+  });
+});
+
+describe("selectRecentSenateVotes", () => {
+  it("takes the first N entries, since the Senate feed lists votes newest-first", () => {
+    // Regression test: the Senate's vote_menu XML is ordered descending by
+    // vote_number (e.g. #210 first, #1 last) — the opposite of what an earlier
+    // version of this code assumed. Slicing from the end grabbed the OLDEST
+    // votes instead of the newest, so the bot silently reposted/skipped votes
+    // #1-5 forever.
+    const descendingVotes = [210, 209, 208, 207, 206, 205, 3, 2, 1].map((n) => ({
+      vote_number: n,
+    }));
+    expect(selectRecentSenateVotes(descendingVotes, 5)).toEqual(
+      [210, 209, 208, 207, 206].map((n) => ({ vote_number: n }))
+    );
+  });
+
+  it("returns fewer than count if the array is shorter", () => {
+    const votes = [2, 1].map((n) => ({ vote_number: n }));
+    expect(selectRecentSenateVotes(votes, 5)).toEqual(votes);
   });
 });
 
@@ -187,6 +220,47 @@ describe("formatPct", () => {
   });
 });
 
+describe("buildBillUrl", () => {
+  it("maps a House bill", () => {
+    expect(buildBillUrl(119, "H.R. 5103")).toBe("https://www.congress.gov/bill/119th-congress/house-bill/5103");
+  });
+
+  it("maps space-separated designations, as found in House legis-num fields", () => {
+    expect(buildBillUrl(119, "H R 5103")).toBe("https://www.congress.gov/bill/119th-congress/house-bill/5103");
+    expect(buildBillUrl(119, "H J RES 139")).toBe(
+      "https://www.congress.gov/bill/119th-congress/house-joint-resolution/139"
+    );
+    expect(buildBillUrl(119, "H RES 1131")).toBe(
+      "https://www.congress.gov/bill/119th-congress/house-resolution/1131"
+    );
+  });
+
+  it("maps Senate designations", () => {
+    expect(buildBillUrl(119, "S. 3627")).toBe("https://www.congress.gov/bill/119th-congress/senate-bill/3627");
+    expect(buildBillUrl(119, "S.J.Res. 98")).toBe(
+      "https://www.congress.gov/bill/119th-congress/senate-joint-resolution/98"
+    );
+    expect(buildBillUrl(119, "S.Con.Res. 33")).toBe(
+      "https://www.congress.gov/bill/119th-congress/senate-concurrent-resolution/33"
+    );
+  });
+
+  it("uses the correct ordinal suffix, including the 11/12/13 exception", () => {
+    expect(buildBillUrl(101, "H.R. 1")).toContain("/101st-congress/");
+    expect(buildBillUrl(102, "H.R. 1")).toContain("/102nd-congress/");
+    expect(buildBillUrl(103, "H.R. 1")).toContain("/103rd-congress/");
+    expect(buildBillUrl(111, "H.R. 1")).toContain("/111th-congress/");
+    expect(buildBillUrl(112, "H.R. 1")).toContain("/112th-congress/");
+    expect(buildBillUrl(113, "H.R. 1")).toContain("/113th-congress/");
+  });
+
+  it("returns an empty string for designations with no bill page, like nominations or amendments", () => {
+    expect(buildBillUrl(119, "PN615-2")).toBe("");
+    expect(buildBillUrl(119, "S.Amdt. 5235")).toBe("");
+    expect(buildBillUrl(119, "")).toBe("");
+  });
+});
+
 describe("buildPopulationPost", () => {
   const baseVote: VoteResult = {
     id: "house-2026-100",
@@ -204,10 +278,12 @@ describe("buildPopulationPost", () => {
     pctYea: 0.4531,
     pctNay: 0.4229,
     url: "https://example.com",
+    billUrl: "https://www.congress.gov/bill/119th-congress/house-bill/100",
   };
 
   it("builds the full post with description", () => {
-    expect(buildPopulationPost(baseVote)).toBe(
+    const post = buildPopulationPost(baseVote);
+    expect(post.text).toBe(
       "House Vote: On Passage\n" +
         "To reauthorize the thing\n" +
         "Result: Passed (220-210)\n\n" +
@@ -217,9 +293,94 @@ describe("buildPopulationPost", () => {
     );
   });
 
+  it("links the description text to the bill instead of appending the URL", () => {
+    const post = buildPopulationPost(baseVote);
+    expect(post.text).not.toContain(baseVote.billUrl); // link is a facet, not visible text
+    expect(post.facets).toHaveLength(1);
+    expect(post.facets[0].uri).toBe(baseVote.billUrl);
+    expect(facetText(post.text, post.facets[0])).toBe("To reauthorize the thing");
+  });
+
+  it("omits facets when there's no bill URL to link to", () => {
+    const post = buildPopulationPost({ ...baseVote, billUrl: "" });
+    expect(post.facets).toEqual([]);
+  });
+
   it("omits the description line when there is no description", () => {
     const post = buildPopulationPost({ ...baseVote, description: "" });
-    expect(post).not.toContain("To reauthorize the thing");
-    expect(post.startsWith("House Vote: On Passage\nResult: Passed (220-210)")).toBe(true);
+    expect(post.text).not.toContain("To reauthorize the thing");
+    expect(post.text.startsWith("House Vote: On Passage\nResult: Passed (220-210)")).toBe(true);
+    expect(post.facets).toEqual([]);
+  });
+
+  it("shortens an over-length description instead of cutting off the Result/Population lines", () => {
+    // Regression test: a real post got cut off mid-way through the "NO" line
+    // because the old truncation sliced the whole post at 300 raw chars.
+    const longDescription =
+      "Providing for consideration of the bills (H.R. 8800, H.R. 8884, H.R. 7008, " +
+      "H.R. 6955, and H.R. 9770); and providing for consideration of the concurrent " +
+      "resolution (H. Con. Res. 113)";
+    const vote: VoteResult = {
+      ...baseVote,
+      chamber: "House",
+      question: "On Agreeing to the Resolution",
+      description: longDescription,
+      result: "Passed",
+      yeas: 214,
+      nays: 211,
+      url: "https://clerk.house.gov/Votes/2026100",
+      billUrl: "https://www.congress.gov/bill/119th-congress/house-resolution/113",
+    };
+
+    const post = buildPopulationPost(vote);
+
+    expect(graphemeLength(post.text)).toBeLessThanOrEqual(MAX_POST_LENGTH);
+    expect(fitsInPost(post.text)).toBe(true);
+    // The Result and Population lines must survive intact, not get sliced.
+    expect(post.text).toContain("Result: Passed (214-211)");
+    expect(post.text).toContain("🇺🇸 Population represented:");
+    expect(post.text).toContain("✅ YES: 150.0M (45.3%)");
+    expect(post.text).toContain("❌  NO: 140.0M (42.3%)");
+    // The description was shortened...
+    expect(post.text).toContain("…");
+    expect(post.text).not.toContain(vote.billUrl);
+    // ...and the shortened snippet itself (ellipsis included) links to the bill.
+    expect(post.facets).toHaveLength(1);
+    expect(post.facets[0].uri).toBe(vote.billUrl);
+    const linkedText = facetText(post.text, post.facets[0]);
+    expect(linkedText.endsWith("…")).toBe(true);
+    expect(longDescription.startsWith(linkedText.slice(0, -1))).toBe(true);
+  });
+
+  it("never posts over the limit even in a pathological case (an extremely long question)", () => {
+    // Real congressional "question" text is always short ("On Passage", "On
+    // Agreeing to the Resolution"...) — only `description` is ever long
+    // enough to need shortening. This just confirms the last-resort safety
+    // net holds even if that assumption is ever wrong.
+    const vote: VoteResult = { ...baseVote, question: "x".repeat(500), description: "y".repeat(500) };
+
+    const post = buildPopulationPost(vote);
+    expect(fitsInPost(post.text)).toBe(true);
+    expect(post.facets).toEqual([]);
+  });
+});
+
+describe("graphemeLength / fitsInPost / truncateToGraphemes", () => {
+  it("counts multi-codepoint emoji as a single grapheme, unlike .length", () => {
+    const flag = "🇺🇸";
+    expect(flag.length).toBeGreaterThan(1); // JS UTF-16 length overcounts it
+    expect(graphemeLength(flag)).toBe(1);
+  });
+
+  it("fitsInPost matches the 300-grapheme limit", () => {
+    expect(fitsInPost("a".repeat(MAX_POST_LENGTH))).toBe(true);
+    expect(fitsInPost("a".repeat(MAX_POST_LENGTH + 1))).toBe(false);
+  });
+
+  it("truncateToGraphemes cuts by grapheme, not UTF-16 unit", () => {
+    expect(truncateToGraphemes("hello world", 5)).toBe("hello");
+    expect(truncateToGraphemes("🇺🇸🇺🇸🇺🇸", 2)).toBe("🇺🇸🇺🇸");
+    expect(truncateToGraphemes("short", 100)).toBe("short");
+    expect(truncateToGraphemes("anything", 0)).toBe("");
   });
 });
