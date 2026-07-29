@@ -7,11 +7,17 @@
     "fetch-votes": "tsx src/fetchVotes.ts",
     "post-votes": "tsx src/fetchVotes.ts --post",
     "watch-votes": "tsx src/fetchVotes.ts --post --watch",
+    "fetch-ages": "tsx src/fetchAgeVotes.ts",
+    "post-ages": "tsx src/fetchAgeVotes.ts --post",
+    "watch-ages": "tsx src/fetchAgeVotes.ts --post --watch",
     "refresh-cache": "tsx src/refreshCache.ts",
     "refresh-members": "tsx src/refreshCache.ts -- --members",
     "refresh-census": "tsx src/refreshCache.ts -- --census",
+    "refresh-ages": "tsx src/refreshCache.ts -- --ages",
     "render-start": "test -f data/state-populations.json || npm run refresh-cache; npm run watch-votes",
-    "test": "vitest run"
+    "render-start-age": "test -f data/member-ages.json || npm run refresh-ages; npm run watch-ages",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +30,8 @@
     "xml2js": "^0.6.0"
   },
   "devDependencies": {
+    "@types/node": "^26.1.2",
+    "@types/xml2js": "^0.4.14",
     "vitest": "^4.1.10"
   }
 }

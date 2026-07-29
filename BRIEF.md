@@ -202,9 +202,160 @@ nominations), and the description text renders as an actual clickable link to co
 
 ---
 
+## Age bot + multi-bot refactor (2026-07-28)
+
+The second bot persona (`@age.votesactually.com`) posts the **average age of the members who
+voted yea vs. nay**, in the same post shape as the population bot.
+
+### The refactor that made it possible
+Adding a second bot exposed the fact that `fetchVotes.ts` mixed three unrelated concerns:
+fetching votes, computing populations, and formatting posts. Only the middle one is
+population-specific. Rather than copy ~200 lines of XML parsing into the age bot, the shared
+parts were extracted:
+
+```
+src/voteSources.ts     — NEW. All senate.gov / clerk.house.gov fetching + XML parsing.
+                         Returns chamber-agnostic RawVote records; knows nothing about
+                         population, age, or any other bot's analysis.
+src/voteCalculations.ts — buildVotePost(meta, statBlock) extracted out of
+                         buildPopulationPost(). Post length budgeting, description
+                         shortening, and bill-link facet placement now live in ONE place
+                         that every bot shares. buildPopulationPost() is now a thin wrapper
+                         that supplies the population stat block.
+src/fetchVotes.ts      — population bot: cache loading + population math + posting only.
+src/fetchAgeVotes.ts   — NEW. age bot: same shape, age math instead.
+```
+
+`RawVote.members` carries every identifier both chambers publish (`bioguide`, `lisId`,
+`state`, raw `voteCast`) so each bot can key off whichever it needs — the population bot uses
+state/bioguide, the age bot uses bioguide/lisId. Adding a third bot is now: one calc module,
+one entry point, one `.env` pair, one `render.yaml` service.
+
+**Verified the refactor was behavior-preserving** before building on it: the 36 existing
+`voteCalculations.test.ts` tests still pass unchanged (they exercise `buildPopulationPost`,
+which now routes through `buildVotePost`), and a live `npm run fetch-votes` run produced the
+same populations and the same post text as before.
+
+### Age data source & the Senate ID problem
+Birthdays come from `bio.birthday` in the same `congress-legislators` JSON already used for
+the member→district map — no new data source, no API key. All 537 current members have a
+birthday on file.
+
+The catch: **the two chambers publish different member IDs.** House vote XML has BioGuide IDs
+(`name-id`), but Senate vote XML has only `lis_member_id` — no BioGuide anywhere. So the age
+cache indexes members by *both* (`id.bioguide` and `id.lis` from congress-legislators; all 100
+senators have an LIS ID), and `lookupMemberAge()` tries BioGuide first, then LIS.
+
+### Age caching + birthday invalidation
+`data/member-ages.json` stores, per member: `birthday` (the source of truth), `age`, and
+`ageValidUntil` — **the date the cached age goes wrong, i.e. their next birthday**.
+
+This means the cache never needs a scheduled refresh just because time passed. On each run
+`refreshStaleAges()` finds entries whose `ageValidUntil` has arrived, recomputes those ages
+from the birthday already on disk, and writes the file back (logging a `🎂 Happy birthday`
+line). A real refresh (`npm run refresh-ages`) is only needed when the **roster** changes —
+new Congress, special elections — same cadence as `refresh-members`.
+
+All date math is UTC so a machine's local timezone can't shift a birthday by a day. Feb 29
+birthdays increment on Mar 1 in non-leap years, in both `calculateAge` and `nextBirthday`.
+
+### Key files
+```
+src/ageCalculations.ts       — pure age math, aggregation, post formatting
+src/ageCalculations.test.ts  — vitest unit tests
+src/fetchAgeVotes.ts         — age bot pipeline (mirrors fetchVotes.ts)
+data/member-ages.json        — age cache (gitignored — run `npm run refresh-ages` first)
+```
+
+### npm scripts
+```
+npm run fetch-ages     — fetch + print age analysis (no posting)
+npm run post-ages      — fetch + post new votes to Bluesky (one-shot)
+npm run watch-ages     — same, looping on POLL_INTERVAL_MINUTES
+npm run refresh-ages   — refresh the member age cache only
+npm run typecheck      — tsc --noEmit (see below)
+```
+
+### Typechecking now actually works
+`npx tsc --noEmit` had never been clean — `@types/node` and `@types/xml2js` were simply not
+installed, so every `fs`/`path`/`process`/`console`/`fetch` reference errored and the noise
+made real type errors invisible. Everything runs through `tsx`, which strips types without
+checking them, so nothing caught this. Both are now devDependencies and the whole project
+typechecks clean via `npm run typecheck`.
+
+### Verification (2026-07-28)
+- `npm test` — 73 tests pass (36 existing population + 37 new age).
+- `npm run typecheck` — clean across the whole project.
+- `npm run fetch-votes` — population bot output unchanged after the refactor.
+- `npm run fetch-ages` — live run against real 119th Congress data:
+  - Senate #210: 51 + 43 members, every one matched (avg 64.6 yea vs. 65.3 nay).
+  - House #283 (`Yea`/`Nay` bill vote): 232 + 188, all matched, bill link resolved.
+  - House #282 (`Aye`/`No` resolution vote): 214 + 208 — matches the official totals, so the
+    Aye/No normalization that once silently zeroed the population bot is handled here.
+  - **Zero unmatched members on House votes**, vs. the population bot's usual 3. Non-voting
+    delegates have birthdays in congress-legislators even though they have no district
+    population, so the age bot covers members the population bot has to drop.
+  - All sampled posts landed within the 300-grapheme limit (longest observed: exactly 300).
+
+### Deployment
+
+`render.yaml` gained an `age-bot` worker alongside `population-bot`, same shape (Starter plan,
+1GB disk at `data/`, `npm run render-start-age`). It needs **no** `CENSUS_API_KEY` — only
+`BLUESKY_AGE_HANDLE` / `BLUESKY_AGE_APP_PASSWORD`.
+
+#### One Blueprint, many services (answered 2026-07-28)
+
+**Each new bot is a new *service*, not a new *Blueprint*.** `render.yaml` is a single Blueprint
+that defines a *list* of services; Render's existing Blueprint instance manages every service in
+that one file. Adding a bot = appending one `- type: worker` block, nothing else.
+
+How a new bot reaches production:
+1. Merge the updated `render.yaml` into the branch the Blueprint tracks (`main`). Render sees
+   nothing until it lands there — an unpushed branch is invisible to Render.
+2. Render detects the diff and offers a Blueprint sync. Approve it; the new service is created.
+   Existing services whose blocks didn't change are left alone (the `age-bot` commit left the
+   `population-bot` block byte-identical, so the live population bot was untouched).
+3. Enter the `sync: false` env vars on the new service in the Render dashboard. These do **not**
+   come from local `.env` — that file only covers local runs.
+
+#### Why each bot gets its own disk
+
+Each bot needs its own `data/` — its own reference cache, its own `seen-votes-{botid}.json`, its
+own `bluesky-session-{botid}.json`. On Render a disk attaches to exactly one service, so sharing
+one between two workers isn't possible regardless. Both disks mount at the same *path*
+(`/opt/render/project/src/data`), which is fine — different service instances, different disks.
+
+First boot needs no hand-holding: the disk starts empty, so each `render-start-*` script runs its
+cache refresh before entering the watch loop (`test -f <cache file> || npm run refresh-…`).
+
+#### Cost
+
+Render's free plan supports neither Background Workers nor disks, so every bot is a Starter
+service: **~$7/mo + ~$0.25/mo disk, per bot.** This scales linearly — the four planned personas
+would run ~$29/mo.
+
+If that becomes the binding constraint, the alternative is folding multiple personas into a
+single worker that polls votes once and posts to several accounts. The Phase-2 refactor already
+makes this cheap: `voteSources.ts` does the fetching for everybody, and each bot is just a calc
+module plus a thin entry point, so a combined runner would mostly be a loop over
+`[{botId, analyze, buildPost}]`. Not built — noted as the escape hatch if per-bot cost matters
+more than per-bot isolation (independent restarts, independent failure blast radius).
+
+#### Bluesky account status
+
+`.env` has `BLUESKY_AGE_HANDLE` / `BLUESKY_AGE_APP_PASSWORD` as of 2026-07-28, so local
+`npm run post-ages` is unblocked. Still outstanding: the same two values on the Render service,
+and the `age-bot` branch is local-only — not pushed, not merged, so not deployed. Nothing has
+been posted to Bluesky from this branch.
+
+---
+
 ## Known issues / future cleanup
 - Senate post text sometimes verbose — question field can duplicate the description field
 - 1 unmatched House member per vote (non-voting delegate) — acceptable, can be noted in posts
+- Age bot uses each member's age **as of the run time**, not as of the vote date. Votes are
+  fetched within minutes-to-hours of happening, so this only matters for a hypothetical
+  backfill of old votes.
 
 ---
 

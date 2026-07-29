@@ -1,16 +1,14 @@
 /**
  * fetchVotes.ts
  *
- * Fetches the latest congressional votes and calculates the US population
- * represented by each side of the vote.
+ * The population bot: fetches the latest congressional votes and calculates the
+ * US population represented by each side of the vote.
+ *
+ * Vote fetching itself lives in voteSources.ts, shared with the other bots.
+ * This file only adds the population-specific analysis and post formatting.
  *
  * Loads slow-changing reference data from local cache files.
  * Run `npm run refresh-cache` to populate or update the cache.
- *
- * Data sources:
- *   - Senate votes:  senate.gov XML feeds (no API key needed)
- *   - House votes:   clerk.house.gov XML feeds (no API key needed)
- *   - Cache files:   data/ directory (populated by refreshCache.ts)
  *
  * Usage:
  *   npm run fetch-votes
@@ -19,24 +17,20 @@
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
-import { parseStringPromise } from "xml2js";
 import { postToBluesky } from "./bluesky.js";
 import { loadSeenVotes, saveSeenVotes } from "./seenVotes.js";
+import { RawVote, fetchAllVotes } from "./voteSources.js";
 import {
   StatePop,
   DistrictPop,
   MemberDistrict,
   VoteResult,
-  extractText,
-  computeCongressSession,
   calculateSenatePopulation,
   calculateHousePopulation,
   formatPop,
   formatPct,
   buildPopulationPost,
-  buildBillUrl,
   graphemeLength,
-  selectRecentSenateVotes,
 } from "./voteCalculations.js";
 
 dotenv.config();
@@ -45,11 +39,11 @@ const SHOULD_POST = process.argv.includes("--post");
 const SHOULD_WATCH = process.argv.includes("--watch");
 const POLL_INTERVAL_MS = Number(process.env.POLL_INTERVAL_MINUTES ?? 15) * 60 * 1000;
 
+const BOT_ID = "population";
+
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
-
-const VOTES_TO_SHOW = 5;
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DISTRICT_POP_FILE = path.join(DATA_DIR, "district-populations.json");
@@ -105,262 +99,47 @@ function loadMemberDistricts(): Map<string, MemberDistrict> {
 }
 
 // ---------------------------------------------------------------------------
-// Auto-detection: House year (Congress/session detection is in voteCalculations.ts)
+// Population analysis
+//
+// Senate: each senator represents their whole state, so the denominator is
+// 2 × total US population. House: each member represents one district, so the
+// denominator is the total US population.
 // ---------------------------------------------------------------------------
 
-async function urlExists(url: string): Promise<boolean> {
-  const resp = await fetch(url, {
-    headers: { "User-Agent": "votes-actually (educational project)" },
-  });
-  return resp.ok;
-}
-
-// The Senate doesn't publish a session's vote_menu XML until that session's first
-// vote happens (e.g. early January before floor activity starts). Fall back to the
-// previous session if the calendar-derived one has no data yet.
-async function detectCongressSession(): Promise<{ congress: number; session: number }> {
-  let { congress, session } = computeCongressSession(new Date());
-
-  const menuUrl = (c: number, s: number) =>
-    `https://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_${c}_${s}.xml`;
-
-  if (await urlExists(menuUrl(congress, session))) return { congress, session };
-
-  console.warn(
-    `  ⚠️  No Senate vote data yet for ${congress}th Congress, Session ${session}. Falling back to previous session.`
-  );
-  if (session === 1) {
-    congress -= 1;
-    session = 2;
-  } else {
-    session = 1;
-  }
-  return { congress, session };
-}
-
-// The House rolls its vote numbering over on Jan 1 each calendar year. Fall back to
-// the previous year if the new year has no roll call votes published yet.
-async function detectHouseYear(): Promise<number> {
-  const currentYear = new Date().getFullYear();
-  const url = `https://clerk.house.gov/evs/${currentYear}/roll001.xml`;
-
-  if (await urlExists(url)) return currentYear;
-
-  console.warn(`  ⚠️  No House vote data yet for ${currentYear}. Falling back to ${currentYear - 1}.`);
-  return currentYear - 1;
-}
-
-// ---------------------------------------------------------------------------
-// Senate votes
-// ---------------------------------------------------------------------------
-
-async function fetchSenateVotes(
+function analyzeVote(
+  vote: RawVote,
   statePops: Map<string, StatePop>,
-  congressNum: number,
-  senateSession: number
-): Promise<VoteResult[]> {
-  console.log(`\n🏛️  Fetching Senate votes (${congressNum}th Congress, Session ${senateSession})...`);
-
-  const listUrl =
-    `https://www.senate.gov/legislative/LIS/roll_call_lists/` +
-    `vote_menu_${congressNum}_${senateSession}.xml`;
-
-  const listResp = await fetch(listUrl, {
-    headers: { "User-Agent": "votes-actually (educational project)" },
-  });
-  if (!listResp.ok) throw new Error(`Senate list error: ${listResp.status}`);
-
-  const listXml = await listResp.text();
-  const listData = await parseStringPromise(listXml, { explicitArray: false });
-
-  const allVotes = listData.vote_summary.votes.vote;
-  const voteArray: unknown[] = Array.isArray(allVotes) ? allVotes : [allVotes];
-  const recentVotes = selectRecentSenateVotes(voteArray, VOTES_TO_SHOW);
-
-  const totalPop = [...statePops.values()].reduce((sum, s) => sum + s.population, 0);
-  const results: VoteResult[] = [];
-
-  for (const vote of recentVotes) {
-    const v = vote as Record<string, unknown>;
-    const voteNum = String(v.vote_number).padStart(5, "0");
-
-    const detailUrl =
-      `https://www.senate.gov/legislative/LIS/roll_call_votes/` +
-      `vote${congressNum}${senateSession}/` +
-      `vote_${congressNum}_${senateSession}_${voteNum}.xml`;
-
-    const detailResp = await fetch(detailUrl, {
-      headers: { "User-Agent": "votes-actually (educational project)" },
-    });
-    if (!detailResp.ok) {
-      console.warn(`  ⚠️  Could not fetch Senate vote #${voteNum}, skipping.`);
-      continue;
-    }
-
-    const detailXml = await detailResp.text();
-    const detail = await parseStringPromise(detailXml, { explicitArray: false });
-    const rc = detail.roll_call_vote as Record<string, unknown>;
-
-    const count = rc.count as Record<string, unknown> | undefined;
-    const yeas = parseInt(extractText(count?.yeas), 10) || 0;
-    const nays = parseInt(extractText(count?.nays), 10) || 0;
-
-    const question = extractText(rc.vote_question_text) || extractText(v.question) || "Unknown";
-    const description = extractText(rc.vote_title) || "";
-
-    // Prefer the vote's own bill/resolution; for amendment votes (document_number
-    // is blank) fall back to the bill/resolution the amendment applies to.
-    const document = rc.document as Record<string, unknown> | undefined;
-    const documentType = extractText(document?.document_type);
-    const documentNumber = extractText(document?.document_number);
-    const amendment = rc.amendment as Record<string, unknown> | undefined;
-    const amendmentToDocument = extractText(amendment?.amendment_to_document_number);
-    const billDesignation = documentNumber ? `${documentType} ${documentNumber}` : amendmentToDocument;
-    const billUrl = billDesignation ? buildBillUrl(congressNum, billDesignation) : "";
-
-    const membersRaw = (rc.members as Record<string, unknown>)?.member;
-    const members: unknown[] = Array.isArray(membersRaw) ? membersRaw : [membersRaw];
-
-    const memberVotes = members.map((m) => {
-      const member = m as Record<string, unknown>;
-      return {
-        state: extractText(member.state),
-        voteCast: extractText(member.vote_cast),
-      };
-    });
-
-    const { popYea, popNay } = calculateSenatePopulation(memberVotes, statePops);
-
-    results.push({
-      id: `senate-${congressNum}-${senateSession}-${voteNum}`,
-      chamber: "Senate",
-      voteNumber: String(v.vote_number),
-      date: extractText(rc.vote_date),
-      question,
-      description,
-      result: extractText(rc.vote_result),
-      yeas,
-      nays,
-      populationYea: popYea,
-      populationNay: popNay,
-      totalUsPopulation: totalPop,
-      pctYea: popYea / (totalPop * 2),
-      pctNay: popNay / (totalPop * 2),
-      url:
-        `https://www.senate.gov/legislative/LIS/roll_call_lists/` +
-        `roll_call_vote_cfm.cfm?congress=${congressNum}&session=${senateSession}` +
-        `&vote=${v.vote_number}`,
-      billUrl,
-    });
-  }
-
-  return results;
-}
-
-// ---------------------------------------------------------------------------
-// House votes
-// ---------------------------------------------------------------------------
-
-async function findLatestHouseRollNumber(houseYear: number): Promise<number> {
-  const CEILING = 600;
-  let lo = 1, hi = CEILING, latest = 1;
-  while (lo <= hi) {
-    const mid = Math.floor((lo + hi) / 2);
-    const url = `https://clerk.house.gov/evs/${houseYear}/roll${String(mid).padStart(3, "0")}.xml`;
-    const resp = await fetch(url, { headers: { "User-Agent": "votes-actually" } });
-    if (resp.ok) { latest = mid; lo = mid + 1; }
-    else { hi = mid - 1; }
-  }
-  return latest;
-}
-
-async function fetchHouseVotes(
-  memberDistricts: Map<string, MemberDistrict>,
   districtPops: Map<string, DistrictPop>,
-  statePops: Map<string, StatePop>,
-  houseYear: number
-): Promise<VoteResult[]> {
-  console.log(`\n🏠  Fetching House votes (${houseYear})...`);
-  console.log(`    Finding latest roll call number...`);
+  memberDistricts: Map<string, MemberDistrict>,
+  totalPop: number
+): VoteResult {
+  let popYea: number;
+  let popNay: number;
+  let denominator: number;
 
-  const latestRoll = await findLatestHouseRollNumber(houseYear);
-  console.log(`    Latest House roll call: #${latestRoll}`);
-
-  const totalPop = [...statePops.values()].reduce((sum, s) => sum + s.population, 0);
-  const results: VoteResult[] = [];
-
-  for (let i = 0; i < VOTES_TO_SHOW; i++) {
-    const rollNum = latestRoll - i;
-    if (rollNum < 1) break;
-
-    const paddedNum = String(rollNum).padStart(3, "0");
-    const url = `https://clerk.house.gov/evs/${houseYear}/roll${paddedNum}.xml`;
-
-    const resp = await fetch(url, { headers: { "User-Agent": "votes-actually" } });
-    if (!resp.ok) {
-      console.warn(`  ⚠️  Could not fetch House roll #${rollNum}, skipping.`);
-      continue;
+  if (vote.chamber === "Senate") {
+    ({ popYea, popNay } = calculateSenatePopulation(vote.members, statePops));
+    denominator = totalPop * 2;
+  } else {
+    const result = calculateHousePopulation(vote.members, memberDistricts, districtPops);
+    popYea = result.popYea;
+    popNay = result.popNay;
+    denominator = totalPop;
+    if (result.unmatched > 0) {
+      console.warn(
+        `  ⚠️  ${vote.id}: ${result.matched} matched, ${result.unmatched} unmatched (likely delegates).`
+      );
     }
-
-    const xml = await resp.text();
-    const data = await parseStringPromise(xml, { explicitArray: false });
-    const doc = data["rollcall-vote"] as Record<string, unknown>;
-    const meta = doc["vote-metadata"] as Record<string, unknown>;
-    const voteData = doc["vote-data"] as Record<string, unknown>;
-
-    const voteTotals = meta["vote-totals"] as Record<string, unknown>;
-    const byVote = voteTotals["totals-by-vote"] as Record<string, unknown>;
-    const yeas = parseInt(extractText(byVote["yea-total"]), 10) || 0;
-    const nays = parseInt(extractText(byVote["nay-total"]), 10) || 0;
-
-    const legisNum = extractText(meta["legis-num"]);
-    const voteCongress = parseInt(extractText(meta["congress"]), 10);
-    const billUrl = legisNum && voteCongress ? buildBillUrl(voteCongress, legisNum) : "";
-
-    const recordedRaw = voteData["recorded-vote"];
-    const members: unknown[] = Array.isArray(recordedRaw) ? recordedRaw : [recordedRaw];
-
-    const memberVotes = members.map((m) => {
-      const member = m as Record<string, unknown>;
-      const leg = member.legislator as Record<string, unknown>;
-      const attrs = leg?.$ as Record<string, string> | undefined;
-      return {
-        bioguide: attrs?.["name-id"] ?? "",
-        voteCast: extractText(member.vote),
-      };
-    });
-
-    const { popYea, popNay, matched, unmatched } = calculateHousePopulation(
-      memberVotes,
-      memberDistricts,
-      districtPops
-    );
-
-    if (unmatched > 0) {
-      console.warn(`  ⚠️  Roll #${rollNum}: ${matched} matched, ${unmatched} unmatched (likely delegates).`);
-    }
-
-    results.push({
-      id: `house-${houseYear}-${paddedNum}`,
-      chamber: "House",
-      voteNumber: extractText(meta["rollcall-num"]),
-      date: extractText(meta["action-date"]),
-      question: extractText(meta["vote-question"]),
-      description: extractText(meta["vote-desc"]),
-      result: extractText(meta["vote-result"]),
-      yeas,
-      nays,
-      populationYea: popYea,
-      populationNay: popNay,
-      totalUsPopulation: totalPop,
-      pctYea: popYea / totalPop,
-      pctNay: popNay / totalPop,
-      url: `https://clerk.house.gov/Votes/${houseYear}${paddedNum}`,
-      billUrl,
-    });
   }
 
-  return results;
+  return {
+    ...vote,
+    populationYea: popYea,
+    populationNay: popNay,
+    totalUsPopulation: totalPop,
+    pctYea: popYea / denominator,
+    pctNay: popNay / denominator,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -391,8 +170,7 @@ function printVoteResult(v: VoteResult): void {
 // ---------------------------------------------------------------------------
 
 async function postNewVotes(allVotes: VoteResult[]): Promise<void> {
-  const botId = "population";
-  const seen = loadSeenVotes(botId);
+  const seen = loadSeenVotes(BOT_ID);
   let postedCount = 0;
   let skippedCount = 0;
 
@@ -403,7 +181,7 @@ async function postNewVotes(allVotes: VoteResult[]): Promise<void> {
     }
     try {
       const post = buildPopulationPost(v);
-      await postToBluesky(botId, post.text, post.facets);
+      await postToBluesky(BOT_ID, post.text, post.facets);
       seen.add(v.id);
       postedCount++;
       console.log(`  ✅ Posted ${v.chamber} vote #${v.voteNumber} to Bluesky.`);
@@ -412,7 +190,7 @@ async function postNewVotes(allVotes: VoteResult[]): Promise<void> {
     }
   }
 
-  saveSeenVotes(botId, seen);
+  saveSeenVotes(BOT_ID, seen);
   console.log(`\n📬 Posting summary: ${postedCount} new, ${skippedCount} already posted before.\n`);
 }
 
@@ -426,7 +204,7 @@ function sleep(ms: number): Promise<void> {
 
 async function runOnce(): Promise<void> {
   console.log("=".repeat(60));
-  console.log("  Congress Vote Bots — Fetch Latest Votes");
+  console.log("  Population Bot — Fetch Latest Votes");
   console.log("=".repeat(60));
   console.log();
 
@@ -446,33 +224,17 @@ async function runOnce(): Promise<void> {
 
   console.log();
 
-  // Auto-detect current Congress/session/year from the live calendar and site data
-  const { congress: congressNum, session: senateSession } = await detectCongressSession();
-  const houseYear = await detectHouseYear();
+  const rawVotes = await fetchAllVotes();
 
-  // Fetch live vote data (always fresh)
-  let senateVotes: VoteResult[] = [];
-  try {
-    senateVotes = await fetchSenateVotes(statePops, congressNum, senateSession);
-    console.log(`✅ Retrieved ${senateVotes.length} Senate votes.\n`);
-  } catch (err) {
-    console.error("❌ Senate fetch failed:", err);
-  }
-
-  let houseVotes: VoteResult[] = [];
-  try {
-    houseVotes = await fetchHouseVotes(memberDistricts, districtPops, statePops, houseYear);
-    console.log(`✅ Retrieved ${houseVotes.length} House votes.\n`);
-  } catch (err) {
-    console.error("❌ House fetch failed:", err);
-  }
-
-  const allVotes = [...senateVotes, ...houseVotes];
-
-  if (allVotes.length === 0) {
+  if (rawVotes.length === 0) {
     console.log("No votes retrieved. Check network connection and congress/session numbers.");
     return;
   }
+
+  const totalPop = [...statePops.values()].reduce((sum, s) => sum + s.population, 0);
+  const allVotes = rawVotes.map((v) =>
+    analyzeVote(v, statePops, districtPops, memberDistricts, totalPop)
+  );
 
   console.log("\n" + "=".repeat(60));
   console.log("  RESULTS");

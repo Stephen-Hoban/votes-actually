@@ -7,16 +7,20 @@
  * When to refresh:
  *   district-populations.json  → After each decennial Census (next: ~2031)
  *   member-districts.json      → Start of each Congress + after special elections
+ *   member-ages.json           → Start of each Congress + after special elections
  *
  * Usage:
  *   npm run refresh-cache              — refresh everything
  *   npm run refresh-cache -- --members — refresh member→district map only
  *   npm run refresh-cache -- --census  — refresh district populations only
+ *   npm run refresh-cache -- --ages    — refresh member ages only
  */
 
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
+
+import { buildMemberAge, type MemberAge } from "./ageCalculations.js";
 
 dotenv.config();
 
@@ -29,6 +33,7 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const DISTRICT_POP_FILE = path.join(DATA_DIR, "district-populations.json");
 const MEMBER_DISTRICT_FILE = path.join(DATA_DIR, "member-districts.json");
 const STATE_POP_FILE = path.join(DATA_DIR, "state-populations.json");
+const MEMBER_AGE_FILE = path.join(DATA_DIR, "member-ages.json");
 
 // ---------------------------------------------------------------------------
 // State FIPS lookup
@@ -223,6 +228,78 @@ async function refreshMemberDistricts(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Refresh member ages
+// ---------------------------------------------------------------------------
+
+async function refreshMemberAges(): Promise<void> {
+  console.log("🎂 Fetching member ages from congress-legislators...");
+
+  const resp = await fetch(LEGISLATORS_URL, {
+    headers: { "User-Agent": "votes-actually (educational project)" },
+  });
+  if (!resp.ok) throw new Error(`Legislators fetch error: ${resp.status} ${resp.statusText}`);
+
+  const legislators = (await resp.json()) as Array<{
+    id: { bioguide: string; lis?: string };
+    name: { official_full?: string; first: string; last: string };
+    // `bio` is present for every current member today, but a newly-seated member
+    // can land in the feed before their bio block is filled in — so don't assume it.
+    bio?: { birthday?: string };
+    terms: Array<{ type: string; state: string; party?: string }>;
+  }>;
+
+  const now = new Date();
+  const members: MemberAge[] = [];
+  let senateCount = 0;
+  let houseCount = 0;
+  let skipped = 0;
+
+  for (const leg of legislators) {
+    const bioguide = leg.id.bioguide;
+    const birthday = leg.bio?.birthday;
+    if (!bioguide || !birthday) {
+      skipped++;
+      continue;
+    }
+
+    const terms = leg.terms ?? [];
+    const lastTerm = terms[terms.length - 1];
+    if (!lastTerm) {
+      skipped++;
+      continue;
+    }
+
+    const lisId = leg.id.lis ?? "";
+    const state = lastTerm.state;
+    const party = lastTerm.party ?? "Unknown";
+    const chamber = lastTerm.type === "sen" ? "Senate" : "House";
+    const name = leg.name.official_full ?? `${leg.name.first} ${leg.name.last}`;
+
+    members.push(
+      buildMemberAge({ bioguide, lisId, name, state, party, chamber, birthday }, now)
+    );
+
+    if (chamber === "Senate") senateCount++;
+    else houseCount++;
+  }
+
+  if (skipped > 0) {
+    console.warn(`⚠️  Skipped ${skipped} legislator(s) missing bioguide or birthday`);
+  }
+
+  const output = {
+    fetchedAt: new Date().toISOString(),
+    source: "unitedstates/congress-legislators (gh-pages branch)",
+    note: "Ages auto-recompute from birthdays at run time; refresh when the roster changes (new Congress, special elections)",
+    totalMembers: members.length,
+    members,
+  };
+
+  fs.writeFileSync(MEMBER_AGE_FILE, JSON.stringify(output, null, 2));
+  console.log(`✅ Saved ${members.length} member ages (${senateCount} Senate, ${houseCount} House) → ${MEMBER_AGE_FILE}`);
+}
+
+// ---------------------------------------------------------------------------
 // Show cache status
 // ---------------------------------------------------------------------------
 
@@ -233,6 +310,7 @@ function showCacheStatus(): void {
     { label: "State populations", path: STATE_POP_FILE },
     { label: "District populations", path: DISTRICT_POP_FILE },
     { label: "Member→district map", path: MEMBER_DISTRICT_FILE },
+    { label: "Member ages", path: MEMBER_AGE_FILE },
   ];
 
   for (const f of files) {
@@ -263,6 +341,7 @@ async function main(): Promise<void> {
   const refreshAll = args.length === 0;
   const refreshCensus = refreshAll || args.includes("--census");
   const refreshMembers = refreshAll || args.includes("--members");
+  const refreshAges = refreshAll || args.includes("--ages");
 
   if (refreshCensus) {
     try {
@@ -283,6 +362,14 @@ async function main(): Promise<void> {
       await refreshMemberDistricts();
     } catch (err) {
       console.error("❌ Member district refresh failed:", err);
+    }
+  }
+
+  if (refreshAges) {
+    try {
+      await refreshMemberAges();
+    } catch (err) {
+      console.error("❌ Member age refresh failed:", err);
     }
   }
 

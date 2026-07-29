@@ -291,20 +291,39 @@ function linkFacet(text: string, descriptionStart: number, descriptionText: stri
   ];
 }
 
-export function buildPopulationPost(v: VoteResult): Post {
+/**
+ * The vote fields every bot's post needs, regardless of what it measures.
+ * `VoteResult` (and each bot's own result type) satisfies this structurally.
+ */
+export interface VotePostMeta {
+  id: string;
+  chamber: "Senate" | "House";
+  question: string;
+  description: string;
+  result: string;
+  yeas: number;
+  nays: number;
+  billUrl: string;
+}
+
+/**
+ * Assembles a bot post: shared header/description/result lines, then the
+ * bot-specific `statBlock` (e.g. population represented, average age).
+ *
+ * The header, result line, and stat block are fixed — only the description is
+ * shortened to fit, and it carries the congress.gov link facet when there is one.
+ * Every bot shares this so post-length and facet handling only lives in one place.
+ */
+export function buildVotePost(v: VotePostMeta, statBlock: string): Post {
   const header = `${v.chamber} Vote: ${v.question}`;
   const resultLine = `Result: ${v.result} (${v.yeas}-${v.nays})`;
-  const popBlock =
-    `🇺🇸 Population represented:\n` +
-    `✅ YES: ${formatPop(v.populationYea)} (${formatPct(v.pctYea)})\n` +
-    `❌  NO: ${formatPop(v.populationNay)} (${formatPct(v.pctNay)})`;
 
-  const withoutDescription = `${header}\n${resultLine}\n\n${popBlock}`;
+  const withoutDescription = `${header}\n${resultLine}\n\n${statBlock}`;
   if (!v.description) return finalizePost(v.id, withoutDescription, []);
 
   const descriptionStart = header.length + 1; // after "header\n"
 
-  const fullDescriptionText = `${header}\n${v.description}\n${resultLine}\n\n${popBlock}`;
+  const fullDescriptionText = `${header}\n${v.description}\n${resultLine}\n\n${statBlock}`;
   if (fitsInPost(fullDescriptionText)) {
     return finalizePost(v.id, fullDescriptionText, linkFacet(fullDescriptionText, descriptionStart, v.description, v.billUrl));
   }
@@ -313,6 +332,15 @@ export function buildPopulationPost(v: VoteResult): Post {
   const shortened = shortenDescription(v.description, MAX_POST_LENGTH - fixedLength);
   if (!shortened) return finalizePost(v.id, withoutDescription, []);
 
-  const text = `${header}\n${shortened}\n${resultLine}\n\n${popBlock}`;
+  const text = `${header}\n${shortened}\n${resultLine}\n\n${statBlock}`;
   return finalizePost(v.id, text, linkFacet(text, descriptionStart, shortened, v.billUrl));
+}
+
+export function buildPopulationPost(v: VoteResult): Post {
+  const popBlock =
+    `🇺🇸 Population represented:\n` +
+    `✅ YES: ${formatPop(v.populationYea)} (${formatPct(v.pctYea)})\n` +
+    `❌  NO: ${formatPop(v.populationNay)} (${formatPct(v.pctNay)})`;
+
+  return buildVotePost(v, popBlock);
 }
