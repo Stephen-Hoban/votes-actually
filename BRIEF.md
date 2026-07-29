@@ -298,16 +298,55 @@ typechecks clean via `npm run typecheck`.
   - All sampled posts landed within the 300-grapheme limit (longest observed: exactly 300).
 
 ### Deployment
+
 `render.yaml` gained an `age-bot` worker alongside `population-bot`, same shape (Starter plan,
 1GB disk at `data/`, `npm run render-start-age`). It needs **no** `CENSUS_API_KEY` — only
 `BLUESKY_AGE_HANDLE` / `BLUESKY_AGE_APP_PASSWORD`.
 
-**Not done yet — needs a human:** the `@age.votesactually.com` Bluesky account doesn't exist.
-Create it, verify the subdomain handle via DNS TXT, generate an app password, and add the two
-env vars to `.env` (local) and the Render service. Until then `npm run post-ages` will fail
-with the "Missing BLUESKY_AGE_HANDLE" error from `bluesky.ts` — `npm run fetch-ages` works
-now and prints exactly what would be posted. Nothing has been posted to Bluesky from this
-branch.
+#### One Blueprint, many services (answered 2026-07-28)
+
+**Each new bot is a new *service*, not a new *Blueprint*.** `render.yaml` is a single Blueprint
+that defines a *list* of services; Render's existing Blueprint instance manages every service in
+that one file. Adding a bot = appending one `- type: worker` block, nothing else.
+
+How a new bot reaches production:
+1. Merge the updated `render.yaml` into the branch the Blueprint tracks (`main`). Render sees
+   nothing until it lands there — an unpushed branch is invisible to Render.
+2. Render detects the diff and offers a Blueprint sync. Approve it; the new service is created.
+   Existing services whose blocks didn't change are left alone (the `age-bot` commit left the
+   `population-bot` block byte-identical, so the live population bot was untouched).
+3. Enter the `sync: false` env vars on the new service in the Render dashboard. These do **not**
+   come from local `.env` — that file only covers local runs.
+
+#### Why each bot gets its own disk
+
+Each bot needs its own `data/` — its own reference cache, its own `seen-votes-{botid}.json`, its
+own `bluesky-session-{botid}.json`. On Render a disk attaches to exactly one service, so sharing
+one between two workers isn't possible regardless. Both disks mount at the same *path*
+(`/opt/render/project/src/data`), which is fine — different service instances, different disks.
+
+First boot needs no hand-holding: the disk starts empty, so each `render-start-*` script runs its
+cache refresh before entering the watch loop (`test -f <cache file> || npm run refresh-…`).
+
+#### Cost
+
+Render's free plan supports neither Background Workers nor disks, so every bot is a Starter
+service: **~$7/mo + ~$0.25/mo disk, per bot.** This scales linearly — the four planned personas
+would run ~$29/mo.
+
+If that becomes the binding constraint, the alternative is folding multiple personas into a
+single worker that polls votes once and posts to several accounts. The Phase-2 refactor already
+makes this cheap: `voteSources.ts` does the fetching for everybody, and each bot is just a calc
+module plus a thin entry point, so a combined runner would mostly be a loop over
+`[{botId, analyze, buildPost}]`. Not built — noted as the escape hatch if per-bot cost matters
+more than per-bot isolation (independent restarts, independent failure blast radius).
+
+#### Bluesky account status
+
+`.env` has `BLUESKY_AGE_HANDLE` / `BLUESKY_AGE_APP_PASSWORD` as of 2026-07-28, so local
+`npm run post-ages` is unblocked. Still outstanding: the same two values on the Render service,
+and the `age-bot` branch is local-only — not pushed, not merged, so not deployed. Nothing has
+been posted to Bluesky from this branch.
 
 ---
 
