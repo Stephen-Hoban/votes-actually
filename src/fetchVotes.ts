@@ -18,7 +18,7 @@ import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
 import { postToBluesky } from "./bluesky.js";
-import { loadSeenVotes, saveSeenVotes } from "./seenVotes.js";
+import { claimVote, releaseVote } from "./seenVotes.js";
 import { RawVote, fetchAllVotes } from "./voteSources.js";
 import {
   StatePop,
@@ -170,27 +170,29 @@ function printVoteResult(v: VoteResult): void {
 // ---------------------------------------------------------------------------
 
 async function postNewVotes(allVotes: VoteResult[]): Promise<void> {
-  const seen = loadSeenVotes(BOT_ID);
   let postedCount = 0;
   let skippedCount = 0;
 
   for (const v of allVotes) {
-    if (seen.has(v.id)) {
+    // Claim first, post second. The seen_votes primary key — not this loop — is
+    // what guarantees a vote is never posted twice, even if two scheduled runs
+    // overlap. claimVote throws if Supabase is unreachable, which aborts the
+    // cycle rather than posting blind.
+    if (!(await claimVote(BOT_ID, v.id))) {
       skippedCount++;
       continue;
     }
     try {
       const post = buildPopulationPost(v);
       await postToBluesky(BOT_ID, post.text, post.facets);
-      seen.add(v.id);
       postedCount++;
       console.log(`  ✅ Posted ${v.chamber} vote #${v.voteNumber} to Bluesky.`);
     } catch (err) {
       console.error(`  ❌ Failed to post ${v.chamber} vote #${v.voteNumber}:`, err);
+      await releaseVote(BOT_ID, v.id);
     }
   }
 
-  saveSeenVotes(BOT_ID, seen);
   console.log(`\n📬 Posting summary: ${postedCount} new, ${skippedCount} already posted before.\n`);
 }
 

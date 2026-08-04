@@ -2,8 +2,10 @@
  * bluesky.ts
  *
  * Minimal Bluesky posting client for the vote bots.
- * Persists each bot's login session to disk so repeated runs don't hit
- * Bluesky's login rate limit.
+ * Persists each bot's login session to Supabase so repeated runs don't hit
+ * Bluesky's login rate limit. (This used to be a file on the Render worker's
+ * persistent disk; scheduled GitHub Actions containers are ephemeral, so
+ * without a durable store every run would log in fresh.)
  *
  * Each bot has its own account, so credentials and env vars are keyed by
  * bot ID. For a bot with ID "population", requires in .env:
@@ -14,8 +16,7 @@
  */
 
 import { AtpAgent, type AppBskyRichtextFacet, type AtpSessionData } from "@atproto/api";
-import * as fs from "fs";
-import * as path from "path";
+import { getSupabase } from "./supabase.js";
 import {
   fitsInPost,
   graphemeLength,
@@ -24,31 +25,49 @@ import {
   type PostFacet,
 } from "./voteCalculations.js";
 
+const SESSION_TABLE = "bluesky_sessions";
+
 function envPrefix(botId: string): string {
   return `BLUESKY_${botId.toUpperCase()}_`;
 }
 
-function sessionFile(botId: string): string {
-  return path.join(process.cwd(), "data", `bluesky-session-${botId}.json`);
+async function loadSavedSession(botId: string): Promise<AtpSessionData | undefined> {
+  const { data, error } = await getSupabase()
+    .from(SESSION_TABLE)
+    .select("session_json")
+    .eq("bot_id", botId)
+    .maybeSingle();
+
+  // A missing or unreadable session is recoverable — we just log in fresh — so
+  // this warns instead of throwing. Contrast with seenVotes, where failing open
+  // would risk a duplicate post.
+  if (error) {
+    console.warn(`  ⚠️  Could not load saved Bluesky session for "${botId}": ${error.message}`);
+    return undefined;
+  }
+  return (data?.session_json as AtpSessionData | undefined) ?? undefined;
 }
 
-function loadSavedSession(botId: string): AtpSessionData | undefined {
-  const file = sessionFile(botId);
-  if (!fs.existsSync(file)) return undefined;
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf-8"));
-  } catch {
-    return undefined;
+export async function saveSession(botId: string, session: AtpSessionData): Promise<void> {
+  const { error } = await getSupabase()
+    .from(SESSION_TABLE)
+    .upsert(
+      { bot_id: botId, session_json: session, updated_at: new Date().toISOString() },
+      { onConflict: "bot_id" }
+    );
+
+  if (error) {
+    console.warn(`  ⚠️  Could not save Bluesky session for "${botId}": ${error.message}`);
   }
 }
 
-function saveSession(botId: string, session: AtpSessionData): void {
-  const file = sessionFile(botId);
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(session, null, 2));
-}
-
-async function getAgent(botId: string): Promise<AtpAgent> {
+/**
+ * @atproto's persistSession callback is synchronous, but our save is a network
+ * round-trip. Collecting the in-flight saves lets postToBluesky await them
+ * before the process exits — otherwise a refreshed token could be dropped and
+ * the next scheduled run would log in fresh for no reason.
+ */
+async function getAgent(botId: string): Promise<{ agent: AtpAgent; saves: Promise<void>[] }> {
   const prefix = envPrefix(botId);
   const handle = process.env[`${prefix}HANDLE`]?.replace(/^@/, "");
   const password = process.env[`${prefix}APP_PASSWORD`];
@@ -59,25 +78,26 @@ async function getAgent(botId: string): Promise<AtpAgent> {
     );
   }
 
+  const saves: Promise<void>[] = [];
   const agent = new AtpAgent({
     service: "https://bsky.social",
     persistSession: (_evt, session) => {
-      if (session) saveSession(botId, session);
+      if (session) saves.push(saveSession(botId, session));
     },
   });
 
-  const saved = loadSavedSession(botId);
+  const saved = await loadSavedSession(botId);
   if (saved) {
     try {
       await agent.resumeSession(saved);
-      return agent;
+      return { agent, saves };
     } catch {
       console.warn(`  ⚠️  Saved Bluesky session for "${botId}" expired, logging in fresh.`);
     }
   }
 
   await agent.login({ identifier: handle, password });
-  return agent;
+  return { agent, saves };
 }
 
 // Callers (e.g. buildPopulationPost) should already shorten text to fit.
@@ -103,12 +123,18 @@ function toAtprotoFacets(text: string, facets: PostFacet[]): AppBskyRichtextFace
 }
 
 export async function postToBluesky(botId: string, text: string, facets: PostFacet[] = []): Promise<void> {
-  const agent = await getAgent(botId);
+  const { agent, saves } = await getAgent(botId);
   const atprotoFacets = toAtprotoFacets(text, facets);
   const finalText = truncateForBluesky(text);
-  await agent.post({
-    text: finalText,
-    facets: atprotoFacets.length > 0 ? atprotoFacets : undefined,
-    createdAt: new Date().toISOString(),
-  });
+  try {
+    await agent.post({
+      text: finalText,
+      facets: atprotoFacets.length > 0 ? atprotoFacets : undefined,
+      createdAt: new Date().toISOString(),
+    });
+  } finally {
+    // Flush even when the post failed: the session may still have been
+    // refreshed during the attempt, and losing it costs a needless relogin.
+    await Promise.all(saves);
+  }
 }

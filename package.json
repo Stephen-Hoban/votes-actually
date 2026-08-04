@@ -14,8 +14,8 @@
     "refresh-members": "tsx src/refreshCache.ts -- --members",
     "refresh-census": "tsx src/refreshCache.ts -- --census",
     "refresh-ages": "tsx src/refreshCache.ts -- --ages",
-    "render-start": "test -f data/state-populations.json || npm run refresh-cache; npm run watch-votes",
-    "render-start-age": "test -f data/member-ages.json || npm run refresh-ages; npm run watch-ages",
+    "migrate-supabase": "tsx src/migrateToSupabase.ts",
+    "baseline-seen": "tsx src/baselineSeenVotes.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
@@ -24,13 +24,16 @@
   "license": "ISC",
   "dependencies": {
     "@atproto/api": "^0.19.19",
+    "@supabase/supabase-js": "^2.109.0",
     "dotenv": "^16.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
+    "ws": "^8.21.2",
     "xml2js": "^0.6.0"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",
+    "@types/ws": "^8.18.1",
     "@types/xml2js": "^0.4.14",
     "vitest": "^4.1.10"
   }

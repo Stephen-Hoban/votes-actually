@@ -1,0 +1,2198 @@
+{
+  "fetchedAt": "2026-03-23T02:54:48.764Z",
+  "source": "US Census Bureau ACS5 2022",
+  "note": "Refresh after each decennial Census (~2031) or after redistricting",
+  "totalDistricts": 438,
+  "districts": {
+    "AL-01": {
+      "stateAbbr": "AL",
+      "district": "01",
+      "population": 718903
+    },
+    "AL-02": {
+      "stateAbbr": "AL",
+      "district": "02",
+      "population": 714527
+    },
+    "AL-03": {
+      "stateAbbr": "AL",
+      "district": "03",
+      "population": 717658
+    },
+    "AL-04": {
+      "stateAbbr": "AL",
+      "district": "04",
+      "population": 717747
+    },
+    "AL-05": {
+      "stateAbbr": "AL",
+      "district": "05",
+      "population": 720871
+    },
+    "AL-06": {
+      "stateAbbr": "AL",
+      "district": "06",
+      "population": 711393
+    },
+    "AL-07": {
+      "stateAbbr": "AL",
+      "district": "07",
+      "population": 726993
+    },
+    "AK-00": {
+      "stateAbbr": "AK",
+      "district": "00",
+      "population": 734821
+    },
+    "AZ-01": {
+      "stateAbbr": "AZ",
+      "district": "01",
+      "population": 789173
+    },
+    "AZ-02": {
+      "stateAbbr": "AZ",
+      "district": "02",
+      "population": 798999
+    },
+    "AZ-03": {
+      "stateAbbr": "AZ",
+      "district": "03",
+      "population": 807937
+    },
+    "AZ-04": {
+      "stateAbbr": "AZ",
+      "district": "04",
+      "population": 801287
+    },
+    "AZ-05": {
+      "stateAbbr": "AZ",
+      "district": "05",
+      "population": 787758
+    },
+    "AZ-06": {
+      "stateAbbr": "AZ",
+      "district": "06",
+      "population": 784933
+    },
+    "AZ-07": {
+      "stateAbbr": "AZ",
+      "district": "07",
+      "population": 806472
+    },
+    "AZ-08": {
+      "stateAbbr": "AZ",
+      "district": "08",
+      "population": 784453
+    },
+    "AZ-09": {
+      "stateAbbr": "AZ",
+      "district": "09",
+      "population": 811270
+    },
+    "AR-01": {
+      "stateAbbr": "AR",
+      "district": "01",
+      "population": 754109
+    },
+    "AR-02": {
+      "stateAbbr": "AR",
+      "district": "02",
+      "population": 751268
+    },
+    "AR-03": {
+      "stateAbbr": "AR",
+      "district": "03",
+      "population": 758572
+    },
+    "AR-04": {
+      "stateAbbr": "AR",
+      "district": "04",
+      "population": 754720
+    },
+    "CA-01": {
+      "stateAbbr": "CA",
+      "district": "01",
+      "population": 766231
+    },
+    "CA-02": {
+      "stateAbbr": "CA",
+      "district": "02",
+      "population": 763623
+    },
+    "CA-03": {
+      "stateAbbr": "CA",
+      "district": "03",
+      "population": 764866
+    },
+    "CA-04": {
+      "stateAbbr": "CA",
+      "district": "04",
+      "population": 764345
+    },
+    "CA-05": {
+      "stateAbbr": "CA",
+      "district": "05",
+      "population": 761352
+    },
+    "CA-06": {
+      "stateAbbr": "CA",
+      "district": "06",
+      "population": 755594
+    },
+    "CA-07": {
+      "stateAbbr": "CA",
+      "district": "07",
+      "population": 753515
+    },
+    "CA-08": {
+      "stateAbbr": "CA",
+      "district": "08",
+      "population": 752780
+    },
+    "CA-09": {
+      "stateAbbr": "CA",
+      "district": "09",
+      "population": 762122
+    },
+    "CA-10": {
+      "stateAbbr": "CA",
+      "district": "10",
+      "population": 755993
+    },
+    "CA-11": {
+      "stateAbbr": "CA",
+      "district": "11",
+      "population": 735920
+    },
+    "CA-12": {
+      "stateAbbr": "CA",
+      "district": "12",
+      "population": 750210
+    },
+    "CA-13": {
+      "stateAbbr": "CA",
+      "district": "13",
+      "population": 770975
+    },
+    "CA-14": {
+      "stateAbbr": "CA",
+      "district": "14",
+      "population": 751587
+    },
+    "CA-15": {
+      "stateAbbr": "CA",
+      "district": "15",
+      "population": 752065
+    },
+    "CA-16": {
+      "stateAbbr": "CA",
+      "district": "16",
+      "population": 749237
+    },
+    "CA-17": {
+      "stateAbbr": "CA",
+      "district": "17",
+      "population": 751593
+    },
+    "CA-18": {
+      "stateAbbr": "CA",
+      "district": "18",
+      "population": 759200
+    },
+    "CA-19": {
+      "stateAbbr": "CA",
+      "district": "19",
+      "population": 753931
+    },
+    "CA-20": {
+      "stateAbbr": "CA",
+      "district": "20",
+      "population": 762132
+    },
+    "CA-21": {
+      "stateAbbr": "CA",
+      "district": "21",
+      "population": 758893
+    },
+    "CA-22": {
+      "stateAbbr": "CA",
+      "district": "22",
+      "population": 780816
+    },
+    "CA-23": {
+      "stateAbbr": "CA",
+      "district": "23",
+      "population": 758852
+    },
+    "CA-24": {
+      "stateAbbr": "CA",
+      "district": "24",
+      "population": 760229
+    },
+    "CA-25": {
+      "stateAbbr": "CA",
+      "district": "25",
+      "population": 763179
+    },
+    "CA-26": {
+      "stateAbbr": "CA",
+      "district": "26",
+      "population": 757602
+    },
+    "CA-27": {
+      "stateAbbr": "CA",
+      "district": "27",
+      "population": 747561
+    },
+    "CA-28": {
+      "stateAbbr": "CA",
+      "district": "28",
+      "population": 748192
+    },
+    "CA-29": {
+      "stateAbbr": "CA",
+      "district": "29",
+      "population": 742347
+    },
+    "CA-30": {
+      "stateAbbr": "CA",
+      "district": "30",
+      "population": 744757
+    },
+    "CA-31": {
+      "stateAbbr": "CA",
+      "district": "31",
+      "population": 749679
+    },
+    "CA-32": {
+      "stateAbbr": "CA",
+      "district": "32",
+      "population": 764598
+    },
+    "CA-33": {
+      "stateAbbr": "CA",
+      "district": "33",
+      "population": 757643
+    },
+    "CA-34": {
+      "stateAbbr": "CA",
+      "district": "34",
+      "population": 766809
+    },
+    "CA-35": {
+      "stateAbbr": "CA",
+      "district": "35",
+      "population": 767456
+    },
+    "CA-36": {
+      "stateAbbr": "CA",
+      "district": "36",
+      "population": 740438
+    },
+    "CA-37": {
+      "stateAbbr": "CA",
+      "district": "37",
+      "population": 756145
+    },
+    "CA-38": {
+      "stateAbbr": "CA",
+      "district": "38",
+      "population": 754110
+    },
+    "CA-39": {
+      "stateAbbr": "CA",
+      "district": "39",
+      "population": 759924
+    },
+    "CA-40": {
+      "stateAbbr": "CA",
+      "district": "40",
+      "population": 754432
+    },
+    "CA-41": {
+      "stateAbbr": "CA",
+      "district": "41",
+      "population": 770422
+    },
+    "CA-42": {
+      "stateAbbr": "CA",
+      "district": "42",
+      "population": 752589
+    },
+    "CA-43": {
+      "stateAbbr": "CA",
+      "district": "43",
+      "population": 747415
+    },
+    "CA-44": {
+      "stateAbbr": "CA",
+      "district": "44",
+      "population": 756441
+    },
+    "CA-45": {
+      "stateAbbr": "CA",
+      "district": "45",
+      "population": 756570
+    },
+    "CA-46": {
+      "stateAbbr": "CA",
+      "district": "46",
+      "population": 759331
+    },
+    "CA-47": {
+      "stateAbbr": "CA",
+      "district": "47",
+      "population": 753964
+    },
+    "CA-48": {
+      "stateAbbr": "CA",
+      "district": "48",
+      "population": 764088
+    },
+    "CA-49": {
+      "stateAbbr": "CA",
+      "district": "49",
+      "population": 756381
+    },
+    "CA-50": {
+      "stateAbbr": "CA",
+      "district": "50",
+      "population": 735988
+    },
+    "CA-51": {
+      "stateAbbr": "CA",
+      "district": "51",
+      "population": 762631
+    },
+    "CA-52": {
+      "stateAbbr": "CA",
+      "district": "52",
+      "population": 769351
+    },
+    "CO-01": {
+      "stateAbbr": "CO",
+      "district": "01",
+      "population": 717038
+    },
+    "CO-02": {
+      "stateAbbr": "CO",
+      "district": "02",
+      "population": 718206
+    },
+    "CO-03": {
+      "stateAbbr": "CO",
+      "district": "03",
+      "population": 723027
+    },
+    "CO-04": {
+      "stateAbbr": "CO",
+      "district": "04",
+      "population": 727411
+    },
+    "CO-05": {
+      "stateAbbr": "CO",
+      "district": "05",
+      "population": 722030
+    },
+    "CO-06": {
+      "stateAbbr": "CO",
+      "district": "06",
+      "population": 721810
+    },
+    "CO-07": {
+      "stateAbbr": "CO",
+      "district": "07",
+      "population": 719604
+    },
+    "CO-08": {
+      "stateAbbr": "CO",
+      "district": "08",
+      "population": 721664
+    },
+    "CT-01": {
+      "stateAbbr": "CT",
+      "district": "01",
+      "population": 718451
+    },
+    "CT-02": {
+      "stateAbbr": "CT",
+      "district": "02",
+      "population": 723724
+    },
+    "CT-03": {
+      "stateAbbr": "CT",
+      "district": "03",
+      "population": 723601
+    },
+    "CT-04": {
+      "stateAbbr": "CT",
+      "district": "04",
+      "population": 722029
+    },
+    "CT-05": {
+      "stateAbbr": "CT",
+      "district": "05",
+      "population": 723512
+    },
+    "CT-ZZ": {
+      "stateAbbr": "CT",
+      "district": "ZZ",
+      "population": 0
+    },
+    "DE-00": {
+      "stateAbbr": "DE",
+      "district": "00",
+      "population": 993635
+    },
+    "FL-01": {
+      "stateAbbr": "FL",
+      "district": "01",
+      "population": 772291
+    },
+    "FL-02": {
+      "stateAbbr": "FL",
+      "district": "02",
+      "population": 775769
+    },
+    "FL-03": {
+      "stateAbbr": "FL",
+      "district": "03",
+      "population": 769691
+    },
+    "FL-04": {
+      "stateAbbr": "FL",
+      "district": "04",
+      "population": 775118
+    },
+    "FL-05": {
+      "stateAbbr": "FL",
+      "district": "05",
+      "population": 770573
+    },
+    "FL-06": {
+      "stateAbbr": "FL",
+      "district": "06",
+      "population": 779543
+    },
+    "FL-07": {
+      "stateAbbr": "FL",
+      "district": "07",
+      "population": 771916
+    },
+    "FL-08": {
+      "stateAbbr": "FL",
+      "district": "08",
+      "population": 773536
+    },
+    "FL-09": {
+      "stateAbbr": "FL",
+      "district": "09",
+      "population": 754301
+    },
+    "FL-10": {
+      "stateAbbr": "FL",
+      "district": "10",
+      "population": 785358
+    },
+    "FL-11": {
+      "stateAbbr": "FL",
+      "district": "11",
+      "population": 776905
+    },
+    "FL-12": {
+      "stateAbbr": "FL",
+      "district": "12",
+      "population": 770735
+    },
+    "FL-13": {
+      "stateAbbr": "FL",
+      "district": "13",
+      "population": 768555
+    },
+    "FL-14": {
+      "stateAbbr": "FL",
+      "district": "14",
+      "population": 772661
+    },
+    "FL-15": {
+      "stateAbbr": "FL",
+      "district": "15",
+      "population": 785390
+    },
+    "FL-16": {
+      "stateAbbr": "FL",
+      "district": "16",
+      "population": 774262
+    },
+    "FL-17": {
+      "stateAbbr": "FL",
+      "district": "17",
+      "population": 785836
+    },
+    "FL-18": {
+      "stateAbbr": "FL",
+      "district": "18",
+      "population": 780642
+    },
+    "FL-19": {
+      "stateAbbr": "FL",
+      "district": "19",
+      "population": 772972
+    },
+    "FL-20": {
+      "stateAbbr": "FL",
+      "district": "20",
+      "population": 773320
+    },
+    "FL-21": {
+      "stateAbbr": "FL",
+      "district": "21",
+      "population": 776143
+    },
+    "FL-22": {
+      "stateAbbr": "FL",
+      "district": "22",
+      "population": 768503
+    },
+    "FL-23": {
+      "stateAbbr": "FL",
+      "district": "23",
+      "population": 762506
+    },
+    "FL-24": {
+      "stateAbbr": "FL",
+      "district": "24",
+      "population": 780118
+    },
+    "FL-25": {
+      "stateAbbr": "FL",
+      "district": "25",
+      "population": 765444
+    },
+    "FL-26": {
+      "stateAbbr": "FL",
+      "district": "26",
+      "population": 775185
+    },
+    "FL-27": {
+      "stateAbbr": "FL",
+      "district": "27",
+      "population": 752682
+    },
+    "FL-28": {
+      "stateAbbr": "FL",
+      "district": "28",
+      "population": 764574
+    },
+    "GA-01": {
+      "stateAbbr": "GA",
+      "district": "01",
+      "population": 768625
+    },
+    "GA-02": {
+      "stateAbbr": "GA",
+      "district": "02",
+      "population": 757675
+    },
+    "GA-03": {
+      "stateAbbr": "GA",
+      "district": "03",
+      "population": 767633
+    },
+    "GA-04": {
+      "stateAbbr": "GA",
+      "district": "04",
+      "population": 766420
+    },
+    "GA-05": {
+      "stateAbbr": "GA",
+      "district": "05",
+      "population": 756319
+    },
+    "GA-06": {
+      "stateAbbr": "GA",
+      "district": "06",
+      "population": 767777
+    },
+    "GA-07": {
+      "stateAbbr": "GA",
+      "district": "07",
+      "population": 763613
+    },
+    "GA-08": {
+      "stateAbbr": "GA",
+      "district": "08",
+      "population": 767071
+    },
+    "GA-09": {
+      "stateAbbr": "GA",
+      "district": "09",
+      "population": 768577
+    },
+    "GA-10": {
+      "stateAbbr": "GA",
+      "district": "10",
+      "population": 770605
+    },
+    "GA-11": {
+      "stateAbbr": "GA",
+      "district": "11",
+      "population": 770928
+    },
+    "GA-12": {
+      "stateAbbr": "GA",
+      "district": "12",
+      "population": 764339
+    },
+    "GA-13": {
+      "stateAbbr": "GA",
+      "district": "13",
+      "population": 765369
+    },
+    "GA-14": {
+      "stateAbbr": "GA",
+      "district": "14",
+      "population": 767374
+    },
+    "HI-01": {
+      "stateAbbr": "HI",
+      "district": "01",
+      "population": 723185
+    },
+    "HI-02": {
+      "stateAbbr": "HI",
+      "district": "02",
+      "population": 727404
+    },
+    "ID-01": {
+      "stateAbbr": "ID",
+      "district": "01",
+      "population": 931503
+    },
+    "ID-02": {
+      "stateAbbr": "ID",
+      "district": "02",
+      "population": 922606
+    },
+    "IL-01": {
+      "stateAbbr": "IL",
+      "district": "01",
+      "population": 754024
+    },
+    "IL-02": {
+      "stateAbbr": "IL",
+      "district": "02",
+      "population": 755018
+    },
+    "IL-03": {
+      "stateAbbr": "IL",
+      "district": "03",
+      "population": 746412
+    },
+    "IL-04": {
+      "stateAbbr": "IL",
+      "district": "04",
+      "population": 735314
+    },
+    "IL-05": {
+      "stateAbbr": "IL",
+      "district": "05",
+      "population": 753753
+    },
+    "IL-06": {
+      "stateAbbr": "IL",
+      "district": "06",
+      "population": 754650
+    },
+    "IL-07": {
+      "stateAbbr": "IL",
+      "district": "07",
+      "population": 730552
+    },
+    "IL-08": {
+      "stateAbbr": "IL",
+      "district": "08",
+      "population": 753960
+    },
+    "IL-09": {
+      "stateAbbr": "IL",
+      "district": "09",
+      "population": 749895
+    },
+    "IL-10": {
+      "stateAbbr": "IL",
+      "district": "10",
+      "population": 753313
+    },
+    "IL-11": {
+      "stateAbbr": "IL",
+      "district": "11",
+      "population": 750486
+    },
+    "IL-12": {
+      "stateAbbr": "IL",
+      "district": "12",
+      "population": 752942
+    },
+    "IL-13": {
+      "stateAbbr": "IL",
+      "district": "13",
+      "population": 751712
+    },
+    "IL-14": {
+      "stateAbbr": "IL",
+      "district": "14",
+      "population": 757406
+    },
+    "IL-15": {
+      "stateAbbr": "IL",
+      "district": "15",
+      "population": 754127
+    },
+    "IL-16": {
+      "stateAbbr": "IL",
+      "district": "16",
+      "population": 751284
+    },
+    "IL-17": {
+      "stateAbbr": "IL",
+      "district": "17",
+      "population": 752786
+    },
+    "IL-ZZ": {
+      "stateAbbr": "IL",
+      "district": "ZZ",
+      "population": 0
+    },
+    "IN-01": {
+      "stateAbbr": "IN",
+      "district": "01",
+      "population": 753721
+    },
+    "IN-02": {
+      "stateAbbr": "IN",
+      "district": "02",
+      "population": 752670
+    },
+    "IN-03": {
+      "stateAbbr": "IN",
+      "district": "03",
+      "population": 753447
+    },
+    "IN-04": {
+      "stateAbbr": "IN",
+      "district": "04",
+      "population": 756007
+    },
+    "IN-05": {
+      "stateAbbr": "IN",
+      "district": "05",
+      "population": 756125
+    },
+    "IN-06": {
+      "stateAbbr": "IN",
+      "district": "06",
+      "population": 752728
+    },
+    "IN-07": {
+      "stateAbbr": "IN",
+      "district": "07",
+      "population": 750334
+    },
+    "IN-08": {
+      "stateAbbr": "IN",
+      "district": "08",
+      "population": 754480
+    },
+    "IN-09": {
+      "stateAbbr": "IN",
+      "district": "09",
+      "population": 754891
+    },
+    "IA-01": {
+      "stateAbbr": "IA",
+      "district": "01",
+      "population": 797528
+    },
+    "IA-02": {
+      "stateAbbr": "IA",
+      "district": "02",
+      "population": 795900
+    },
+    "IA-03": {
+      "stateAbbr": "IA",
+      "district": "03",
+      "population": 799081
+    },
+    "IA-04": {
+      "stateAbbr": "IA",
+      "district": "04",
+      "population": 796327
+    },
+    "KS-01": {
+      "stateAbbr": "KS",
+      "district": "01",
+      "population": 734313
+    },
+    "KS-02": {
+      "stateAbbr": "KS",
+      "district": "02",
+      "population": 734782
+    },
+    "KS-03": {
+      "stateAbbr": "KS",
+      "district": "03",
+      "population": 733585
+    },
+    "KS-04": {
+      "stateAbbr": "KS",
+      "district": "04",
+      "population": 733242
+    },
+    "KY-01": {
+      "stateAbbr": "KY",
+      "district": "01",
+      "population": 751426
+    },
+    "KY-02": {
+      "stateAbbr": "KY",
+      "district": "02",
+      "population": 753141
+    },
+    "KY-03": {
+      "stateAbbr": "KY",
+      "district": "03",
+      "population": 746481
+    },
+    "KY-04": {
+      "stateAbbr": "KY",
+      "district": "04",
+      "population": 751457
+    },
+    "KY-05": {
+      "stateAbbr": "KY",
+      "district": "05",
+      "population": 750027
+    },
+    "KY-06": {
+      "stateAbbr": "KY",
+      "district": "06",
+      "population": 750403
+    },
+    "LA-01": {
+      "stateAbbr": "LA",
+      "district": "01",
+      "population": 768258
+    },
+    "LA-02": {
+      "stateAbbr": "LA",
+      "district": "02",
+      "population": 769243
+    },
+    "LA-03": {
+      "stateAbbr": "LA",
+      "district": "03",
+      "population": 771697
+    },
+    "LA-04": {
+      "stateAbbr": "LA",
+      "district": "04",
+      "population": 774854
+    },
+    "LA-05": {
+      "stateAbbr": "LA",
+      "district": "05",
+      "population": 775396
+    },
+    "LA-06": {
+      "stateAbbr": "LA",
+      "district": "06",
+      "population": 781098
+    },
+    "ME-01": {
+      "stateAbbr": "ME",
+      "district": "01",
+      "population": 683145
+    },
+    "ME-02": {
+      "stateAbbr": "ME",
+      "district": "02",
+      "population": 683804
+    },
+    "MD-01": {
+      "stateAbbr": "MD",
+      "district": "01",
+      "population": 773966
+    },
+    "MD-02": {
+      "stateAbbr": "MD",
+      "district": "02",
+      "population": 769431
+    },
+    "MD-03": {
+      "stateAbbr": "MD",
+      "district": "03",
+      "population": 770623
+    },
+    "MD-04": {
+      "stateAbbr": "MD",
+      "district": "04",
+      "population": 764378
+    },
+    "MD-05": {
+      "stateAbbr": "MD",
+      "district": "05",
+      "population": 774011
+    },
+    "MD-06": {
+      "stateAbbr": "MD",
+      "district": "06",
+      "population": 777191
+    },
+    "MD-07": {
+      "stateAbbr": "MD",
+      "district": "07",
+      "population": 764705
+    },
+    "MD-08": {
+      "stateAbbr": "MD",
+      "district": "08",
+      "population": 767402
+    },
+    "MA-01": {
+      "stateAbbr": "MA",
+      "district": "01",
+      "population": 778095
+    },
+    "MA-02": {
+      "stateAbbr": "MA",
+      "district": "02",
+      "population": 771071
+    },
+    "MA-03": {
+      "stateAbbr": "MA",
+      "district": "03",
+      "population": 776406
+    },
+    "MA-04": {
+      "stateAbbr": "MA",
+      "district": "04",
+      "population": 778731
+    },
+    "MA-05": {
+      "stateAbbr": "MA",
+      "district": "05",
+      "population": 776872
+    },
+    "MA-06": {
+      "stateAbbr": "MA",
+      "district": "06",
+      "population": 777375
+    },
+    "MA-07": {
+      "stateAbbr": "MA",
+      "district": "07",
+      "population": 773828
+    },
+    "MA-08": {
+      "stateAbbr": "MA",
+      "district": "08",
+      "population": 772082
+    },
+    "MA-09": {
+      "stateAbbr": "MA",
+      "district": "09",
+      "population": 779745
+    },
+    "MI-01": {
+      "stateAbbr": "MI",
+      "district": "01",
+      "population": 777560
+    },
+    "MI-02": {
+      "stateAbbr": "MI",
+      "district": "02",
+      "population": 777946
+    },
+    "MI-03": {
+      "stateAbbr": "MI",
+      "district": "03",
+      "population": 773965
+    },
+    "MI-04": {
+      "stateAbbr": "MI",
+      "district": "04",
+      "population": 774289
+    },
+    "MI-05": {
+      "stateAbbr": "MI",
+      "district": "05",
+      "population": 773808
+    },
+    "MI-06": {
+      "stateAbbr": "MI",
+      "district": "06",
+      "population": 770957
+    },
+    "MI-07": {
+      "stateAbbr": "MI",
+      "district": "07",
+      "population": 773038
+    },
+    "MI-08": {
+      "stateAbbr": "MI",
+      "district": "08",
+      "population": 773930
+    },
+    "MI-09": {
+      "stateAbbr": "MI",
+      "district": "09",
+      "population": 774580
+    },
+    "MI-10": {
+      "stateAbbr": "MI",
+      "district": "10",
+      "population": 772612
+    },
+    "MI-11": {
+      "stateAbbr": "MI",
+      "district": "11",
+      "population": 774826
+    },
+    "MI-12": {
+      "stateAbbr": "MI",
+      "district": "12",
+      "population": 770452
+    },
+    "MI-13": {
+      "stateAbbr": "MI",
+      "district": "13",
+      "population": 769958
+    },
+    "MN-01": {
+      "stateAbbr": "MN",
+      "district": "01",
+      "population": 712863
+    },
+    "MN-02": {
+      "stateAbbr": "MN",
+      "district": "02",
+      "population": 713718
+    },
+    "MN-03": {
+      "stateAbbr": "MN",
+      "district": "03",
+      "population": 707707
+    },
+    "MN-04": {
+      "stateAbbr": "MN",
+      "district": "04",
+      "population": 708545
+    },
+    "MN-05": {
+      "stateAbbr": "MN",
+      "district": "05",
+      "population": 707627
+    },
+    "MN-06": {
+      "stateAbbr": "MN",
+      "district": "06",
+      "population": 715967
+    },
+    "MN-07": {
+      "stateAbbr": "MN",
+      "district": "07",
+      "population": 713351
+    },
+    "MN-08": {
+      "stateAbbr": "MN",
+      "district": "08",
+      "population": 715514
+    },
+    "MS-01": {
+      "stateAbbr": "MS",
+      "district": "01",
+      "population": 741109
+    },
+    "MS-02": {
+      "stateAbbr": "MS",
+      "district": "02",
+      "population": 738521
+    },
+    "MS-03": {
+      "stateAbbr": "MS",
+      "district": "03",
+      "population": 738576
+    },
+    "MS-04": {
+      "stateAbbr": "MS",
+      "district": "04",
+      "population": 740640
+    },
+    "MO-01": {
+      "stateAbbr": "MO",
+      "district": "01",
+      "population": 766456
+    },
+    "MO-02": {
+      "stateAbbr": "MO",
+      "district": "02",
+      "population": 764420
+    },
+    "MO-03": {
+      "stateAbbr": "MO",
+      "district": "03",
+      "population": 770039
+    },
+    "MO-04": {
+      "stateAbbr": "MO",
+      "district": "04",
+      "population": 771882
+    },
+    "MO-05": {
+      "stateAbbr": "MO",
+      "district": "05",
+      "population": 768398
+    },
+    "MO-06": {
+      "stateAbbr": "MO",
+      "district": "06",
+      "population": 769064
+    },
+    "MO-07": {
+      "stateAbbr": "MO",
+      "district": "07",
+      "population": 771969
+    },
+    "MO-08": {
+      "stateAbbr": "MO",
+      "district": "08",
+      "population": 772194
+    },
+    "MT-01": {
+      "stateAbbr": "MT",
+      "district": "01",
+      "population": 547233
+    },
+    "MT-02": {
+      "stateAbbr": "MT",
+      "district": "02",
+      "population": 544607
+    },
+    "NE-01": {
+      "stateAbbr": "NE",
+      "district": "01",
+      "population": 653295
+    },
+    "NE-02": {
+      "stateAbbr": "NE",
+      "district": "02",
+      "population": 652597
+    },
+    "NE-03": {
+      "stateAbbr": "NE",
+      "district": "03",
+      "population": 653047
+    },
+    "NV-01": {
+      "stateAbbr": "NV",
+      "district": "01",
+      "population": 756838
+    },
+    "NV-02": {
+      "stateAbbr": "NV",
+      "district": "02",
+      "population": 777013
+    },
+    "NV-03": {
+      "stateAbbr": "NV",
+      "district": "03",
+      "population": 783412
+    },
+    "NV-04": {
+      "stateAbbr": "NV",
+      "district": "04",
+      "population": 787554
+    },
+    "NH-01": {
+      "stateAbbr": "NH",
+      "district": "01",
+      "population": 689659
+    },
+    "NH-02": {
+      "stateAbbr": "NH",
+      "district": "02",
+      "population": 689951
+    },
+    "NH-ZZ": {
+      "stateAbbr": "NH",
+      "district": "ZZ",
+      "population": 0
+    },
+    "NJ-01": {
+      "stateAbbr": "NJ",
+      "district": "01",
+      "population": 770451
+    },
+    "NJ-02": {
+      "stateAbbr": "NJ",
+      "district": "02",
+      "population": 777770
+    },
+    "NJ-03": {
+      "stateAbbr": "NJ",
+      "district": "03",
+      "population": 777191
+    },
+    "NJ-04": {
+      "stateAbbr": "NJ",
+      "district": "04",
+      "population": 774829
+    },
+    "NJ-05": {
+      "stateAbbr": "NJ",
+      "district": "05",
+      "population": 771690
+    },
+    "NJ-06": {
+      "stateAbbr": "NJ",
+      "district": "06",
+      "population": 772409
+    },
+    "NJ-07": {
+      "stateAbbr": "NJ",
+      "district": "07",
+      "population": 775299
+    },
+    "NJ-08": {
+      "stateAbbr": "NJ",
+      "district": "08",
+      "population": 760708
+    },
+    "NJ-09": {
+      "stateAbbr": "NJ",
+      "district": "09",
+      "population": 765162
+    },
+    "NJ-10": {
+      "stateAbbr": "NJ",
+      "district": "10",
+      "population": 764061
+    },
+    "NJ-11": {
+      "stateAbbr": "NJ",
+      "district": "11",
+      "population": 769976
+    },
+    "NJ-12": {
+      "stateAbbr": "NJ",
+      "district": "12",
+      "population": 769517
+    },
+    "NM-01": {
+      "stateAbbr": "NM",
+      "district": "01",
+      "population": 707680
+    },
+    "NM-02": {
+      "stateAbbr": "NM",
+      "district": "02",
+      "population": 703136
+    },
+    "NM-03": {
+      "stateAbbr": "NM",
+      "district": "03",
+      "population": 701647
+    },
+    "NY-01": {
+      "stateAbbr": "NY",
+      "district": "01",
+      "population": 778417
+    },
+    "NY-02": {
+      "stateAbbr": "NY",
+      "district": "02",
+      "population": 772462
+    },
+    "NY-03": {
+      "stateAbbr": "NY",
+      "district": "03",
+      "population": 776626
+    },
+    "NY-04": {
+      "stateAbbr": "NY",
+      "district": "04",
+      "population": 773437
+    },
+    "NY-05": {
+      "stateAbbr": "NY",
+      "district": "05",
+      "population": 800945
+    },
+    "NY-06": {
+      "stateAbbr": "NY",
+      "district": "06",
+      "population": 755796
+    },
+    "NY-07": {
+      "stateAbbr": "NY",
+      "district": "07",
+      "population": 748880
+    },
+    "NY-08": {
+      "stateAbbr": "NY",
+      "district": "08",
+      "population": 778365
+    },
+    "NY-09": {
+      "stateAbbr": "NY",
+      "district": "09",
+      "population": 761493
+    },
+    "NY-10": {
+      "stateAbbr": "NY",
+      "district": "10",
+      "population": 738425
+    },
+    "NY-11": {
+      "stateAbbr": "NY",
+      "district": "11",
+      "population": 759570
+    },
+    "NY-12": {
+      "stateAbbr": "NY",
+      "district": "12",
+      "population": 711829
+    },
+    "NY-13": {
+      "stateAbbr": "NY",
+      "district": "13",
+      "population": 813765
+    },
+    "NY-14": {
+      "stateAbbr": "NY",
+      "district": "14",
+      "population": 727966
+    },
+    "NY-15": {
+      "stateAbbr": "NY",
+      "district": "15",
+      "population": 764377
+    },
+    "NY-16": {
+      "stateAbbr": "NY",
+      "district": "16",
+      "population": 773881
+    },
+    "NY-17": {
+      "stateAbbr": "NY",
+      "district": "17",
+      "population": 775256
+    },
+    "NY-18": {
+      "stateAbbr": "NY",
+      "district": "18",
+      "population": 778056
+    },
+    "NY-19": {
+      "stateAbbr": "NY",
+      "district": "19",
+      "population": 774864
+    },
+    "NY-20": {
+      "stateAbbr": "NY",
+      "district": "20",
+      "population": 779088
+    },
+    "NY-21": {
+      "stateAbbr": "NY",
+      "district": "21",
+      "population": 777284
+    },
+    "NY-22": {
+      "stateAbbr": "NY",
+      "district": "22",
+      "population": 772136
+    },
+    "NY-23": {
+      "stateAbbr": "NY",
+      "district": "23",
+      "population": 776787
+    },
+    "NY-24": {
+      "stateAbbr": "NY",
+      "district": "24",
+      "population": 777980
+    },
+    "NY-25": {
+      "stateAbbr": "NY",
+      "district": "25",
+      "population": 774084
+    },
+    "NY-26": {
+      "stateAbbr": "NY",
+      "district": "26",
+      "population": 772610
+    },
+    "NC-01": {
+      "stateAbbr": "NC",
+      "district": "01",
+      "population": 748754
+    },
+    "NC-02": {
+      "stateAbbr": "NC",
+      "district": "02",
+      "population": 738814
+    },
+    "NC-03": {
+      "stateAbbr": "NC",
+      "district": "03",
+      "population": 746908
+    },
+    "NC-04": {
+      "stateAbbr": "NC",
+      "district": "04",
+      "population": 743550
+    },
+    "NC-05": {
+      "stateAbbr": "NC",
+      "district": "05",
+      "population": 747107
+    },
+    "NC-06": {
+      "stateAbbr": "NC",
+      "district": "06",
+      "population": 745094
+    },
+    "NC-07": {
+      "stateAbbr": "NC",
+      "district": "07",
+      "population": 754700
+    },
+    "NC-08": {
+      "stateAbbr": "NC",
+      "district": "08",
+      "population": 748980
+    },
+    "NC-09": {
+      "stateAbbr": "NC",
+      "district": "09",
+      "population": 747637
+    },
+    "NC-10": {
+      "stateAbbr": "NC",
+      "district": "10",
+      "population": 749703
+    },
+    "NC-11": {
+      "stateAbbr": "NC",
+      "district": "11",
+      "population": 746329
+    },
+    "NC-12": {
+      "stateAbbr": "NC",
+      "district": "12",
+      "population": 742097
+    },
+    "NC-13": {
+      "stateAbbr": "NC",
+      "district": "13",
+      "population": 760678
+    },
+    "NC-14": {
+      "stateAbbr": "NC",
+      "district": "14",
+      "population": 749863
+    },
+    "ND-00": {
+      "stateAbbr": "ND",
+      "district": "00",
+      "population": 776874
+    },
+    "OH-01": {
+      "stateAbbr": "OH",
+      "district": "01",
+      "population": 785183
+    },
+    "OH-02": {
+      "stateAbbr": "OH",
+      "district": "02",
+      "population": 786866
+    },
+    "OH-03": {
+      "stateAbbr": "OH",
+      "district": "03",
+      "population": 785445
+    },
+    "OH-04": {
+      "stateAbbr": "OH",
+      "district": "04",
+      "population": 787372
+    },
+    "OH-05": {
+      "stateAbbr": "OH",
+      "district": "05",
+      "population": 785703
+    },
+    "OH-06": {
+      "stateAbbr": "OH",
+      "district": "06",
+      "population": 784426
+    },
+    "OH-07": {
+      "stateAbbr": "OH",
+      "district": "07",
+      "population": 783302
+    },
+    "OH-08": {
+      "stateAbbr": "OH",
+      "district": "08",
+      "population": 784012
+    },
+    "OH-09": {
+      "stateAbbr": "OH",
+      "district": "09",
+      "population": 784857
+    },
+    "OH-10": {
+      "stateAbbr": "OH",
+      "district": "10",
+      "population": 784983
+    },
+    "OH-11": {
+      "stateAbbr": "OH",
+      "district": "11",
+      "population": 781356
+    },
+    "OH-12": {
+      "stateAbbr": "OH",
+      "district": "12",
+      "population": 788205
+    },
+    "OH-13": {
+      "stateAbbr": "OH",
+      "district": "13",
+      "population": 785253
+    },
+    "OH-14": {
+      "stateAbbr": "OH",
+      "district": "14",
+      "population": 785932
+    },
+    "OH-15": {
+      "stateAbbr": "OH",
+      "district": "15",
+      "population": 781788
+    },
+    "OK-01": {
+      "stateAbbr": "OK",
+      "district": "01",
+      "population": 792397
+    },
+    "OK-02": {
+      "stateAbbr": "OK",
+      "district": "02",
+      "population": 797693
+    },
+    "OK-03": {
+      "stateAbbr": "OK",
+      "district": "03",
+      "population": 792662
+    },
+    "OK-04": {
+      "stateAbbr": "OK",
+      "district": "04",
+      "population": 794112
+    },
+    "OK-05": {
+      "stateAbbr": "OK",
+      "district": "05",
+      "population": 793633
+    },
+    "OR-01": {
+      "stateAbbr": "OR",
+      "district": "01",
+      "population": 703447
+    },
+    "OR-02": {
+      "stateAbbr": "OR",
+      "district": "02",
+      "population": 705019
+    },
+    "OR-03": {
+      "stateAbbr": "OR",
+      "district": "03",
+      "population": 701275
+    },
+    "OR-04": {
+      "stateAbbr": "OR",
+      "district": "04",
+      "population": 705794
+    },
+    "OR-05": {
+      "stateAbbr": "OR",
+      "district": "05",
+      "population": 707199
+    },
+    "OR-06": {
+      "stateAbbr": "OR",
+      "district": "06",
+      "population": 706640
+    },
+    "PA-01": {
+      "stateAbbr": "PA",
+      "district": "01",
+      "population": 763498
+    },
+    "PA-02": {
+      "stateAbbr": "PA",
+      "district": "02",
+      "population": 762893
+    },
+    "PA-03": {
+      "stateAbbr": "PA",
+      "district": "03",
+      "population": 756676
+    },
+    "PA-04": {
+      "stateAbbr": "PA",
+      "district": "04",
+      "population": 764402
+    },
+    "PA-05": {
+      "stateAbbr": "PA",
+      "district": "05",
+      "population": 763043
+    },
+    "PA-06": {
+      "stateAbbr": "PA",
+      "district": "06",
+      "population": 766664
+    },
+    "PA-07": {
+      "stateAbbr": "PA",
+      "district": "07",
+      "population": 766617
+    },
+    "PA-08": {
+      "stateAbbr": "PA",
+      "district": "08",
+      "population": 764480
+    },
+    "PA-09": {
+      "stateAbbr": "PA",
+      "district": "09",
+      "population": 765339
+    },
+    "PA-10": {
+      "stateAbbr": "PA",
+      "district": "10",
+      "population": 766732
+    },
+    "PA-11": {
+      "stateAbbr": "PA",
+      "district": "11",
+      "population": 765641
+    },
+    "PA-12": {
+      "stateAbbr": "PA",
+      "district": "12",
+      "population": 763762
+    },
+    "PA-13": {
+      "stateAbbr": "PA",
+      "district": "13",
+      "population": 765340
+    },
+    "PA-14": {
+      "stateAbbr": "PA",
+      "district": "14",
+      "population": 763254
+    },
+    "PA-15": {
+      "stateAbbr": "PA",
+      "district": "15",
+      "population": 765029
+    },
+    "PA-16": {
+      "stateAbbr": "PA",
+      "district": "16",
+      "population": 765331
+    },
+    "PA-17": {
+      "stateAbbr": "PA",
+      "district": "17",
+      "population": 760507
+    },
+    "RI-01": {
+      "stateAbbr": "RI",
+      "district": "01",
+      "population": 545354
+    },
+    "RI-02": {
+      "stateAbbr": "RI",
+      "district": "02",
+      "population": 548896
+    },
+    "SC-01": {
+      "stateAbbr": "SC",
+      "district": "01",
+      "population": 734138
+    },
+    "SC-02": {
+      "stateAbbr": "SC",
+      "district": "02",
+      "population": 735646
+    },
+    "SC-03": {
+      "stateAbbr": "SC",
+      "district": "03",
+      "population": 731595
+    },
+    "SC-04": {
+      "stateAbbr": "SC",
+      "district": "04",
+      "population": 737328
+    },
+    "SC-05": {
+      "stateAbbr": "SC",
+      "district": "05",
+      "population": 733429
+    },
+    "SC-06": {
+      "stateAbbr": "SC",
+      "district": "06",
+      "population": 732601
+    },
+    "SC-07": {
+      "stateAbbr": "SC",
+      "district": "07",
+      "population": 738013
+    },
+    "SD-00": {
+      "stateAbbr": "SD",
+      "district": "00",
+      "population": 890342
+    },
+    "TN-01": {
+      "stateAbbr": "TN",
+      "district": "01",
+      "population": 769366
+    },
+    "TN-02": {
+      "stateAbbr": "TN",
+      "district": "02",
+      "population": 771752
+    },
+    "TN-03": {
+      "stateAbbr": "TN",
+      "district": "03",
+      "population": 771173
+    },
+    "TN-04": {
+      "stateAbbr": "TN",
+      "district": "04",
+      "population": 771866
+    },
+    "TN-05": {
+      "stateAbbr": "TN",
+      "district": "05",
+      "population": 767227
+    },
+    "TN-06": {
+      "stateAbbr": "TN",
+      "district": "06",
+      "population": 773165
+    },
+    "TN-07": {
+      "stateAbbr": "TN",
+      "district": "07",
+      "population": 766775
+    },
+    "TN-08": {
+      "stateAbbr": "TN",
+      "district": "08",
+      "population": 765143
+    },
+    "TN-09": {
+      "stateAbbr": "TN",
+      "district": "09",
+      "population": 767305
+    },
+    "TX-01": {
+      "stateAbbr": "TX",
+      "district": "01",
+      "population": 769305
+    },
+    "TX-02": {
+      "stateAbbr": "TX",
+      "district": "02",
+      "population": 761434
+    },
+    "TX-03": {
+      "stateAbbr": "TX",
+      "district": "03",
+      "population": 780231
+    },
+    "TX-04": {
+      "stateAbbr": "TX",
+      "district": "04",
+      "population": 773348
+    },
+    "TX-05": {
+      "stateAbbr": "TX",
+      "district": "05",
+      "population": 773020
+    },
+    "TX-06": {
+      "stateAbbr": "TX",
+      "district": "06",
+      "population": 763185
+    },
+    "TX-07": {
+      "stateAbbr": "TX",
+      "district": "07",
+      "population": 781231
+    },
+    "TX-08": {
+      "stateAbbr": "TX",
+      "district": "08",
+      "population": 771642
+    },
+    "TX-09": {
+      "stateAbbr": "TX",
+      "district": "09",
+      "population": 757232
+    },
+    "TX-10": {
+      "stateAbbr": "TX",
+      "district": "10",
+      "population": 765079
+    },
+    "TX-11": {
+      "stateAbbr": "TX",
+      "district": "11",
+      "population": 760697
+    },
+    "TX-12": {
+      "stateAbbr": "TX",
+      "district": "12",
+      "population": 771857
+    },
+    "TX-13": {
+      "stateAbbr": "TX",
+      "district": "13",
+      "population": 769816
+    },
+    "TX-14": {
+      "stateAbbr": "TX",
+      "district": "14",
+      "population": 768073
+    },
+    "TX-15": {
+      "stateAbbr": "TX",
+      "district": "15",
+      "population": 764599
+    },
+    "TX-16": {
+      "stateAbbr": "TX",
+      "district": "16",
+      "population": 771490
+    },
+    "TX-17": {
+      "stateAbbr": "TX",
+      "district": "17",
+      "population": 777093
+    },
+    "TX-18": {
+      "stateAbbr": "TX",
+      "district": "18",
+      "population": 768562
+    },
+    "TX-19": {
+      "stateAbbr": "TX",
+      "district": "19",
+      "population": 766171
+    },
+    "TX-20": {
+      "stateAbbr": "TX",
+      "district": "20",
+      "population": 797033
+    },
+    "TX-21": {
+      "stateAbbr": "TX",
+      "district": "21",
+      "population": 764786
+    },
+    "TX-22": {
+      "stateAbbr": "TX",
+      "district": "22",
+      "population": 781040
+    },
+    "TX-23": {
+      "stateAbbr": "TX",
+      "district": "23",
+      "population": 745532
+    },
+    "TX-24": {
+      "stateAbbr": "TX",
+      "district": "24",
+      "population": 756184
+    },
+    "TX-25": {
+      "stateAbbr": "TX",
+      "district": "25",
+      "population": 778250
+    },
+    "TX-26": {
+      "stateAbbr": "TX",
+      "district": "26",
+      "population": 775735
+    },
+    "TX-27": {
+      "stateAbbr": "TX",
+      "district": "27",
+      "population": 768203
+    },
+    "TX-28": {
+      "stateAbbr": "TX",
+      "district": "28",
+      "population": 764122
+    },
+    "TX-29": {
+      "stateAbbr": "TX",
+      "district": "29",
+      "population": 774018
+    },
+    "TX-30": {
+      "stateAbbr": "TX",
+      "district": "30",
+      "population": 771989
+    },
+    "TX-31": {
+      "stateAbbr": "TX",
+      "district": "31",
+      "population": 780858
+    },
+    "TX-32": {
+      "stateAbbr": "TX",
+      "district": "32",
+      "population": 758895
+    },
+    "TX-33": {
+      "stateAbbr": "TX",
+      "district": "33",
+      "population": 776063
+    },
+    "TX-34": {
+      "stateAbbr": "TX",
+      "district": "34",
+      "population": 774101
+    },
+    "TX-35": {
+      "stateAbbr": "TX",
+      "district": "35",
+      "population": 768499
+    },
+    "TX-36": {
+      "stateAbbr": "TX",
+      "district": "36",
+      "population": 762290
+    },
+    "TX-37": {
+      "stateAbbr": "TX",
+      "district": "37",
+      "population": 767538
+    },
+    "TX-38": {
+      "stateAbbr": "TX",
+      "district": "38",
+      "population": 764141
+    },
+    "UT-01": {
+      "stateAbbr": "UT",
+      "district": "01",
+      "population": 822008
+    },
+    "UT-02": {
+      "stateAbbr": "UT",
+      "district": "02",
+      "population": 823538
+    },
+    "UT-03": {
+      "stateAbbr": "UT",
+      "district": "03",
+      "population": 813368
+    },
+    "UT-04": {
+      "stateAbbr": "UT",
+      "district": "04",
+      "population": 824895
+    },
+    "VT-00": {
+      "stateAbbr": "VT",
+      "district": "00",
+      "population": 643816
+    },
+    "VA-01": {
+      "stateAbbr": "VA",
+      "district": "01",
+      "population": 789933
+    },
+    "VA-02": {
+      "stateAbbr": "VA",
+      "district": "02",
+      "population": 783084
+    },
+    "VA-03": {
+      "stateAbbr": "VA",
+      "district": "03",
+      "population": 778421
+    },
+    "VA-04": {
+      "stateAbbr": "VA",
+      "district": "04",
+      "population": 784211
+    },
+    "VA-05": {
+      "stateAbbr": "VA",
+      "district": "05",
+      "population": 789918
+    },
+    "VA-06": {
+      "stateAbbr": "VA",
+      "district": "06",
+      "population": 783906
+    },
+    "VA-07": {
+      "stateAbbr": "VA",
+      "district": "07",
+      "population": 786030
+    },
+    "VA-08": {
+      "stateAbbr": "VA",
+      "district": "08",
+      "population": 778819
+    },
+    "VA-09": {
+      "stateAbbr": "VA",
+      "district": "09",
+      "population": 785903
+    },
+    "VA-10": {
+      "stateAbbr": "VA",
+      "district": "10",
+      "population": 783536
+    },
+    "VA-11": {
+      "stateAbbr": "VA",
+      "district": "11",
+      "population": 780750
+    },
+    "WA-01": {
+      "stateAbbr": "WA",
+      "district": "01",
+      "population": 768493
+    },
+    "WA-02": {
+      "stateAbbr": "WA",
+      "district": "02",
+      "population": 770694
+    },
+    "WA-03": {
+      "stateAbbr": "WA",
+      "district": "03",
+      "population": 770201
+    },
+    "WA-04": {
+      "stateAbbr": "WA",
+      "district": "04",
+      "population": 769380
+    },
+    "WA-05": {
+      "stateAbbr": "WA",
+      "district": "05",
+      "population": 773672
+    },
+    "WA-06": {
+      "stateAbbr": "WA",
+      "district": "06",
+      "population": 771582
+    },
+    "WA-07": {
+      "stateAbbr": "WA",
+      "district": "07",
+      "population": 765336
+    },
+    "WA-08": {
+      "stateAbbr": "WA",
+      "district": "08",
+      "population": 768045
+    },
+    "WA-09": {
+      "stateAbbr": "WA",
+      "district": "09",
+      "population": 762237
+    },
+    "WA-10": {
+      "stateAbbr": "WA",
+      "district": "10",
+      "population": 768909
+    },
+    "WV-01": {
+      "stateAbbr": "WV",
+      "district": "01",
+      "population": 893959
+    },
+    "WV-02": {
+      "stateAbbr": "WV",
+      "district": "02",
+      "population": 899008
+    },
+    "WI-01": {
+      "stateAbbr": "WI",
+      "district": "01",
+      "population": 733336
+    },
+    "WI-02": {
+      "stateAbbr": "WI",
+      "district": "02",
+      "population": 735105
+    },
+    "WI-03": {
+      "stateAbbr": "WI",
+      "district": "03",
+      "population": 735541
+    },
+    "WI-04": {
+      "stateAbbr": "WI",
+      "district": "04",
+      "population": 731384
+    },
+    "WI-05": {
+      "stateAbbr": "WI",
+      "district": "05",
+      "population": 738618
+    },
+    "WI-06": {
+      "stateAbbr": "WI",
+      "district": "06",
+      "population": 734872
+    },
+    "WI-07": {
+      "stateAbbr": "WI",
+      "district": "07",
+      "population": 737082
+    },
+    "WI-08": {
+      "stateAbbr": "WI",
+      "district": "08",
+      "population": 736190
+    },
+    "WY-00": {
+      "stateAbbr": "WY",
+      "district": "00",
+      "population": 577929
+    }
+  }
+}

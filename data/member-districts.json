@@ -1,0 +1,3389 @@
+{
+  "fetchedAt": "2026-03-23T02:54:49.069Z",
+  "source": "unitedstates/congress-legislators (gh-pages branch)",
+  "note": "Refresh at start of each Congress (every 2 years) and after special elections",
+  "totalMembers": 483,
+  "members": {
+    "C000127": {
+      "districtKey": "WA-01",
+      "name": "Maria Cantwell",
+      "state": "WA",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "S000033": {
+      "districtKey": "VT-00",
+      "name": "Bernard Sanders",
+      "state": "VT",
+      "district": 0,
+      "party": "Independent"
+    },
+    "W000437": {
+      "districtKey": "MS-01",
+      "name": "Roger F. Wicker",
+      "state": "MS",
+      "district": 1,
+      "party": "Republican"
+    },
+    "D000563": {
+      "districtKey": "IL-20",
+      "name": "Richard J. Durbin",
+      "state": "IL",
+      "district": 20,
+      "party": "Democrat"
+    },
+    "G000359": {
+      "districtKey": "SC-03",
+      "name": "Lindsey Graham",
+      "state": "SC",
+      "district": 3,
+      "party": "Republican"
+    },
+    "R000122": {
+      "districtKey": "RI-02",
+      "name": "Jack Reed",
+      "state": "RI",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "G000555": {
+      "districtKey": "NY-20",
+      "name": "Kirsten E. Gillibrand",
+      "state": "NY",
+      "district": 20,
+      "party": "Democrat"
+    },
+    "A000055": {
+      "districtKey": "AL-04",
+      "name": "Robert B. Aderholt",
+      "state": "AL",
+      "district": 4,
+      "party": "Republican"
+    },
+    "B001230": {
+      "districtKey": "WI-02",
+      "name": "Tammy Baldwin",
+      "state": "WI",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "B001257": {
+      "districtKey": "FL-12",
+      "name": "Gus M. Bilirakis",
+      "state": "FL",
+      "district": 12,
+      "party": "Republican"
+    },
+    "B000490": {
+      "districtKey": "GA-02",
+      "name": "Sanford D. Bishop, Jr.",
+      "state": "GA",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "B001243": {
+      "districtKey": "TN-07",
+      "name": "Marsha Blackburn",
+      "state": "TN",
+      "district": 7,
+      "party": "Republican"
+    },
+    "B001236": {
+      "districtKey": "AR-03",
+      "name": "John Boozman",
+      "state": "AR",
+      "district": 3,
+      "party": "Republican"
+    },
+    "B001260": {
+      "districtKey": "FL-16",
+      "name": "Vern Buchanan",
+      "state": "FL",
+      "district": 16,
+      "party": "Republican"
+    },
+    "C000059": {
+      "districtKey": "CA-41",
+      "name": "Ken Calvert",
+      "state": "CA",
+      "district": 41,
+      "party": "Republican"
+    },
+    "C001047": {
+      "districtKey": "WV-02",
+      "name": "Shelley Moore Capito",
+      "state": "WV",
+      "district": 2,
+      "party": "Republican"
+    },
+    "C001072": {
+      "districtKey": "IN-07",
+      "name": "André Carson",
+      "state": "IN",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "C001051": {
+      "districtKey": "TX-31",
+      "name": "John R. Carter",
+      "state": "TX",
+      "district": 31,
+      "party": "Republican"
+    },
+    "C001075": {
+      "districtKey": "LA-06",
+      "name": "Bill Cassidy",
+      "state": "LA",
+      "district": 6,
+      "party": "Republican"
+    },
+    "C001066": {
+      "districtKey": "FL-14",
+      "name": "Kathy Castor",
+      "state": "FL",
+      "district": 14,
+      "party": "Democrat"
+    },
+    "C001080": {
+      "districtKey": "CA-28",
+      "name": "Judy Chu",
+      "state": "CA",
+      "district": 28,
+      "party": "Democrat"
+    },
+    "C001067": {
+      "districtKey": "NY-09",
+      "name": "Yvette D. Clarke",
+      "state": "NY",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "C001061": {
+      "districtKey": "MO-05",
+      "name": "Emanuel Cleaver",
+      "state": "MO",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "C000537": {
+      "districtKey": "SC-06",
+      "name": "James E. Clyburn",
+      "state": "SC",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "C001068": {
+      "districtKey": "TN-09",
+      "name": "Steve Cohen",
+      "state": "TN",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "C001053": {
+      "districtKey": "OK-04",
+      "name": "Tom Cole",
+      "state": "OK",
+      "district": 4,
+      "party": "Republican"
+    },
+    "C001059": {
+      "districtKey": "CA-21",
+      "name": "Jim Costa",
+      "state": "CA",
+      "district": 21,
+      "party": "Democrat"
+    },
+    "C001069": {
+      "districtKey": "CT-02",
+      "name": "Joe Courtney",
+      "state": "CT",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "C000880": {
+      "districtKey": "ID-02",
+      "name": "Mike Crapo",
+      "state": "ID",
+      "district": 2,
+      "party": "Republican"
+    },
+    "C001087": {
+      "districtKey": "AR-01",
+      "name": "Eric A. \"Rick\" Crawford",
+      "state": "AR",
+      "district": 1,
+      "party": "Republican"
+    },
+    "C001063": {
+      "districtKey": "TX-28",
+      "name": "Henry Cuellar",
+      "state": "TX",
+      "district": 28,
+      "party": "Democrat"
+    },
+    "D000096": {
+      "districtKey": "IL-07",
+      "name": "Danny K. Davis",
+      "state": "IL",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "D000197": {
+      "districtKey": "CO-01",
+      "name": "Diana DeGette",
+      "state": "CO",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "D000216": {
+      "districtKey": "CT-03",
+      "name": "Rosa L. DeLauro",
+      "state": "CT",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "D000616": {
+      "districtKey": "TN-04",
+      "name": "Scott DesJarlais",
+      "state": "TN",
+      "district": 4,
+      "party": "Republican"
+    },
+    "D000600": {
+      "districtKey": "FL-26",
+      "name": "Mario Diaz-Balart",
+      "state": "FL",
+      "district": 26,
+      "party": "Republican"
+    },
+    "D000399": {
+      "districtKey": "TX-37",
+      "name": "Lloyd Doggett",
+      "state": "TX",
+      "district": 37,
+      "party": "Democrat"
+    },
+    "F000459": {
+      "districtKey": "TN-03",
+      "name": "Charles J. \"Chuck\" Fleischmann",
+      "state": "TN",
+      "district": 3,
+      "party": "Republican"
+    },
+    "F000450": {
+      "districtKey": "NC-05",
+      "name": "Virginia Foxx",
+      "state": "NC",
+      "district": 5,
+      "party": "Republican"
+    },
+    "G000559": {
+      "districtKey": "CA-08",
+      "name": "John Garamendi",
+      "state": "CA",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "G000565": {
+      "districtKey": "AZ-09",
+      "name": "Paul A. Gosar",
+      "state": "AZ",
+      "district": 9,
+      "party": "Republican"
+    },
+    "G000386": {
+      "districtKey": "IA-03",
+      "name": "Chuck Grassley",
+      "state": "IA",
+      "district": 3,
+      "party": "Republican"
+    },
+    "G000546": {
+      "districtKey": "MO-06",
+      "name": "Sam Graves",
+      "state": "MO",
+      "district": 6,
+      "party": "Republican"
+    },
+    "G000553": {
+      "districtKey": "TX-09",
+      "name": "Al Green",
+      "state": "TX",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "G000568": {
+      "districtKey": "VA-09",
+      "name": "H. Morgan Griffith",
+      "state": "VA",
+      "district": 9,
+      "party": "Republican"
+    },
+    "G000558": {
+      "districtKey": "KY-02",
+      "name": "Brett Guthrie",
+      "state": "KY",
+      "district": 2,
+      "party": "Republican"
+    },
+    "H001052": {
+      "districtKey": "MD-01",
+      "name": "Andy Harris",
+      "state": "MD",
+      "district": 1,
+      "party": "Republican"
+    },
+    "H001046": {
+      "districtKey": "NM-01",
+      "name": "Martin Heinrich",
+      "state": "NM",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "H001047": {
+      "districtKey": "CT-04",
+      "name": "James A. Himes",
+      "state": "CT",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "H001042": {
+      "districtKey": "HI-02",
+      "name": "Mazie K. Hirono",
+      "state": "HI",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "H000874": {
+      "districtKey": "MD-05",
+      "name": "Steny H. Hoyer",
+      "state": "MD",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "H001058": {
+      "districtKey": "MI-04",
+      "name": "Bill Huizenga",
+      "state": "MI",
+      "district": 4,
+      "party": "Republican"
+    },
+    "J000288": {
+      "districtKey": "GA-04",
+      "name": "Henry C. \"Hank\" Johnson, Jr.",
+      "state": "GA",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "J000289": {
+      "districtKey": "OH-04",
+      "name": "Jim Jordan",
+      "state": "OH",
+      "district": 4,
+      "party": "Republican"
+    },
+    "K000009": {
+      "districtKey": "OH-09",
+      "name": "Marcy Kaptur",
+      "state": "OH",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "K000375": {
+      "districtKey": "MA-09",
+      "name": "William R. Keating",
+      "state": "MA",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "K000376": {
+      "districtKey": "PA-16",
+      "name": "Mike Kelly",
+      "state": "PA",
+      "district": 16,
+      "party": "Republican"
+    },
+    "L000575": {
+      "districtKey": "OK-05",
+      "name": "James Lankford",
+      "state": "OK",
+      "district": 5,
+      "party": "Republican"
+    },
+    "L000560": {
+      "districtKey": "WA-02",
+      "name": "Rick Larsen",
+      "state": "WA",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "L000557": {
+      "districtKey": "CT-01",
+      "name": "John B. Larson",
+      "state": "CT",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "L000566": {
+      "districtKey": "OH-05",
+      "name": "Robert E. Latta",
+      "state": "OH",
+      "district": 5,
+      "party": "Republican"
+    },
+    "L000397": {
+      "districtKey": "CA-18",
+      "name": "Zoe Lofgren",
+      "state": "CA",
+      "district": 18,
+      "party": "Democrat"
+    },
+    "L000491": {
+      "districtKey": "OK-03",
+      "name": "Frank D. Lucas",
+      "state": "OK",
+      "district": 3,
+      "party": "Republican"
+    },
+    "L000570": {
+      "districtKey": "NM-03",
+      "name": "Ben Ray Luján",
+      "state": "NM",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "L000562": {
+      "districtKey": "MA-08",
+      "name": "Stephen F. Lynch",
+      "state": "MA",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "M000133": {
+      "districtKey": "MA-05",
+      "name": "Edward J. Markey",
+      "state": "MA",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "M001163": {
+      "districtKey": "CA-07",
+      "name": "Doris O. Matsui",
+      "state": "CA",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "M001157": {
+      "districtKey": "TX-10",
+      "name": "Michael T. McCaul",
+      "state": "TX",
+      "district": 10,
+      "party": "Republican"
+    },
+    "M001177": {
+      "districtKey": "CA-05",
+      "name": "Tom McClintock",
+      "state": "CA",
+      "district": 5,
+      "party": "Republican"
+    },
+    "M001143": {
+      "districtKey": "MN-04",
+      "name": "Betty McCollum",
+      "state": "MN",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "M000312": {
+      "districtKey": "MA-02",
+      "name": "James P. McGovern",
+      "state": "MA",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "M001137": {
+      "districtKey": "NY-05",
+      "name": "Gregory W. Meeks",
+      "state": "NY",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "M001160": {
+      "districtKey": "WI-04",
+      "name": "Gwen Moore",
+      "state": "WI",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "M000934": {
+      "districtKey": "KS-01",
+      "name": "Jerry Moran",
+      "state": "KS",
+      "district": 1,
+      "party": "Republican"
+    },
+    "M001169": {
+      "districtKey": "CT-05",
+      "name": "Christopher Murphy",
+      "state": "CT",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "N000002": {
+      "districtKey": "NY-12",
+      "name": "Jerrold Nadler",
+      "state": "NY",
+      "district": 12,
+      "party": "Democrat"
+    },
+    "N000015": {
+      "districtKey": "MA-01",
+      "name": "Richard E. Neal",
+      "state": "MA",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "N000147": {
+      "districtKey": "DC-00",
+      "name": "Eleanor Holmes Norton",
+      "state": "DC",
+      "district": 0,
+      "party": "Democrat"
+    },
+    "P000034": {
+      "districtKey": "NJ-06",
+      "name": "Frank Pallone, Jr.",
+      "state": "NJ",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "P000197": {
+      "districtKey": "CA-11",
+      "name": "Nancy Pelosi",
+      "state": "CA",
+      "district": 11,
+      "party": "Democrat"
+    },
+    "P000595": {
+      "districtKey": "MI-14",
+      "name": "Gary C. Peters",
+      "state": "MI",
+      "district": 14,
+      "party": "Democrat"
+    },
+    "P000597": {
+      "districtKey": "ME-01",
+      "name": "Chellie Pingree",
+      "state": "ME",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "Q000023": {
+      "districtKey": "IL-05",
+      "name": "Mike Quigley",
+      "state": "IL",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "R000395": {
+      "districtKey": "KY-05",
+      "name": "Harold Rogers",
+      "state": "KY",
+      "district": 5,
+      "party": "Republican"
+    },
+    "R000575": {
+      "districtKey": "AL-03",
+      "name": "Mike Rogers",
+      "state": "AL",
+      "district": 3,
+      "party": "Republican"
+    },
+    "S001176": {
+      "districtKey": "LA-01",
+      "name": "Steve Scalise",
+      "state": "LA",
+      "district": 1,
+      "party": "Republican"
+    },
+    "S001145": {
+      "districtKey": "IL-09",
+      "name": "Janice D. Schakowsky",
+      "state": "IL",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "S001150": {
+      "districtKey": "CA-30",
+      "name": "Adam B. Schiff",
+      "state": "CA",
+      "district": 30,
+      "party": "Democrat"
+    },
+    "S000148": {
+      "districtKey": "NY-09",
+      "name": "Charles E. Schumer",
+      "state": "NY",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "S001183": {
+      "districtKey": "AZ-01",
+      "name": "David Schweikert",
+      "state": "AZ",
+      "district": 1,
+      "party": "Republican"
+    },
+    "S001189": {
+      "districtKey": "GA-08",
+      "name": "Austin Scott",
+      "state": "GA",
+      "district": 8,
+      "party": "Republican"
+    },
+    "S001157": {
+      "districtKey": "GA-13",
+      "name": "David Scott",
+      "state": "GA",
+      "district": 13,
+      "party": "Democrat"
+    },
+    "S000185": {
+      "districtKey": "VA-03",
+      "name": "Robert C. \"Bobby\" Scott",
+      "state": "VA",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "S001184": {
+      "districtKey": "SC-01",
+      "name": "Tim Scott",
+      "state": "SC",
+      "district": 1,
+      "party": "Republican"
+    },
+    "S001185": {
+      "districtKey": "AL-07",
+      "name": "Terri A. Sewell",
+      "state": "AL",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "S000344": {
+      "districtKey": "CA-32",
+      "name": "Brad Sherman",
+      "state": "CA",
+      "district": 32,
+      "party": "Democrat"
+    },
+    "S001148": {
+      "districtKey": "ID-02",
+      "name": "Michael K. Simpson",
+      "state": "ID",
+      "district": 2,
+      "party": "Republican"
+    },
+    "S000510": {
+      "districtKey": "WA-09",
+      "name": "Adam Smith",
+      "state": "WA",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "S001172": {
+      "districtKey": "NE-03",
+      "name": "Adrian Smith",
+      "state": "NE",
+      "district": 3,
+      "party": "Republican"
+    },
+    "S000522": {
+      "districtKey": "NJ-04",
+      "name": "Christopher H. Smith",
+      "state": "NJ",
+      "district": 4,
+      "party": "Republican"
+    },
+    "S001156": {
+      "districtKey": "CA-38",
+      "name": "Linda T. Sánchez",
+      "state": "CA",
+      "district": 38,
+      "party": "Democrat"
+    },
+    "T000193": {
+      "districtKey": "MS-02",
+      "name": "Bennie G. Thompson",
+      "state": "MS",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "T000460": {
+      "districtKey": "CA-04",
+      "name": "Mike Thompson",
+      "state": "CA",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "T000467": {
+      "districtKey": "PA-15",
+      "name": "Glenn Thompson",
+      "state": "PA",
+      "district": 15,
+      "party": "Republican"
+    },
+    "T000250": {
+      "districtKey": "SD-00",
+      "name": "John Thune",
+      "state": "SD",
+      "district": 0,
+      "party": "Republican"
+    },
+    "T000469": {
+      "districtKey": "NY-20",
+      "name": "Paul Tonko",
+      "state": "NY",
+      "district": 20,
+      "party": "Democrat"
+    },
+    "T000463": {
+      "districtKey": "OH-10",
+      "name": "Michael R. Turner",
+      "state": "OH",
+      "district": 10,
+      "party": "Republican"
+    },
+    "V000128": {
+      "districtKey": "MD-08",
+      "name": "Chris Van Hollen",
+      "state": "MD",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "V000081": {
+      "districtKey": "NY-07",
+      "name": "Nydia M. Velázquez",
+      "state": "NY",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "W000798": {
+      "districtKey": "MI-05",
+      "name": "Tim Walberg",
+      "state": "MI",
+      "district": 5,
+      "party": "Republican"
+    },
+    "W000797": {
+      "districtKey": "FL-25",
+      "name": "Debbie Wasserman Schultz",
+      "state": "FL",
+      "district": 25,
+      "party": "Democrat"
+    },
+    "W000187": {
+      "districtKey": "CA-43",
+      "name": "Maxine Waters",
+      "state": "CA",
+      "district": 43,
+      "party": "Democrat"
+    },
+    "W000806": {
+      "districtKey": "FL-11",
+      "name": "Daniel Webster",
+      "state": "FL",
+      "district": 11,
+      "party": "Republican"
+    },
+    "W000800": {
+      "districtKey": "VT-00",
+      "name": "Peter Welch",
+      "state": "VT",
+      "district": 0,
+      "party": "Democrat"
+    },
+    "W000795": {
+      "districtKey": "SC-02",
+      "name": "Joe Wilson",
+      "state": "SC",
+      "district": 2,
+      "party": "Republican"
+    },
+    "W000808": {
+      "districtKey": "FL-24",
+      "name": "Frederica S. Wilson",
+      "state": "FL",
+      "district": 24,
+      "party": "Democrat"
+    },
+    "W000804": {
+      "districtKey": "VA-01",
+      "name": "Robert J. Wittman",
+      "state": "VA",
+      "district": 1,
+      "party": "Republican"
+    },
+    "W000809": {
+      "districtKey": "AR-03",
+      "name": "Steve Womack",
+      "state": "AR",
+      "district": 3,
+      "party": "Republican"
+    },
+    "W000779": {
+      "districtKey": "OR-03",
+      "name": "Ron Wyden",
+      "state": "OR",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "Y000064": {
+      "districtKey": "IN-09",
+      "name": "Todd Young",
+      "state": "IN",
+      "district": 9,
+      "party": "Republican"
+    },
+    "A000369": {
+      "districtKey": "NV-02",
+      "name": "Mark E. Amodei",
+      "state": "NV",
+      "district": 2,
+      "party": "Republican"
+    },
+    "B001278": {
+      "districtKey": "OR-01",
+      "name": "Suzanne Bonamici",
+      "state": "OR",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "D000617": {
+      "districtKey": "WA-01",
+      "name": "Suzan K. DelBene",
+      "state": "WA",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "M001184": {
+      "districtKey": "KY-04",
+      "name": "Thomas Massie",
+      "state": "KY",
+      "district": 4,
+      "party": "Republican"
+    },
+    "F000454": {
+      "districtKey": "IL-11",
+      "name": "Bill Foster",
+      "state": "IL",
+      "district": 11,
+      "party": "Democrat"
+    },
+    "T000468": {
+      "districtKey": "NV-01",
+      "name": "Dina Titus",
+      "state": "NV",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "C001095": {
+      "districtKey": "AR-04",
+      "name": "Tom Cotton",
+      "state": "AR",
+      "district": 4,
+      "party": "Republican"
+    },
+    "H001068": {
+      "districtKey": "CA-02",
+      "name": "Jared Huffman",
+      "state": "CA",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "B001287": {
+      "districtKey": "CA-06",
+      "name": "Ami Bera",
+      "state": "CA",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "S001193": {
+      "districtKey": "CA-14",
+      "name": "Eric Swalwell",
+      "state": "CA",
+      "district": 14,
+      "party": "Democrat"
+    },
+    "B001285": {
+      "districtKey": "CA-26",
+      "name": "Julia Brownley",
+      "state": "CA",
+      "district": 26,
+      "party": "Democrat"
+    },
+    "R000599": {
+      "districtKey": "CA-25",
+      "name": "Raul Ruiz",
+      "state": "CA",
+      "district": 25,
+      "party": "Democrat"
+    },
+    "T000472": {
+      "districtKey": "CA-39",
+      "name": "Mark Takano",
+      "state": "CA",
+      "district": 39,
+      "party": "Democrat"
+    },
+    "V000130": {
+      "districtKey": "CA-52",
+      "name": "Juan Vargas",
+      "state": "CA",
+      "district": 52,
+      "party": "Democrat"
+    },
+    "P000608": {
+      "districtKey": "CA-50",
+      "name": "Scott H. Peters",
+      "state": "CA",
+      "district": 50,
+      "party": "Democrat"
+    },
+    "F000462": {
+      "districtKey": "FL-22",
+      "name": "Lois Frankel",
+      "state": "FL",
+      "district": 22,
+      "party": "Democrat"
+    },
+    "D000622": {
+      "districtKey": "IL-08",
+      "name": "Tammy Duckworth",
+      "state": "IL",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "B001282": {
+      "districtKey": "KY-06",
+      "name": "Andy Barr",
+      "state": "KY",
+      "district": 6,
+      "party": "Republican"
+    },
+    "W000812": {
+      "districtKey": "MO-02",
+      "name": "Ann Wagner",
+      "state": "MO",
+      "district": 2,
+      "party": "Republican"
+    },
+    "D000618": {
+      "districtKey": "MT-00",
+      "name": "Steve Daines",
+      "state": "MT",
+      "district": 0,
+      "party": "Republican"
+    },
+    "H001067": {
+      "districtKey": "NC-09",
+      "name": "Richard Hudson",
+      "state": "NC",
+      "district": 9,
+      "party": "Republican"
+    },
+    "C001096": {
+      "districtKey": "ND-00",
+      "name": "Kevin Cramer",
+      "state": "ND",
+      "district": 0,
+      "party": "Republican"
+    },
+    "M001188": {
+      "districtKey": "NY-06",
+      "name": "Grace Meng",
+      "state": "NY",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "J000294": {
+      "districtKey": "NY-08",
+      "name": "Hakeem S. Jeffries",
+      "state": "NY",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "B001281": {
+      "districtKey": "OH-03",
+      "name": "Joyce Beatty",
+      "state": "OH",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "J000295": {
+      "districtKey": "OH-14",
+      "name": "David P. Joyce",
+      "state": "OH",
+      "district": 14,
+      "party": "Republican"
+    },
+    "M001190": {
+      "districtKey": "OK-02",
+      "name": "Markwayne Mullin",
+      "state": "OK",
+      "district": 2,
+      "party": "Republican"
+    },
+    "P000605": {
+      "districtKey": "PA-10",
+      "name": "Scott Perry",
+      "state": "PA",
+      "district": 10,
+      "party": "Republican"
+    },
+    "W000814": {
+      "districtKey": "TX-14",
+      "name": "Randy K. Weber, Sr.",
+      "state": "TX",
+      "district": 14,
+      "party": "Republican"
+    },
+    "C001091": {
+      "districtKey": "TX-20",
+      "name": "Joaquin Castro",
+      "state": "TX",
+      "district": 20,
+      "party": "Democrat"
+    },
+    "W000816": {
+      "districtKey": "TX-25",
+      "name": "Roger Williams",
+      "state": "TX",
+      "district": 25,
+      "party": "Republican"
+    },
+    "V000131": {
+      "districtKey": "TX-33",
+      "name": "Marc A. Veasey",
+      "state": "TX",
+      "district": 33,
+      "party": "Democrat"
+    },
+    "P000607": {
+      "districtKey": "WI-02",
+      "name": "Mark Pocan",
+      "state": "WI",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "K000385": {
+      "districtKey": "IL-02",
+      "name": "Robin L. Kelly",
+      "state": "IL",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "S001195": {
+      "districtKey": "MO-08",
+      "name": "Jason Smith",
+      "state": "MO",
+      "district": 8,
+      "party": "Republican"
+    },
+    "C001101": {
+      "districtKey": "MA-05",
+      "name": "Katherine M. Clark",
+      "state": "MA",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "N000188": {
+      "districtKey": "NJ-01",
+      "name": "Donald Norcross",
+      "state": "NJ",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "A000370": {
+      "districtKey": "NC-12",
+      "name": "Alma S. Adams",
+      "state": "NC",
+      "district": 12,
+      "party": "Democrat"
+    },
+    "P000609": {
+      "districtKey": "AL-06",
+      "name": "Gary J. Palmer",
+      "state": "AL",
+      "district": 6,
+      "party": "Republican"
+    },
+    "H001072": {
+      "districtKey": "AR-02",
+      "name": "J. French Hill",
+      "state": "AR",
+      "district": 2,
+      "party": "Republican"
+    },
+    "W000821": {
+      "districtKey": "AR-04",
+      "name": "Bruce Westerman",
+      "state": "AR",
+      "district": 4,
+      "party": "Republican"
+    },
+    "G000574": {
+      "districtKey": "AZ-03",
+      "name": "Ruben Gallego",
+      "state": "AZ",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "D000623": {
+      "districtKey": "CA-10",
+      "name": "Mark DeSaulnier",
+      "state": "CA",
+      "district": 10,
+      "party": "Democrat"
+    },
+    "A000371": {
+      "districtKey": "CA-33",
+      "name": "Pete Aguilar",
+      "state": "CA",
+      "district": 33,
+      "party": "Democrat"
+    },
+    "L000582": {
+      "districtKey": "CA-36",
+      "name": "Ted Lieu",
+      "state": "CA",
+      "district": 36,
+      "party": "Democrat"
+    },
+    "T000474": {
+      "districtKey": "CA-35",
+      "name": "Norma J. Torres",
+      "state": "CA",
+      "district": 35,
+      "party": "Democrat"
+    },
+    "C001103": {
+      "districtKey": "GA-01",
+      "name": "Earl L. \"Buddy\" Carter",
+      "state": "GA",
+      "district": 1,
+      "party": "Republican"
+    },
+    "L000583": {
+      "districtKey": "GA-11",
+      "name": "Barry Loudermilk",
+      "state": "GA",
+      "district": 11,
+      "party": "Republican"
+    },
+    "A000372": {
+      "districtKey": "GA-12",
+      "name": "Rick W. Allen",
+      "state": "GA",
+      "district": 12,
+      "party": "Republican"
+    },
+    "B001295": {
+      "districtKey": "IL-12",
+      "name": "Mike Bost",
+      "state": "IL",
+      "district": 12,
+      "party": "Republican"
+    },
+    "M001196": {
+      "districtKey": "MA-06",
+      "name": "Seth Moulton",
+      "state": "MA",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "M001194": {
+      "districtKey": "MI-02",
+      "name": "John R. Moolenaar",
+      "state": "MI",
+      "district": 2,
+      "party": "Republican"
+    },
+    "D000624": {
+      "districtKey": "MI-06",
+      "name": "Debbie Dingell",
+      "state": "MI",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "E000294": {
+      "districtKey": "MN-06",
+      "name": "Tom Emmer",
+      "state": "MN",
+      "district": 6,
+      "party": "Republican"
+    },
+    "R000603": {
+      "districtKey": "NC-07",
+      "name": "David Rouzer",
+      "state": "NC",
+      "district": 7,
+      "party": "Republican"
+    },
+    "W000822": {
+      "districtKey": "NJ-12",
+      "name": "Bonnie Watson Coleman",
+      "state": "NJ",
+      "district": 12,
+      "party": "Democrat"
+    },
+    "S001196": {
+      "districtKey": "NY-21",
+      "name": "Elise M. Stefanik",
+      "state": "NY",
+      "district": 21,
+      "party": "Republican"
+    },
+    "B001296": {
+      "districtKey": "PA-02",
+      "name": "Brendan F. Boyle",
+      "state": "PA",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "B001291": {
+      "districtKey": "TX-36",
+      "name": "Brian Babin",
+      "state": "TX",
+      "district": 36,
+      "party": "Republican"
+    },
+    "B001292": {
+      "districtKey": "VA-08",
+      "name": "Donald S. Beyer, Jr.",
+      "state": "VA",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "P000610": {
+      "districtKey": "VI-00",
+      "name": "Stacey E. Plaskett",
+      "state": "VI",
+      "district": 0,
+      "party": "Democrat"
+    },
+    "N000189": {
+      "districtKey": "WA-04",
+      "name": "Dan Newhouse",
+      "state": "WA",
+      "district": 4,
+      "party": "Republican"
+    },
+    "G000576": {
+      "districtKey": "WI-06",
+      "name": "Glenn Grothman",
+      "state": "WI",
+      "district": 6,
+      "party": "Republican"
+    },
+    "R000600": {
+      "districtKey": "AS-00",
+      "name": "Aumua Amata Coleman Radewagen",
+      "state": "AS",
+      "district": 0,
+      "party": "Republican"
+    },
+    "K000388": {
+      "districtKey": "MS-01",
+      "name": "Trent Kelly",
+      "state": "MS",
+      "district": 1,
+      "party": "Republican"
+    },
+    "L000585": {
+      "districtKey": "IL-16",
+      "name": "Darin LaHood",
+      "state": "IL",
+      "district": 16,
+      "party": "Republican"
+    },
+    "D000626": {
+      "districtKey": "OH-08",
+      "name": "Warren Davidson",
+      "state": "OH",
+      "district": 8,
+      "party": "Republican"
+    },
+    "C001108": {
+      "districtKey": "KY-01",
+      "name": "James Comer",
+      "state": "KY",
+      "district": 1,
+      "party": "Republican"
+    },
+    "E000296": {
+      "districtKey": "PA-03",
+      "name": "Dwight Evans",
+      "state": "PA",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "S001190": {
+      "districtKey": "IL-10",
+      "name": "Bradley Scott Schneider",
+      "state": "IL",
+      "district": 10,
+      "party": "Democrat"
+    },
+    "B001302": {
+      "districtKey": "AZ-05",
+      "name": "Andy Biggs",
+      "state": "AZ",
+      "district": 5,
+      "party": "Republican"
+    },
+    "K000389": {
+      "districtKey": "CA-17",
+      "name": "Ro Khanna",
+      "state": "CA",
+      "district": 17,
+      "party": "Democrat"
+    },
+    "P000613": {
+      "districtKey": "CA-19",
+      "name": "Jimmy Panetta",
+      "state": "CA",
+      "district": 19,
+      "party": "Democrat"
+    },
+    "C001112": {
+      "districtKey": "CA-24",
+      "name": "Salud O. Carbajal",
+      "state": "CA",
+      "district": 24,
+      "party": "Democrat"
+    },
+    "B001300": {
+      "districtKey": "CA-44",
+      "name": "Nanette Diaz Barragán",
+      "state": "CA",
+      "district": 44,
+      "party": "Democrat"
+    },
+    "C001110": {
+      "districtKey": "CA-46",
+      "name": "J. Luis Correa",
+      "state": "CA",
+      "district": 46,
+      "party": "Democrat"
+    },
+    "B001303": {
+      "districtKey": "DE-00",
+      "name": "Lisa Blunt Rochester",
+      "state": "DE",
+      "district": 0,
+      "party": "Democrat"
+    },
+    "D000628": {
+      "districtKey": "FL-02",
+      "name": "Neal P. Dunn",
+      "state": "FL",
+      "district": 2,
+      "party": "Republican"
+    },
+    "R000609": {
+      "districtKey": "FL-05",
+      "name": "John H. Rutherford",
+      "state": "FL",
+      "district": 5,
+      "party": "Republican"
+    },
+    "S001200": {
+      "districtKey": "FL-09",
+      "name": "Darren Soto",
+      "state": "FL",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "M001199": {
+      "districtKey": "FL-21",
+      "name": "Brian J. Mast",
+      "state": "FL",
+      "district": 21,
+      "party": "Republican"
+    },
+    "K000391": {
+      "districtKey": "IL-08",
+      "name": "Raja Krishnamoorthi",
+      "state": "IL",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "B001299": {
+      "districtKey": "IN-03",
+      "name": "Jim Banks",
+      "state": "IN",
+      "district": 3,
+      "party": "Republican"
+    },
+    "M001198": {
+      "districtKey": "KS-01",
+      "name": "Roger Marshall",
+      "state": "KS",
+      "district": 1,
+      "party": "Republican"
+    },
+    "H001077": {
+      "districtKey": "LA-03",
+      "name": "Clay Higgins",
+      "state": "LA",
+      "district": 3,
+      "party": "Republican"
+    },
+    "J000299": {
+      "districtKey": "LA-04",
+      "name": "Mike Johnson",
+      "state": "LA",
+      "district": 4,
+      "party": "Republican"
+    },
+    "R000606": {
+      "districtKey": "MD-08",
+      "name": "Jamie Raskin",
+      "state": "MD",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "B001301": {
+      "districtKey": "MI-01",
+      "name": "Jack Bergman",
+      "state": "MI",
+      "district": 1,
+      "party": "Republican"
+    },
+    "B001305": {
+      "districtKey": "NC-13",
+      "name": "Ted Budd",
+      "state": "NC",
+      "district": 13,
+      "party": "Republican"
+    },
+    "B001298": {
+      "districtKey": "NE-02",
+      "name": "Don Bacon",
+      "state": "NE",
+      "district": 2,
+      "party": "Republican"
+    },
+    "G000583": {
+      "districtKey": "NJ-05",
+      "name": "Josh Gottheimer",
+      "state": "NJ",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "R000608": {
+      "districtKey": "NV-03",
+      "name": "Jacky Rosen",
+      "state": "NV",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "E000297": {
+      "districtKey": "NY-13",
+      "name": "Adriano Espaillat",
+      "state": "NY",
+      "district": 13,
+      "party": "Democrat"
+    },
+    "F000466": {
+      "districtKey": "PA-01",
+      "name": "Brian K. Fitzpatrick",
+      "state": "PA",
+      "district": 1,
+      "party": "Republican"
+    },
+    "S001199": {
+      "districtKey": "PA-11",
+      "name": "Lloyd Smucker",
+      "state": "PA",
+      "district": 11,
+      "party": "Republican"
+    },
+    "K000392": {
+      "districtKey": "TN-08",
+      "name": "David Kustoff",
+      "state": "TN",
+      "district": 8,
+      "party": "Republican"
+    },
+    "G000581": {
+      "districtKey": "TX-34",
+      "name": "Vicente Gonzalez",
+      "state": "TX",
+      "district": 34,
+      "party": "Democrat"
+    },
+    "A000375": {
+      "districtKey": "TX-19",
+      "name": "Jodey C. Arrington",
+      "state": "TX",
+      "district": 19,
+      "party": "Republican"
+    },
+    "J000298": {
+      "districtKey": "WA-07",
+      "name": "Pramila Jayapal",
+      "state": "WA",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "E000298": {
+      "districtKey": "KS-04",
+      "name": "Ron Estes",
+      "state": "KS",
+      "district": 4,
+      "party": "Republican"
+    },
+    "N000190": {
+      "districtKey": "SC-05",
+      "name": "Ralph Norman",
+      "state": "SC",
+      "district": 5,
+      "party": "Republican"
+    },
+    "G000585": {
+      "districtKey": "CA-34",
+      "name": "Jimmy Gomez",
+      "state": "CA",
+      "district": 34,
+      "party": "Democrat"
+    },
+    "C001114": {
+      "districtKey": "UT-03",
+      "name": "John R. Curtis",
+      "state": "UT",
+      "district": 3,
+      "party": "Republican"
+    },
+    "C001115": {
+      "districtKey": "TX-27",
+      "name": "Michael Cloud",
+      "state": "TX",
+      "district": 27,
+      "party": "Republican"
+    },
+    "B001306": {
+      "districtKey": "OH-12",
+      "name": "Troy Balderson",
+      "state": "OH",
+      "district": 12,
+      "party": "Republican"
+    },
+    "H001082": {
+      "districtKey": "OK-01",
+      "name": "Kevin Hern",
+      "state": "OK",
+      "district": 1,
+      "party": "Republican"
+    },
+    "M001206": {
+      "districtKey": "NY-25",
+      "name": "Joseph D. Morelle",
+      "state": "NY",
+      "district": 25,
+      "party": "Democrat"
+    },
+    "S001205": {
+      "districtKey": "PA-05",
+      "name": "Mary Gay Scanlon",
+      "state": "PA",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "C001055": {
+      "districtKey": "HI-01",
+      "name": "Ed Case",
+      "state": "HI",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "H001066": {
+      "districtKey": "NV-04",
+      "name": "Steven Horsford",
+      "state": "NV",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "S001211": {
+      "districtKey": "AZ-04",
+      "name": "Greg Stanton",
+      "state": "AZ",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "H001090": {
+      "districtKey": "CA-09",
+      "name": "Josh Harder",
+      "state": "CA",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "L000593": {
+      "districtKey": "CA-49",
+      "name": "Mike Levin",
+      "state": "CA",
+      "district": 49,
+      "party": "Democrat"
+    },
+    "N000191": {
+      "districtKey": "CO-02",
+      "name": "Joe Neguse",
+      "state": "CO",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "C001121": {
+      "districtKey": "CO-06",
+      "name": "Jason Crow",
+      "state": "CO",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "H001081": {
+      "districtKey": "CT-05",
+      "name": "Jahana Hayes",
+      "state": "CT",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "S001214": {
+      "districtKey": "FL-17",
+      "name": "W. Gregory Steube",
+      "state": "FL",
+      "district": 17,
+      "party": "Republican"
+    },
+    "M001208": {
+      "districtKey": "GA-06",
+      "name": "Lucy McBath",
+      "state": "GA",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "F000469": {
+      "districtKey": "ID-01",
+      "name": "Russ Fulcher",
+      "state": "ID",
+      "district": 1,
+      "party": "Republican"
+    },
+    "G000586": {
+      "districtKey": "IL-04",
+      "name": "Jesús G. \"Chuy\" García",
+      "state": "IL",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "C001117": {
+      "districtKey": "IL-06",
+      "name": "Sean Casten",
+      "state": "IL",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "U000040": {
+      "districtKey": "IL-14",
+      "name": "Lauren Underwood",
+      "state": "IL",
+      "district": 14,
+      "party": "Democrat"
+    },
+    "B001307": {
+      "districtKey": "IN-04",
+      "name": "James R. Baird",
+      "state": "IN",
+      "district": 4,
+      "party": "Republican"
+    },
+    "D000629": {
+      "districtKey": "KS-03",
+      "name": "Sharice Davids",
+      "state": "KS",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "T000482": {
+      "districtKey": "MA-03",
+      "name": "Lori Trahan",
+      "state": "MA",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "P000617": {
+      "districtKey": "MA-07",
+      "name": "Ayanna Pressley",
+      "state": "MA",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "S001208": {
+      "districtKey": "MI-07",
+      "name": "Elissa Slotkin",
+      "state": "MI",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "S001215": {
+      "districtKey": "MI-11",
+      "name": "Haley M. Stevens",
+      "state": "MI",
+      "district": 11,
+      "party": "Democrat"
+    },
+    "T000481": {
+      "districtKey": "MI-12",
+      "name": "Rashida Tlaib",
+      "state": "MI",
+      "district": 12,
+      "party": "Democrat"
+    },
+    "C001119": {
+      "districtKey": "MN-02",
+      "name": "Angie Craig",
+      "state": "MN",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "O000173": {
+      "districtKey": "MN-05",
+      "name": "Ilhan Omar",
+      "state": "MN",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "S001212": {
+      "districtKey": "MN-08",
+      "name": "Pete Stauber",
+      "state": "MN",
+      "district": 8,
+      "party": "Republican"
+    },
+    "G000591": {
+      "districtKey": "MS-03",
+      "name": "Michael Guest",
+      "state": "MS",
+      "district": 3,
+      "party": "Republican"
+    },
+    "P000614": {
+      "districtKey": "NH-01",
+      "name": "Chris Pappas",
+      "state": "NH",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "V000133": {
+      "districtKey": "NJ-02",
+      "name": "Jefferson Van Drew",
+      "state": "NJ",
+      "district": 2,
+      "party": "Republican"
+    },
+    "K000394": {
+      "districtKey": "NJ-03",
+      "name": "Andy Kim",
+      "state": "NJ",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "L000590": {
+      "districtKey": "NV-03",
+      "name": "Susie Lee",
+      "state": "NV",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "O000172": {
+      "districtKey": "NY-14",
+      "name": "Alexandria Ocasio-Cortez",
+      "state": "NY",
+      "district": 14,
+      "party": "Democrat"
+    },
+    "D000631": {
+      "districtKey": "PA-04",
+      "name": "Madeleine Dean",
+      "state": "PA",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "H001085": {
+      "districtKey": "PA-06",
+      "name": "Chrissy Houlahan",
+      "state": "PA",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "M001204": {
+      "districtKey": "PA-09",
+      "name": "Daniel Meuser",
+      "state": "PA",
+      "district": 9,
+      "party": "Republican"
+    },
+    "J000302": {
+      "districtKey": "PA-13",
+      "name": "John Joyce",
+      "state": "PA",
+      "district": 13,
+      "party": "Republican"
+    },
+    "R000610": {
+      "districtKey": "PA-14",
+      "name": "Guy Reschenthaler",
+      "state": "PA",
+      "district": 14,
+      "party": "Republican"
+    },
+    "T000480": {
+      "districtKey": "SC-04",
+      "name": "William R. Timmons IV",
+      "state": "SC",
+      "district": 4,
+      "party": "Republican"
+    },
+    "J000301": {
+      "districtKey": "SD-00",
+      "name": "Dusty Johnson",
+      "state": "SD",
+      "district": 0,
+      "party": "Republican"
+    },
+    "B001309": {
+      "districtKey": "TN-02",
+      "name": "Tim Burchett",
+      "state": "TN",
+      "district": 2,
+      "party": "Republican"
+    },
+    "R000612": {
+      "districtKey": "TN-06",
+      "name": "John W. Rose",
+      "state": "TN",
+      "district": 6,
+      "party": "Republican"
+    },
+    "C001120": {
+      "districtKey": "TX-02",
+      "name": "Dan Crenshaw",
+      "state": "TX",
+      "district": 2,
+      "party": "Republican"
+    },
+    "G000589": {
+      "districtKey": "TX-05",
+      "name": "Lance Gooden",
+      "state": "TX",
+      "district": 5,
+      "party": "Republican"
+    },
+    "F000468": {
+      "districtKey": "TX-07",
+      "name": "Lizzie Fletcher",
+      "state": "TX",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "E000299": {
+      "districtKey": "TX-16",
+      "name": "Veronica Escobar",
+      "state": "TX",
+      "district": 16,
+      "party": "Democrat"
+    },
+    "R000614": {
+      "districtKey": "TX-21",
+      "name": "Chip Roy",
+      "state": "TX",
+      "district": 21,
+      "party": "Republican"
+    },
+    "G000587": {
+      "districtKey": "TX-29",
+      "name": "Sylvia R. Garcia",
+      "state": "TX",
+      "district": 29,
+      "party": "Democrat"
+    },
+    "C001118": {
+      "districtKey": "VA-06",
+      "name": "Ben Cline",
+      "state": "VA",
+      "district": 6,
+      "party": "Republican"
+    },
+    "S001216": {
+      "districtKey": "WA-08",
+      "name": "Kim Schrier",
+      "state": "WA",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "S001213": {
+      "districtKey": "WI-01",
+      "name": "Bryan Steil",
+      "state": "WI",
+      "district": 1,
+      "party": "Republican"
+    },
+    "M001205": {
+      "districtKey": "WV-01",
+      "name": "Carol D. Miller",
+      "state": "WV",
+      "district": 1,
+      "party": "Republican"
+    },
+    "G000592": {
+      "districtKey": "ME-02",
+      "name": "Jared F. Golden",
+      "state": "ME",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "M001210": {
+      "districtKey": "NC-03",
+      "name": "Gregory F. Murphy",
+      "state": "NC",
+      "district": 3,
+      "party": "Republican"
+    },
+    "M000687": {
+      "districtKey": "MD-07",
+      "name": "Kweisi Mfume",
+      "state": "MD",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "T000165": {
+      "districtKey": "WI-07",
+      "name": "Thomas P. Tiffany",
+      "state": "WI",
+      "district": 7,
+      "party": "Republican"
+    },
+    "L000571": {
+      "districtKey": "WY-00",
+      "name": "Cynthia M. Lummis",
+      "state": "WY",
+      "district": 0,
+      "party": "Republican"
+    },
+    "I000056": {
+      "districtKey": "CA-48",
+      "name": "Darrell Issa",
+      "state": "CA",
+      "district": 48,
+      "party": "Republican"
+    },
+    "S000250": {
+      "districtKey": "TX-17",
+      "name": "Pete Sessions",
+      "state": "TX",
+      "district": 17,
+      "party": "Republican"
+    },
+    "V000129": {
+      "districtKey": "CA-22",
+      "name": "David G. Valadao",
+      "state": "CA",
+      "district": 22,
+      "party": "Republican"
+    },
+    "M001212": {
+      "districtKey": "AL-01",
+      "name": "Barry Moore",
+      "state": "AL",
+      "district": 1,
+      "party": "Republican"
+    },
+    "O000019": {
+      "districtKey": "CA-23",
+      "name": "Jay Obernolte",
+      "state": "CA",
+      "district": 23,
+      "party": "Republican"
+    },
+    "K000397": {
+      "districtKey": "CA-40",
+      "name": "Young Kim",
+      "state": "CA",
+      "district": 40,
+      "party": "Republican"
+    },
+    "J000305": {
+      "districtKey": "CA-51",
+      "name": "Sara Jacobs",
+      "state": "CA",
+      "district": 51,
+      "party": "Democrat"
+    },
+    "B000825": {
+      "districtKey": "CO-04",
+      "name": "Lauren Boebert",
+      "state": "CO",
+      "district": 4,
+      "party": "Republican"
+    },
+    "C001039": {
+      "districtKey": "FL-03",
+      "name": "Kat Cammack",
+      "state": "FL",
+      "district": 3,
+      "party": "Republican"
+    },
+    "F000472": {
+      "districtKey": "FL-18",
+      "name": "Scott Franklin",
+      "state": "FL",
+      "district": 18,
+      "party": "Republican"
+    },
+    "D000032": {
+      "districtKey": "FL-19",
+      "name": "Byron Donalds",
+      "state": "FL",
+      "district": 19,
+      "party": "Republican"
+    },
+    "G000593": {
+      "districtKey": "FL-28",
+      "name": "Carlos A. Gimenez",
+      "state": "FL",
+      "district": 28,
+      "party": "Republican"
+    },
+    "S000168": {
+      "districtKey": "FL-27",
+      "name": "Maria Elvira Salazar",
+      "state": "FL",
+      "district": 27,
+      "party": "Republican"
+    },
+    "W000788": {
+      "districtKey": "GA-05",
+      "name": "Nikema Williams",
+      "state": "GA",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "C001116": {
+      "districtKey": "GA-09",
+      "name": "Andrew S. Clyde",
+      "state": "GA",
+      "district": 9,
+      "party": "Republican"
+    },
+    "H001091": {
+      "districtKey": "IA-02",
+      "name": "Ashley Hinson",
+      "state": "IA",
+      "district": 2,
+      "party": "Republican"
+    },
+    "M001215": {
+      "districtKey": "IA-01",
+      "name": "Mariannette Miller-Meeks",
+      "state": "IA",
+      "district": 1,
+      "party": "Republican"
+    },
+    "F000446": {
+      "districtKey": "IA-04",
+      "name": "Randy Feenstra",
+      "state": "IA",
+      "district": 4,
+      "party": "Republican"
+    },
+    "M001211": {
+      "districtKey": "IL-15",
+      "name": "Mary E. Miller",
+      "state": "IL",
+      "district": 15,
+      "party": "Republican"
+    },
+    "M001214": {
+      "districtKey": "IN-01",
+      "name": "Frank J. Mrvan",
+      "state": "IN",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "S000929": {
+      "districtKey": "IN-05",
+      "name": "Victoria Spartz",
+      "state": "IN",
+      "district": 5,
+      "party": "Republican"
+    },
+    "M000871": {
+      "districtKey": "KS-01",
+      "name": "Tracey Mann",
+      "state": "KS",
+      "district": 1,
+      "party": "Republican"
+    },
+    "A000148": {
+      "districtKey": "MA-04",
+      "name": "Jake Auchincloss",
+      "state": "MA",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "M001136": {
+      "districtKey": "MI-09",
+      "name": "Lisa C. McClain",
+      "state": "MI",
+      "district": 9,
+      "party": "Republican"
+    },
+    "F000470": {
+      "districtKey": "MN-07",
+      "name": "Michelle Fischbach",
+      "state": "MN",
+      "district": 7,
+      "party": "Republican"
+    },
+    "R000305": {
+      "districtKey": "NC-02",
+      "name": "Deborah K. Ross",
+      "state": "NC",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "L000273": {
+      "districtKey": "NM-03",
+      "name": "Teresa Leger Fernandez",
+      "state": "NM",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "G000597": {
+      "districtKey": "NY-02",
+      "name": "Andrew R. Garbarino",
+      "state": "NY",
+      "district": 2,
+      "party": "Republican"
+    },
+    "M000317": {
+      "districtKey": "NY-11",
+      "name": "Nicole Malliotakis",
+      "state": "NY",
+      "district": 11,
+      "party": "Republican"
+    },
+    "T000486": {
+      "districtKey": "NY-15",
+      "name": "Ritchie Torres",
+      "state": "NY",
+      "district": 15,
+      "party": "Democrat"
+    },
+    "B000740": {
+      "districtKey": "OK-05",
+      "name": "Stephanie I. Bice",
+      "state": "OK",
+      "district": 5,
+      "party": "Republican"
+    },
+    "B000668": {
+      "districtKey": "OR-02",
+      "name": "Cliff Bentz",
+      "state": "OR",
+      "district": 2,
+      "party": "Republican"
+    },
+    "M000194": {
+      "districtKey": "SC-01",
+      "name": "Nancy Mace",
+      "state": "SC",
+      "district": 1,
+      "party": "Republican"
+    },
+    "H001086": {
+      "districtKey": "TN-01",
+      "name": "Diana Harshbarger",
+      "state": "TN",
+      "district": 1,
+      "party": "Republican"
+    },
+    "F000246": {
+      "districtKey": "TX-04",
+      "name": "Pat Fallon",
+      "state": "TX",
+      "district": 4,
+      "party": "Republican"
+    },
+    "P000048": {
+      "districtKey": "TX-11",
+      "name": "August Pfluger",
+      "state": "TX",
+      "district": 11,
+      "party": "Republican"
+    },
+    "J000304": {
+      "districtKey": "TX-13",
+      "name": "Ronny Jackson",
+      "state": "TX",
+      "district": 13,
+      "party": "Republican"
+    },
+    "N000026": {
+      "districtKey": "TX-22",
+      "name": "Troy E. Nehls",
+      "state": "TX",
+      "district": 22,
+      "party": "Republican"
+    },
+    "G000594": {
+      "districtKey": "TX-23",
+      "name": "Tony Gonzales",
+      "state": "TX",
+      "district": 23,
+      "party": "Republican"
+    },
+    "V000134": {
+      "districtKey": "TX-24",
+      "name": "Beth Van Duyne",
+      "state": "TX",
+      "district": 24,
+      "party": "Republican"
+    },
+    "M001213": {
+      "districtKey": "UT-01",
+      "name": "Blake D. Moore",
+      "state": "UT",
+      "district": 1,
+      "party": "Republican"
+    },
+    "O000086": {
+      "districtKey": "UT-04",
+      "name": "Burgess Owens",
+      "state": "UT",
+      "district": 4,
+      "party": "Republican"
+    },
+    "S001159": {
+      "districtKey": "WA-10",
+      "name": "Marilyn Strickland",
+      "state": "WA",
+      "district": 10,
+      "party": "Democrat"
+    },
+    "F000471": {
+      "districtKey": "WI-05",
+      "name": "Scott Fitzgerald",
+      "state": "WI",
+      "district": 5,
+      "party": "Republican"
+    },
+    "T000478": {
+      "districtKey": "NY-24",
+      "name": "Claudia Tenney",
+      "state": "NY",
+      "district": 24,
+      "party": "Republican"
+    },
+    "L000595": {
+      "districtKey": "LA-05",
+      "name": "Julia Letlow",
+      "state": "LA",
+      "district": 5,
+      "party": "Republican"
+    },
+    "C001125": {
+      "districtKey": "LA-02",
+      "name": "Troy A. Carter",
+      "state": "LA",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "S001218": {
+      "districtKey": "NM-01",
+      "name": "Melanie A. Stansbury",
+      "state": "NM",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "E000071": {
+      "districtKey": "TX-06",
+      "name": "Jake Ellzey",
+      "state": "TX",
+      "district": 6,
+      "party": "Republican"
+    },
+    "B001313": {
+      "districtKey": "OH-11",
+      "name": "Shontel M. Brown",
+      "state": "OH",
+      "district": 11,
+      "party": "Democrat"
+    },
+    "C001126": {
+      "districtKey": "OH-15",
+      "name": "Mike Carey",
+      "state": "OH",
+      "district": 15,
+      "party": "Republican"
+    },
+    "C001127": {
+      "districtKey": "FL-20",
+      "name": "Sheila Cherfilus-McCormick",
+      "state": "FL",
+      "district": 20,
+      "party": "Democrat"
+    },
+    "F000474": {
+      "districtKey": "NE-01",
+      "name": "Mike Flood",
+      "state": "NE",
+      "district": 1,
+      "party": "Republican"
+    },
+    "F000475": {
+      "districtKey": "MN-01",
+      "name": "Brad Finstad",
+      "state": "MN",
+      "district": 1,
+      "party": "Republican"
+    },
+    "R000579": {
+      "districtKey": "NY-18",
+      "name": "Patrick Ryan",
+      "state": "NY",
+      "district": 18,
+      "party": "Democrat"
+    },
+    "Y000067": {
+      "districtKey": "IN-02",
+      "name": "Rudy Yakym III",
+      "state": "IN",
+      "district": 2,
+      "party": "Republican"
+    },
+    "Z000018": {
+      "districtKey": "MT-01",
+      "name": "Ryan K. Zinke",
+      "state": "MT",
+      "district": 1,
+      "party": "Republican"
+    },
+    "S001220": {
+      "districtKey": "AL-05",
+      "name": "Dale W. Strong",
+      "state": "AL",
+      "district": 5,
+      "party": "Republican"
+    },
+    "C001132": {
+      "districtKey": "AZ-02",
+      "name": "Elijah Crane",
+      "state": "AZ",
+      "district": 2,
+      "party": "Republican"
+    },
+    "C001133": {
+      "districtKey": "AZ-06",
+      "name": "Juan Ciscomani",
+      "state": "AZ",
+      "district": 6,
+      "party": "Republican"
+    },
+    "K000401": {
+      "districtKey": "CA-03",
+      "name": "Kevin Kiley",
+      "state": "CA",
+      "district": 3,
+      "party": "Republican"
+    },
+    "M001225": {
+      "districtKey": "CA-15",
+      "name": "Kevin Mullin",
+      "state": "CA",
+      "district": 15,
+      "party": "Democrat"
+    },
+    "K000400": {
+      "districtKey": "CA-37",
+      "name": "Sydney Kamlager-Dove",
+      "state": "CA",
+      "district": 37,
+      "party": "Democrat"
+    },
+    "G000598": {
+      "districtKey": "CA-42",
+      "name": "Robert Garcia",
+      "state": "CA",
+      "district": 42,
+      "party": "Democrat"
+    },
+    "P000620": {
+      "districtKey": "CO-07",
+      "name": "Brittany Pettersen",
+      "state": "CO",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "B001314": {
+      "districtKey": "FL-04",
+      "name": "Aaron Bean",
+      "state": "FL",
+      "district": 4,
+      "party": "Republican"
+    },
+    "M001216": {
+      "districtKey": "FL-07",
+      "name": "Cory Mills",
+      "state": "FL",
+      "district": 7,
+      "party": "Republican"
+    },
+    "F000476": {
+      "districtKey": "FL-10",
+      "name": "Maxwell Frost",
+      "state": "FL",
+      "district": 10,
+      "party": "Democrat"
+    },
+    "L000596": {
+      "districtKey": "FL-13",
+      "name": "Anna Paulina Luna",
+      "state": "FL",
+      "district": 13,
+      "party": "Republican"
+    },
+    "L000597": {
+      "districtKey": "FL-15",
+      "name": "Laurel M. Lee",
+      "state": "FL",
+      "district": 15,
+      "party": "Republican"
+    },
+    "M001217": {
+      "districtKey": "FL-23",
+      "name": "Jared Moskowitz",
+      "state": "FL",
+      "district": 23,
+      "party": "Democrat"
+    },
+    "M001218": {
+      "districtKey": "GA-07",
+      "name": "Richard McCormick",
+      "state": "GA",
+      "district": 7,
+      "party": "Republican"
+    },
+    "C001129": {
+      "districtKey": "GA-10",
+      "name": "Mike Collins",
+      "state": "GA",
+      "district": 10,
+      "party": "Republican"
+    },
+    "M001219": {
+      "districtKey": "GU-00",
+      "name": "James C. Moylan",
+      "state": "GU",
+      "district": 0,
+      "party": "Republican"
+    },
+    "T000487": {
+      "districtKey": "HI-02",
+      "name": "Jill N. Tokuda",
+      "state": "HI",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "N000193": {
+      "districtKey": "IA-03",
+      "name": "Zachary Nunn",
+      "state": "IA",
+      "district": 3,
+      "party": "Republican"
+    },
+    "J000309": {
+      "districtKey": "IL-01",
+      "name": "Jonathan L. Jackson",
+      "state": "IL",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "R000617": {
+      "districtKey": "IL-03",
+      "name": "Delia C. Ramirez",
+      "state": "IL",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "B001315": {
+      "districtKey": "IL-13",
+      "name": "Nikki Budzinski",
+      "state": "IL",
+      "district": 13,
+      "party": "Democrat"
+    },
+    "S001225": {
+      "districtKey": "IL-17",
+      "name": "Eric Sorensen",
+      "state": "IL",
+      "district": 17,
+      "party": "Democrat"
+    },
+    "H001093": {
+      "districtKey": "IN-09",
+      "name": "Erin Houchin",
+      "state": "IN",
+      "district": 9,
+      "party": "Republican"
+    },
+    "M001220": {
+      "districtKey": "KY-03",
+      "name": "Morgan McGarvey",
+      "state": "KY",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "I000058": {
+      "districtKey": "MD-04",
+      "name": "Glenn Ivey",
+      "state": "MD",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "S001221": {
+      "districtKey": "MI-03",
+      "name": "Hillary J. Scholten",
+      "state": "MI",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "J000307": {
+      "districtKey": "MI-10",
+      "name": "John James",
+      "state": "MI",
+      "district": 10,
+      "party": "Republican"
+    },
+    "T000488": {
+      "districtKey": "MI-13",
+      "name": "Shri Thanedar",
+      "state": "MI",
+      "district": 13,
+      "party": "Democrat"
+    },
+    "A000379": {
+      "districtKey": "MO-04",
+      "name": "Mark Alford",
+      "state": "MO",
+      "district": 4,
+      "party": "Republican"
+    },
+    "B001316": {
+      "districtKey": "MO-07",
+      "name": "Eric Burlison",
+      "state": "MO",
+      "district": 7,
+      "party": "Republican"
+    },
+    "E000235": {
+      "districtKey": "MS-04",
+      "name": "Mike Ezell",
+      "state": "MS",
+      "district": 4,
+      "party": "Republican"
+    },
+    "D000230": {
+      "districtKey": "NC-01",
+      "name": "Donald G. Davis",
+      "state": "NC",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "F000477": {
+      "districtKey": "NC-04",
+      "name": "Valerie P. Foushee",
+      "state": "NC",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "E000246": {
+      "districtKey": "NC-11",
+      "name": "Chuck Edwards",
+      "state": "NC",
+      "district": 11,
+      "party": "Republican"
+    },
+    "K000398": {
+      "districtKey": "NJ-07",
+      "name": "Thomas H. Kean, Jr.",
+      "state": "NJ",
+      "district": 7,
+      "party": "Republican"
+    },
+    "M001226": {
+      "districtKey": "NJ-08",
+      "name": "Robert Menendez",
+      "state": "NJ",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "V000136": {
+      "districtKey": "NM-02",
+      "name": "Gabe Vasquez",
+      "state": "NM",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "L000598": {
+      "districtKey": "NY-01",
+      "name": "Nick LaLota",
+      "state": "NY",
+      "district": 1,
+      "party": "Republican"
+    },
+    "G000599": {
+      "districtKey": "NY-10",
+      "name": "Daniel S. Goldman",
+      "state": "NY",
+      "district": 10,
+      "party": "Democrat"
+    },
+    "L000599": {
+      "districtKey": "NY-17",
+      "name": "Michael Lawler",
+      "state": "NY",
+      "district": 17,
+      "party": "Republican"
+    },
+    "L000600": {
+      "districtKey": "NY-23",
+      "name": "Nicholas A. Langworthy",
+      "state": "NY",
+      "district": 23,
+      "party": "Republican"
+    },
+    "L000601": {
+      "districtKey": "OH-01",
+      "name": "Greg Landsman",
+      "state": "OH",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "M001222": {
+      "districtKey": "OH-07",
+      "name": "Max L. Miller",
+      "state": "OH",
+      "district": 7,
+      "party": "Republican"
+    },
+    "S001223": {
+      "districtKey": "OH-13",
+      "name": "Emilia Strong Sykes",
+      "state": "OH",
+      "district": 13,
+      "party": "Democrat"
+    },
+    "B001317": {
+      "districtKey": "OK-02",
+      "name": "Josh Brecheen",
+      "state": "OK",
+      "district": 2,
+      "party": "Republican"
+    },
+    "H001094": {
+      "districtKey": "OR-04",
+      "name": "Val T. Hoyle",
+      "state": "OR",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "S001226": {
+      "districtKey": "OR-06",
+      "name": "Andrea Salinas",
+      "state": "OR",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "L000602": {
+      "districtKey": "PA-12",
+      "name": "Summer L. Lee",
+      "state": "PA",
+      "district": 12,
+      "party": "Democrat"
+    },
+    "D000530": {
+      "districtKey": "PA-17",
+      "name": "Christopher R. Deluzio",
+      "state": "PA",
+      "district": 17,
+      "party": "Democrat"
+    },
+    "M001223": {
+      "districtKey": "RI-02",
+      "name": "Seth Magaziner",
+      "state": "RI",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "F000478": {
+      "districtKey": "SC-07",
+      "name": "Russell Fry",
+      "state": "SC",
+      "district": 7,
+      "party": "Republican"
+    },
+    "O000175": {
+      "districtKey": "TN-05",
+      "name": "Andrew Ogles",
+      "state": "TN",
+      "district": 5,
+      "party": "Republican"
+    },
+    "M001224": {
+      "districtKey": "TX-01",
+      "name": "Nathaniel Moran",
+      "state": "TX",
+      "district": 1,
+      "party": "Republican"
+    },
+    "S001224": {
+      "districtKey": "TX-03",
+      "name": "Keith Self",
+      "state": "TX",
+      "district": 3,
+      "party": "Republican"
+    },
+    "L000603": {
+      "districtKey": "TX-08",
+      "name": "Morgan Luttrell",
+      "state": "TX",
+      "district": 8,
+      "party": "Republican"
+    },
+    "D000594": {
+      "districtKey": "TX-15",
+      "name": "Monica De La Cruz",
+      "state": "TX",
+      "district": 15,
+      "party": "Republican"
+    },
+    "C001130": {
+      "districtKey": "TX-30",
+      "name": "Jasmine Crockett",
+      "state": "TX",
+      "district": 30,
+      "party": "Democrat"
+    },
+    "C001131": {
+      "districtKey": "TX-35",
+      "name": "Greg Casar",
+      "state": "TX",
+      "district": 35,
+      "party": "Democrat"
+    },
+    "H001095": {
+      "districtKey": "TX-38",
+      "name": "Wesley Hunt",
+      "state": "TX",
+      "district": 38,
+      "party": "Republican"
+    },
+    "K000399": {
+      "districtKey": "VA-02",
+      "name": "Jennifer A. Kiggans",
+      "state": "VA",
+      "district": 2,
+      "party": "Republican"
+    },
+    "B001318": {
+      "districtKey": "VT-00",
+      "name": "Becca Balint",
+      "state": "VT",
+      "district": 0,
+      "party": "Democrat"
+    },
+    "G000600": {
+      "districtKey": "WA-03",
+      "name": "Marie Gluesenkamp Perez",
+      "state": "WA",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "V000135": {
+      "districtKey": "WI-03",
+      "name": "Derrick Van Orden",
+      "state": "WI",
+      "district": 3,
+      "party": "Republican"
+    },
+    "H001096": {
+      "districtKey": "WY-00",
+      "name": "Harriet M. Hageman",
+      "state": "WY",
+      "district": 0,
+      "party": "Republican"
+    },
+    "M001227": {
+      "districtKey": "VA-04",
+      "name": "Jennifer L. McClellan",
+      "state": "VA",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "A000380": {
+      "districtKey": "RI-01",
+      "name": "Gabe Amo",
+      "state": "RI",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "M001228": {
+      "districtKey": "UT-02",
+      "name": "Celeste Maloy",
+      "state": "UT",
+      "district": 2,
+      "party": "Republican"
+    },
+    "S001201": {
+      "districtKey": "NY-03",
+      "name": "Thomas R. Suozzi",
+      "state": "NY",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "K000402": {
+      "districtKey": "NY-26",
+      "name": "Timothy M. Kennedy",
+      "state": "NY",
+      "district": 26,
+      "party": "Democrat"
+    },
+    "F000480": {
+      "districtKey": "CA-20",
+      "name": "Vince Fong",
+      "state": "CA",
+      "district": 20,
+      "party": "Republican"
+    },
+    "R000619": {
+      "districtKey": "OH-06",
+      "name": "Michael A. Rulli",
+      "state": "OH",
+      "district": 6,
+      "party": "Republican"
+    },
+    "M001229": {
+      "districtKey": "NJ-10",
+      "name": "LaMonica McIver",
+      "state": "NJ",
+      "district": 10,
+      "party": "Democrat"
+    },
+    "W000829": {
+      "districtKey": "WI-08",
+      "name": "Tony Wied",
+      "state": "WI",
+      "district": 8,
+      "party": "Republican"
+    },
+    "F000110": {
+      "districtKey": "LA-06",
+      "name": "Cleo Fields",
+      "state": "LA",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "S001188": {
+      "districtKey": "IN-03",
+      "name": "Marlin A. Stutzman",
+      "state": "IN",
+      "district": 3,
+      "party": "Republican"
+    },
+    "C001123": {
+      "districtKey": "CA-31",
+      "name": "Gilbert Ray Cisneros, Jr.",
+      "state": "CA",
+      "district": 31,
+      "party": "Democrat"
+    },
+    "B001323": {
+      "districtKey": "AK-00",
+      "name": "Nicholas J. Begich III",
+      "state": "AK",
+      "district": 0,
+      "party": "Republican"
+    },
+    "F000481": {
+      "districtKey": "AL-02",
+      "name": "Shomari Figures",
+      "state": "AL",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "A000381": {
+      "districtKey": "AZ-03",
+      "name": "Yassamin Ansari",
+      "state": "AZ",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "H001098": {
+      "districtKey": "AZ-08",
+      "name": "Abraham J. Hamadeh",
+      "state": "AZ",
+      "district": 8,
+      "party": "Republican"
+    },
+    "S001231": {
+      "districtKey": "CA-12",
+      "name": "Lateefah Simon",
+      "state": "CA",
+      "district": 12,
+      "party": "Democrat"
+    },
+    "G000605": {
+      "districtKey": "CA-13",
+      "name": "Adam Gray",
+      "state": "CA",
+      "district": 13,
+      "party": "Democrat"
+    },
+    "L000607": {
+      "districtKey": "CA-16",
+      "name": "Sam T. Liccardo",
+      "state": "CA",
+      "district": 16,
+      "party": "Democrat"
+    },
+    "W000830": {
+      "districtKey": "CA-27",
+      "name": "George Whitesides",
+      "state": "CA",
+      "district": 27,
+      "party": "Democrat"
+    },
+    "R000620": {
+      "districtKey": "CA-29",
+      "name": "Luz M. Rivas",
+      "state": "CA",
+      "district": 29,
+      "party": "Democrat"
+    },
+    "F000483": {
+      "districtKey": "CA-30",
+      "name": "Laura Friedman",
+      "state": "CA",
+      "district": 30,
+      "party": "Democrat"
+    },
+    "T000491": {
+      "districtKey": "CA-45",
+      "name": "Derek Tran",
+      "state": "CA",
+      "district": 45,
+      "party": "Democrat"
+    },
+    "M001241": {
+      "districtKey": "CA-47",
+      "name": "Dave Min",
+      "state": "CA",
+      "district": 47,
+      "party": "Democrat"
+    },
+    "H001100": {
+      "districtKey": "CO-03",
+      "name": "Jeff Hurd",
+      "state": "CO",
+      "district": 3,
+      "party": "Republican"
+    },
+    "C001137": {
+      "districtKey": "CO-05",
+      "name": "Jeff Crank",
+      "state": "CO",
+      "district": 5,
+      "party": "Republican"
+    },
+    "E000300": {
+      "districtKey": "CO-08",
+      "name": "Gabe Evans",
+      "state": "CO",
+      "district": 8,
+      "party": "Republican"
+    },
+    "M001238": {
+      "districtKey": "DE-00",
+      "name": "Sarah McBride",
+      "state": "DE",
+      "district": 0,
+      "party": "Democrat"
+    },
+    "H001099": {
+      "districtKey": "FL-08",
+      "name": "Mike Haridopolos",
+      "state": "FL",
+      "district": 8,
+      "party": "Republican"
+    },
+    "J000311": {
+      "districtKey": "GA-03",
+      "name": "Brian Jack",
+      "state": "GA",
+      "district": 3,
+      "party": "Republican"
+    },
+    "S001229": {
+      "districtKey": "IN-06",
+      "name": "Jefferson Shreve",
+      "state": "IN",
+      "district": 6,
+      "party": "Republican"
+    },
+    "M001233": {
+      "districtKey": "IN-08",
+      "name": "Mark B. Messmer",
+      "state": "IN",
+      "district": 8,
+      "party": "Republican"
+    },
+    "S001228": {
+      "districtKey": "KS-02",
+      "name": "Derek Schmidt",
+      "state": "KS",
+      "district": 2,
+      "party": "Republican"
+    },
+    "O000176": {
+      "districtKey": "MD-02",
+      "name": "Johnny Olszewski, Jr.",
+      "state": "MD",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "E000301": {
+      "districtKey": "MD-03",
+      "name": "Sarah Elfreth",
+      "state": "MD",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "M001232": {
+      "districtKey": "MD-06",
+      "name": "April McClain Delaney",
+      "state": "MD",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "B001321": {
+      "districtKey": "MI-07",
+      "name": "Tom Barrett",
+      "state": "MI",
+      "district": 7,
+      "party": "Republican"
+    },
+    "M001237": {
+      "districtKey": "MI-08",
+      "name": "Kristen McDonald Rivet",
+      "state": "MI",
+      "district": 8,
+      "party": "Democrat"
+    },
+    "M001234": {
+      "districtKey": "MN-03",
+      "name": "Kelly Morrison",
+      "state": "MN",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "B001324": {
+      "districtKey": "MO-01",
+      "name": "Wesley Bell",
+      "state": "MO",
+      "district": 1,
+      "party": "Democrat"
+    },
+    "O000177": {
+      "districtKey": "MO-03",
+      "name": "Robert F. Onder, Jr.",
+      "state": "MO",
+      "district": 3,
+      "party": "Republican"
+    },
+    "K000404": {
+      "districtKey": "MP-00",
+      "name": "Kimberlyn King-Hinds",
+      "state": "MP",
+      "district": 0,
+      "party": "Republican"
+    },
+    "D000634": {
+      "districtKey": "MT-02",
+      "name": "Troy Downing",
+      "state": "MT",
+      "district": 2,
+      "party": "Republican"
+    },
+    "M001240": {
+      "districtKey": "NC-06",
+      "name": "Addison P. McDowell",
+      "state": "NC",
+      "district": 6,
+      "party": "Republican"
+    },
+    "H001102": {
+      "districtKey": "NC-08",
+      "name": "Mark Harris",
+      "state": "NC",
+      "district": 8,
+      "party": "Republican"
+    },
+    "H001101": {
+      "districtKey": "NC-10",
+      "name": "Pat Harrigan",
+      "state": "NC",
+      "district": 10,
+      "party": "Republican"
+    },
+    "K000405": {
+      "districtKey": "NC-13",
+      "name": "Brad Knott",
+      "state": "NC",
+      "district": 13,
+      "party": "Republican"
+    },
+    "M001236": {
+      "districtKey": "NC-14",
+      "name": "Tim Moore",
+      "state": "NC",
+      "district": 14,
+      "party": "Republican"
+    },
+    "F000482": {
+      "districtKey": "ND-00",
+      "name": "Julie Fedorchak",
+      "state": "ND",
+      "district": 0,
+      "party": "Republican"
+    },
+    "G000604": {
+      "districtKey": "NH-02",
+      "name": "Maggie Goodlander",
+      "state": "NH",
+      "district": 2,
+      "party": "Democrat"
+    },
+    "C001136": {
+      "districtKey": "NJ-03",
+      "name": "Herbert C. Conaway, Jr.",
+      "state": "NJ",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "P000621": {
+      "districtKey": "NJ-09",
+      "name": "Nellie Pou",
+      "state": "NJ",
+      "district": 9,
+      "party": "Democrat"
+    },
+    "G000602": {
+      "districtKey": "NY-04",
+      "name": "Laura Gillen",
+      "state": "NY",
+      "district": 4,
+      "party": "Democrat"
+    },
+    "L000606": {
+      "districtKey": "NY-16",
+      "name": "George Latimer",
+      "state": "NY",
+      "district": 16,
+      "party": "Democrat"
+    },
+    "R000622": {
+      "districtKey": "NY-19",
+      "name": "Josh Riley",
+      "state": "NY",
+      "district": 19,
+      "party": "Democrat"
+    },
+    "M001231": {
+      "districtKey": "NY-22",
+      "name": "John W. Mannion",
+      "state": "NY",
+      "district": 22,
+      "party": "Democrat"
+    },
+    "T000490": {
+      "districtKey": "OH-02",
+      "name": "David J. Taylor",
+      "state": "OH",
+      "district": 2,
+      "party": "Republican"
+    },
+    "D000635": {
+      "districtKey": "OR-03",
+      "name": "Maxine Dexter",
+      "state": "OR",
+      "district": 3,
+      "party": "Democrat"
+    },
+    "B001326": {
+      "districtKey": "OR-05",
+      "name": "Janelle S. Bynum",
+      "state": "OR",
+      "district": 5,
+      "party": "Democrat"
+    },
+    "M001230": {
+      "districtKey": "PA-07",
+      "name": "Ryan Mackenzie",
+      "state": "PA",
+      "district": 7,
+      "party": "Republican"
+    },
+    "B001327": {
+      "districtKey": "PA-08",
+      "name": "Robert P. Bresnahan, Jr.",
+      "state": "PA",
+      "district": 8,
+      "party": "Republican"
+    },
+    "H001103": {
+      "districtKey": "PR-00",
+      "name": "Pablo José Hernández",
+      "state": "PR",
+      "district": 0,
+      "party": "Democrat"
+    },
+    "B001325": {
+      "districtKey": "SC-03",
+      "name": "Sheri Biggs",
+      "state": "SC",
+      "district": 3,
+      "party": "Republican"
+    },
+    "G000601": {
+      "districtKey": "TX-12",
+      "name": "Craig A. Goldman",
+      "state": "TX",
+      "district": 12,
+      "party": "Republican"
+    },
+    "G000603": {
+      "districtKey": "TX-26",
+      "name": "Brandon Gill",
+      "state": "TX",
+      "district": 26,
+      "party": "Republican"
+    },
+    "J000310": {
+      "districtKey": "TX-32",
+      "name": "Julie Johnson",
+      "state": "TX",
+      "district": 32,
+      "party": "Democrat"
+    },
+    "K000403": {
+      "districtKey": "UT-03",
+      "name": "Mike Kennedy",
+      "state": "UT",
+      "district": 3,
+      "party": "Republican"
+    },
+    "M001239": {
+      "districtKey": "VA-05",
+      "name": "John J. McGuire III",
+      "state": "VA",
+      "district": 5,
+      "party": "Republican"
+    },
+    "V000138": {
+      "districtKey": "VA-07",
+      "name": "Eugene Simon Vindman",
+      "state": "VA",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "S001230": {
+      "districtKey": "VA-10",
+      "name": "Suhas Subramanyam",
+      "state": "VA",
+      "district": 10,
+      "party": "Democrat"
+    },
+    "B001322": {
+      "districtKey": "WA-05",
+      "name": "Michael Baumgartner",
+      "state": "WA",
+      "district": 5,
+      "party": "Republican"
+    },
+    "R000621": {
+      "districtKey": "WA-06",
+      "name": "Emily Randall",
+      "state": "WA",
+      "district": 6,
+      "party": "Democrat"
+    },
+    "M001235": {
+      "districtKey": "WV-02",
+      "name": "Riley M. Moore",
+      "state": "WV",
+      "district": 2,
+      "party": "Republican"
+    },
+    "P000622": {
+      "districtKey": "FL-01",
+      "name": "Jimmy Patronis",
+      "state": "FL",
+      "district": 1,
+      "party": "Republican"
+    },
+    "F000484": {
+      "districtKey": "FL-06",
+      "name": "Randy Fine",
+      "state": "FL",
+      "district": 6,
+      "party": "Republican"
+    },
+    "W000831": {
+      "districtKey": "VA-11",
+      "name": "James R. Walkinshaw",
+      "state": "VA",
+      "district": 11,
+      "party": "Democrat"
+    },
+    "G000606": {
+      "districtKey": "AZ-07",
+      "name": "Adelita S. Grijalva",
+      "state": "AZ",
+      "district": 7,
+      "party": "Democrat"
+    },
+    "V000139": {
+      "districtKey": "TN-07",
+      "name": "Matt Van Epps",
+      "state": "TN",
+      "district": 7,
+      "party": "Republican"
+    },
+    "M001245": {
+      "districtKey": "TX-18",
+      "name": "Christian Menefee",
+      "state": "TX",
+      "district": 18,
+      "party": "Democrat"
+    }
+  }
+}

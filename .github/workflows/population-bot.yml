@@ -1,0 +1,52 @@
+# Population bot — posts the US population represented by each side of a vote.
+#
+# Replaces the always-on Render background worker. The work is a few seconds
+# every 15 minutes, so a scheduled container is a far better fit than a process
+# that idles >99% of the time. Each bot gets its own workflow so one bot's
+# failure can never take another down — the same isolation the separate Render
+# services had.
+name: Population bot
+
+on:
+  schedule:
+    # Offset from :00/:15/:30/:45 on purpose. Those are the most contended slots
+    # on GitHub's scheduler, and cron runs get queued behind load; an odd offset
+    # measurably reduces the delay.
+    - cron: "2,17,32,47 * * * *"
+  workflow_dispatch: # manual "Run workflow" button, for testing the cutover
+
+# Never let two runs of this bot overlap. Supabase's seen_votes primary key is
+# the real guarantee against a duplicate post; this just avoids the wasted work
+# and the confusing interleaved logs.
+concurrency:
+  group: population-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 # a normal run is well under a minute; this catches hangs
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      # Reference caches (populations, member→district map) are committed to the
+      # repo, so there's nothing to fetch or restore here — the checkout above
+      # already provided them.
+      - name: Fetch votes and post new ones
+        run: npm run post-votes
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BLUESKY_POPULATION_HANDLE: ${{ secrets.BLUESKY_POPULATION_HANDLE }}
+          BLUESKY_POPULATION_APP_PASSWORD: ${{ secrets.BLUESKY_POPULATION_APP_PASSWORD }}

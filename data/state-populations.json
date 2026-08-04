@@ -1,0 +1,308 @@
+{
+  "fetchedAt": "2026-03-23T02:54:47.885Z",
+  "source": "US Census Bureau ACS5 2022",
+  "note": "Refresh after each decennial Census (~2031)",
+  "totalStates": 50,
+  "states": {
+    "AL": {
+      "name": "Alabama",
+      "abbr": "AL",
+      "population": 5028092,
+      "fips": "01"
+    },
+    "AK": {
+      "name": "Alaska",
+      "abbr": "AK",
+      "population": 734821,
+      "fips": "02"
+    },
+    "AZ": {
+      "name": "Arizona",
+      "abbr": "AZ",
+      "population": 7172282,
+      "fips": "04"
+    },
+    "AR": {
+      "name": "Arkansas",
+      "abbr": "AR",
+      "population": 3018669,
+      "fips": "05"
+    },
+    "CA": {
+      "name": "California",
+      "abbr": "CA",
+      "population": 39356104,
+      "fips": "06"
+    },
+    "CO": {
+      "name": "Colorado",
+      "abbr": "CO",
+      "population": 5770790,
+      "fips": "08"
+    },
+    "CT": {
+      "name": "Connecticut",
+      "abbr": "CT",
+      "population": 3611317,
+      "fips": "09"
+    },
+    "DE": {
+      "name": "Delaware",
+      "abbr": "DE",
+      "population": 993635,
+      "fips": "10"
+    },
+    "FL": {
+      "name": "Florida",
+      "abbr": "FL",
+      "population": 21634529,
+      "fips": "12"
+    },
+    "GA": {
+      "name": "Georgia",
+      "abbr": "GA",
+      "population": 10722325,
+      "fips": "13"
+    },
+    "HI": {
+      "name": "Hawaii",
+      "abbr": "HI",
+      "population": 1450589,
+      "fips": "15"
+    },
+    "ID": {
+      "name": "Idaho",
+      "abbr": "ID",
+      "population": 1854109,
+      "fips": "16"
+    },
+    "IL": {
+      "name": "Illinois",
+      "abbr": "IL",
+      "population": 12757634,
+      "fips": "17"
+    },
+    "IN": {
+      "name": "Indiana",
+      "abbr": "IN",
+      "population": 6784403,
+      "fips": "18"
+    },
+    "IA": {
+      "name": "Iowa",
+      "abbr": "IA",
+      "population": 3188836,
+      "fips": "19"
+    },
+    "KS": {
+      "name": "Kansas",
+      "abbr": "KS",
+      "population": 2935922,
+      "fips": "20"
+    },
+    "KY": {
+      "name": "Kentucky",
+      "abbr": "KY",
+      "population": 4502935,
+      "fips": "21"
+    },
+    "LA": {
+      "name": "Louisiana",
+      "abbr": "LA",
+      "population": 4640546,
+      "fips": "22"
+    },
+    "ME": {
+      "name": "Maine",
+      "abbr": "ME",
+      "population": 1366949,
+      "fips": "23"
+    },
+    "MD": {
+      "name": "Maryland",
+      "abbr": "MD",
+      "population": 6161707,
+      "fips": "24"
+    },
+    "MA": {
+      "name": "Massachusetts",
+      "abbr": "MA",
+      "population": 6984205,
+      "fips": "25"
+    },
+    "MI": {
+      "name": "Michigan",
+      "abbr": "MI",
+      "population": 10057921,
+      "fips": "26"
+    },
+    "MN": {
+      "name": "Minnesota",
+      "abbr": "MN",
+      "population": 5695292,
+      "fips": "27"
+    },
+    "MS": {
+      "name": "Mississippi",
+      "abbr": "MS",
+      "population": 2958846,
+      "fips": "28"
+    },
+    "MO": {
+      "name": "Missouri",
+      "abbr": "MO",
+      "population": 6154422,
+      "fips": "29"
+    },
+    "MT": {
+      "name": "Montana",
+      "abbr": "MT",
+      "population": 1091840,
+      "fips": "30"
+    },
+    "NE": {
+      "name": "Nebraska",
+      "abbr": "NE",
+      "population": 1958939,
+      "fips": "31"
+    },
+    "NV": {
+      "name": "Nevada",
+      "abbr": "NV",
+      "population": 3104817,
+      "fips": "32"
+    },
+    "NH": {
+      "name": "New Hampshire",
+      "abbr": "NH",
+      "population": 1379610,
+      "fips": "33"
+    },
+    "NJ": {
+      "name": "New Jersey",
+      "abbr": "NJ",
+      "population": 9249063,
+      "fips": "34"
+    },
+    "NM": {
+      "name": "New Mexico",
+      "abbr": "NM",
+      "population": 2112463,
+      "fips": "35"
+    },
+    "NY": {
+      "name": "New York",
+      "abbr": "NY",
+      "population": 19994379,
+      "fips": "36"
+    },
+    "NC": {
+      "name": "North Carolina",
+      "abbr": "NC",
+      "population": 10470214,
+      "fips": "37"
+    },
+    "ND": {
+      "name": "North Dakota",
+      "abbr": "ND",
+      "population": 776874,
+      "fips": "38"
+    },
+    "OH": {
+      "name": "Ohio",
+      "abbr": "OH",
+      "population": 11774683,
+      "fips": "39"
+    },
+    "OK": {
+      "name": "Oklahoma",
+      "abbr": "OK",
+      "population": 3970497,
+      "fips": "40"
+    },
+    "OR": {
+      "name": "Oregon",
+      "abbr": "OR",
+      "population": 4229374,
+      "fips": "41"
+    },
+    "PA": {
+      "name": "Pennsylvania",
+      "abbr": "PA",
+      "population": 12989208,
+      "fips": "42"
+    },
+    "RI": {
+      "name": "Rhode Island",
+      "abbr": "RI",
+      "population": 1094250,
+      "fips": "44"
+    },
+    "SC": {
+      "name": "South Carolina",
+      "abbr": "SC",
+      "population": 5142750,
+      "fips": "45"
+    },
+    "SD": {
+      "name": "South Dakota",
+      "abbr": "SD",
+      "population": 890342,
+      "fips": "46"
+    },
+    "TN": {
+      "name": "Tennessee",
+      "abbr": "TN",
+      "population": 6923772,
+      "fips": "47"
+    },
+    "TX": {
+      "name": "Texas",
+      "abbr": "TX",
+      "population": 29243342,
+      "fips": "48"
+    },
+    "UT": {
+      "name": "Utah",
+      "abbr": "UT",
+      "population": 3283809,
+      "fips": "49"
+    },
+    "VT": {
+      "name": "Vermont",
+      "abbr": "VT",
+      "population": 643816,
+      "fips": "50"
+    },
+    "VA": {
+      "name": "Virginia",
+      "abbr": "VA",
+      "population": 8624511,
+      "fips": "51"
+    },
+    "WA": {
+      "name": "Washington",
+      "abbr": "WA",
+      "population": 7688549,
+      "fips": "53"
+    },
+    "WV": {
+      "name": "West Virginia",
+      "abbr": "WV",
+      "population": 1792967,
+      "fips": "54"
+    },
+    "WI": {
+      "name": "Wisconsin",
+      "abbr": "WI",
+      "population": 5882128,
+      "fips": "55"
+    },
+    "WY": {
+      "name": "Wyoming",
+      "abbr": "WY",
+      "population": 577929,
+      "fips": "56"
+    }
+  }
+}
