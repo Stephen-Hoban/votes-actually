@@ -63,6 +63,13 @@ src/voteCalculations.test.ts  — vitest unit tests (36 tests)
 npm test    — run the test suite once (vitest run)
 ```
 
+### CI enforcement (added 2026-08-04)
+`.github/workflows/ci.yml` runs `npm run typecheck` and `npm test` on every pull request and
+on every push to `main`. Before this, the suite existed but nothing ran it — a PR could merge
+with failing tests and the bots would post wrong numbers on the next cron tick, which is
+exactly the failure mode the tests were written to prevent. Actions minutes are free and
+unlimited on public repos, so running this on every PR costs nothing.
+
 ### Coverage
 - `normalizeHouseVote` — Yea/Nay (bills) and Aye/No (resolutions) both normalize correctly
 - `calculateSenatePopulation` / `calculateHousePopulation` — correct sums, plus edge cases:

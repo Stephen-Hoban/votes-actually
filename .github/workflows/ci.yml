@@ -1,0 +1,50 @@
+# Runs the typecheck and test suite on every pull request and on pushes to main.
+#
+# Why this exists: the test suite was added specifically to catch silent
+# calculation errors before they're posted publicly and irreversibly (see
+# "Testing" in BRIEF.md — a bug once produced 0% population with no error and
+# nearly shipped a wrong post). Until now nothing enforced it; a PR could go
+# green-by-default with failing tests and the bots would start posting wrong
+# numbers on the next cron tick.
+#
+# The repo is public, so Actions minutes are free and unlimited — there's no
+# reason not to run this on every PR.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push to the same branch makes the in-flight run irrelevant, so cancel
+# it. Unlike the bot workflows, nothing here has side effects worth finishing.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 # the suite runs in seconds; this only catches hangs
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # No secrets are set for this job on purpose: the calculation tests are
+      # pure and need neither network nor Supabase, so a test that quietly
+      # started depending on either should fail here rather than pass.
+      - name: Test
+        run: npm test
