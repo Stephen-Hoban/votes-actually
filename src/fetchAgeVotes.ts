@@ -22,7 +22,7 @@ import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
 import { postToBluesky } from "./bluesky.js";
-import { loadSeenVotes, saveSeenVotes } from "./seenVotes.js";
+import { claimVote, releaseVote } from "./seenVotes.js";
 import { RawVote, fetchAllVotes } from "./voteSources.js";
 import { graphemeLength } from "./voteCalculations.js";
 import {
@@ -84,10 +84,18 @@ function applyBirthdays(members: MemberAge[]): void {
     console.log(`  🎂 Happy birthday, ${m.name} — now ${m.age}.`);
   }
 
-  const cache = JSON.parse(fs.readFileSync(MEMBER_AGE_FILE, "utf-8")) as MemberAgeCache;
-  cache.members = members;
-  fs.writeFileSync(MEMBER_AGE_FILE, JSON.stringify(cache, null, 2));
-  console.log(`  ✅ Updated ${refreshed.length} cached age(s).`);
+  // Writing back is an optimization, not a requirement: `members` is already
+  // corrected in memory for this run, and a scheduled Actions container throws
+  // its filesystem away anyway. So a failed write must not abort the run — it
+  // just means the next run recomputes the same birthdays.
+  try {
+    const cache = JSON.parse(fs.readFileSync(MEMBER_AGE_FILE, "utf-8")) as MemberAgeCache;
+    cache.members = members;
+    fs.writeFileSync(MEMBER_AGE_FILE, JSON.stringify(cache, null, 2));
+    console.log(`  ✅ Updated ${refreshed.length} cached age(s).`);
+  } catch (err) {
+    console.warn(`  ⚠️  Could not write updated ages back to cache: ${(err as Error).message}`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -134,27 +142,26 @@ function printVoteResult(v: AgeVoteResult): void {
 // ---------------------------------------------------------------------------
 
 async function postNewVotes(allVotes: AgeVoteResult[]): Promise<void> {
-  const seen = loadSeenVotes(BOT_ID);
   let postedCount = 0;
   let skippedCount = 0;
 
   for (const v of allVotes) {
-    if (seen.has(v.id)) {
+    // Claim first, post second — see the identical comment in fetchVotes.ts.
+    if (!(await claimVote(BOT_ID, v.id))) {
       skippedCount++;
       continue;
     }
     try {
       const post = buildAgePost(v);
       await postToBluesky(BOT_ID, post.text, post.facets);
-      seen.add(v.id);
       postedCount++;
       console.log(`  ✅ Posted ${v.chamber} vote #${v.voteNumber} to Bluesky.`);
     } catch (err) {
       console.error(`  ❌ Failed to post ${v.chamber} vote #${v.voteNumber}:`, err);
+      await releaseVote(BOT_ID, v.id);
     }
   }
 
-  saveSeenVotes(BOT_ID, seen);
   console.log(`\n📬 Posting summary: ${postedCount} new, ${skippedCount} already posted before.\n`);
 }
 

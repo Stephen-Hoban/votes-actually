@@ -1,6 +1,22 @@
 node_modules/
 .env
 dist/
-data/
 npm-debug.log*
 .DS_Store
+
+# data/ is an allowlist, deliberately.
+#
+# The four reference caches below are committed: scheduled GitHub Actions runs
+# get a fresh, empty container every 15 minutes, and rebuilding these from the
+# Census API on every run would be slow, pointless, and rate-limited. They're
+# slow-changing build artifacts (refresh with the `refresh-*` scripts and commit
+# the result), not runtime state.
+#
+# Everything else in data/ stays ignored by default. Per-run state now lives in
+# Supabase, and the leftover local files are exactly the ones that must never
+# reach a public repo — bluesky-session-*.json holds live auth tokens.
+data/*
+!data/state-populations.json
+!data/district-populations.json
+!data/member-districts.json
+!data/member-ages.json

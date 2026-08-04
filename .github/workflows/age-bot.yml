@@ -1,0 +1,46 @@
+# Age bot — posts the average age of the members who voted yea vs. nay.
+#
+# Same shape as population-bot.yml; see that file for why each bot gets its own
+# workflow. Needs no CENSUS_API_KEY — birthdays come from congress-legislators,
+# which is a plain public JSON fetch baked into data/member-ages.json.
+name: Age bot
+
+on:
+  schedule:
+    # Staggered five minutes off the population bot so the two aren't queued
+    # against each other, and off the quarter-hour for the reason in that file.
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: age-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      # Cached ages self-heal from each member's stored birthday at run time, so
+      # the committed data/member-ages.json only needs a real refresh when the
+      # roster changes. See refresh-caches.yml.
+      - name: Fetch votes and post new ones
+        run: npm run post-ages
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BLUESKY_AGE_HANDLE: ${{ secrets.BLUESKY_AGE_HANDLE }}
+          BLUESKY_AGE_APP_PASSWORD: ${{ secrets.BLUESKY_AGE_APP_PASSWORD }}

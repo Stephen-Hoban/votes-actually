@@ -1,0 +1,58 @@
+# Refreshes the committed reference caches and commits any changes.
+#
+# Why this exists: on Render, each worker's start script rebuilt these caches on
+# first boot onto a persistent disk. Scheduled Actions containers check the repo
+# out instead, so without this workflow nothing would ever update them — the
+# member→district map would silently go stale after a special election and votes
+# would start coming back unmatched.
+#
+# The bot workflows deliberately do NOT do this. These caches change on a
+# Census-update / new-Congress cadence, not a 15-minute one, and refreshing
+# district populations means ~435 Census API calls.
+name: Refresh reference caches
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monthly. Also doubles as repo activity: GitHub disables scheduled workflows
+    # after 60 days without commits, which would silently stop both bots.
+    - cron: "0 6 1 * *"
+
+concurrency:
+  group: refresh-caches
+  cancel-in-progress: false
+
+permissions:
+  contents: write # needs to push the refreshed caches back
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30 # ~435 Census district calls plus the roster fetch
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Refresh all caches
+        run: npm run refresh-cache
+        env:
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+
+      - name: Commit any changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Reference caches unchanged — nothing to commit."
+          else
+            git commit -m "Refresh reference caches"
+            git push
+          fi
