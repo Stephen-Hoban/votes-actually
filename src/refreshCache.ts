@@ -8,12 +8,15 @@
  *   district-populations.json  → After each decennial Census (next: ~2031)
  *   member-districts.json      → Start of each Congress + after special elections
  *   member-ages.json           → Start of each Congress + after special elections
+ *   member-networth.json       → Quarterly (NET_WORTH_REFRESH_DAYS), and after
+ *                                the mid-May annual financial disclosure filing
  *
  * Usage:
- *   npm run refresh-cache              — refresh everything
- *   npm run refresh-cache -- --members — refresh member→district map only
- *   npm run refresh-cache -- --census  — refresh district populations only
- *   npm run refresh-cache -- --ages    — refresh member ages only
+ *   npm run refresh-cache                — refresh everything
+ *   npm run refresh-cache -- --members   — refresh member→district map only
+ *   npm run refresh-cache -- --census    — refresh district populations only
+ *   npm run refresh-cache -- --ages      — refresh member ages only
+ *   npm run refresh-cache -- --networth  — refresh member net worths only
  */
 
 import * as dotenv from "dotenv";
@@ -21,6 +24,16 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { buildMemberAge, type MemberAge } from "./ageCalculations.js";
+import {
+  buildMemberNetWorth,
+  NET_WORTH_REFRESH_DAYS,
+  type MemberNetWorth,
+} from "./netWorthCalculations.js";
+import { netWorthRange } from "./disclosureBrackets.js";
+import { joinDisclosures, type RosterMember } from "./disclosureJoin.js";
+import { fetchHouseDisclosures } from "./disclosureHouse.js";
+import { fetchSenateDisclosures } from "./disclosureSenate.js";
+import type { RawDisclosure } from "./disclosureTypes.js";
 
 dotenv.config();
 
@@ -34,6 +47,7 @@ const DISTRICT_POP_FILE = path.join(DATA_DIR, "district-populations.json");
 const MEMBER_DISTRICT_FILE = path.join(DATA_DIR, "member-districts.json");
 const STATE_POP_FILE = path.join(DATA_DIR, "state-populations.json");
 const MEMBER_AGE_FILE = path.join(DATA_DIR, "member-ages.json");
+const MEMBER_NET_WORTH_FILE = path.join(DATA_DIR, "member-networth.json");
 
 // ---------------------------------------------------------------------------
 // State FIPS lookup
@@ -300,6 +314,213 @@ async function refreshMemberAges(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Refresh member net worths
+//
+// This is by far the heaviest refresh, and the only one whose source doesn't
+// hand us numbers. Congress discloses assets and liabilities in *brackets*, in
+// per-member PDFs (House) and HTML behind a session flow (Senate), keyed by
+// name rather than by any ID the vote feeds use. So the pipeline is:
+//
+//   congress-legislators  →  roster with BioGuide + LIS IDs
+//   House ZIP + PDFs      ┐
+//   Senate eFD HTML       ┘→  bracketed asset/liability totals, keyed by name
+//   disclosureJoin        →  name+state/district → BioGuide
+//   netWorthRange         →  assets − liabilities, as a range
+//
+// Every figure that comes out is a derived estimate with an explicit range, not
+// a reported fact. See BRIEF.md for the methodology and its limits.
+// ---------------------------------------------------------------------------
+
+/** Builds the roster the disclosure join matches against. */
+async function fetchRoster(): Promise<RosterMember[]> {
+  const resp = await fetch(LEGISLATORS_URL, {
+    headers: { "User-Agent": "votes-actually (educational project)" },
+  });
+  if (!resp.ok) throw new Error(`Legislators fetch error: ${resp.status} ${resp.statusText}`);
+
+  const legislators = (await resp.json()) as Array<{
+    id: { bioguide: string; lis?: string };
+    name: { official_full?: string; first: string; last: string };
+    terms: Array<{ type: string; state: string; district?: number; party?: string }>;
+  }>;
+
+  const roster: RosterMember[] = [];
+  for (const leg of legislators) {
+    const terms = leg.terms ?? [];
+    const lastTerm = terms[terms.length - 1];
+    if (!leg.id.bioguide || !lastTerm) continue;
+
+    roster.push({
+      bioguide: leg.id.bioguide,
+      lisId: leg.id.lis ?? "",
+      name: leg.name.official_full ?? `${leg.name.first} ${leg.name.last}`,
+      state: lastTerm.state,
+      district: lastTerm.type === "sen" ? "" : String(lastTerm.district ?? 0).padStart(2, "0"),
+      party: lastTerm.party ?? "Unknown",
+      chamber: lastTerm.type === "sen" ? "Senate" : "House",
+    });
+  }
+  return roster;
+}
+
+/** Pulls both chambers for one report year, tolerating a failure in either. */
+async function fetchDisclosuresForYear(reportYear: number): Promise<RawDisclosure[]> {
+  const disclosures: RawDisclosure[] = [];
+
+  try {
+    const house = await fetchHouseDisclosures(reportYear);
+    disclosures.push(...house.disclosures);
+    console.log(
+      `   🏠 House ${reportYear}: ${house.disclosures.length} parsed, ${house.skipped.length} skipped.`
+    );
+  } catch (err) {
+    console.error(`   ❌ House ${reportYear} disclosures failed:`, (err as Error).message);
+  }
+
+  try {
+    const senate = await fetchSenateDisclosures(reportYear);
+    disclosures.push(...senate.disclosures);
+    console.log(
+      `   🏛️  Senate ${reportYear}: ${senate.disclosures.length} parsed, ${senate.skipped.length} skipped.`
+    );
+  } catch (err) {
+    console.error(`   ❌ Senate ${reportYear} disclosures failed:`, (err as Error).message);
+  }
+
+  return disclosures;
+}
+
+function toMemberNetWorth(
+  member: RosterMember,
+  disclosure: RawDisclosure,
+  asOf: Date
+): MemberNetWorth {
+  const range = netWorthRange(disclosure.assets, disclosure.liabilities);
+  return buildMemberNetWorth(
+    {
+      bioguide: member.bioguide,
+      lisId: member.lisId,
+      name: member.name,
+      state: member.state,
+      party: member.party,
+      chamber: member.chamber,
+      netWorthLow: range.low,
+      netWorthHigh: range.high,
+      disclosureYear: disclosure.reportYear,
+    },
+    asOf
+  );
+}
+
+async function refreshMemberNetWorths(): Promise<void> {
+  console.log("💰 Building member net worths from financial disclosures...");
+
+  const roster = await fetchRoster();
+  console.log(`   👥 Roster: ${roster.length} sitting members.`);
+
+  // The annual report filed in May covers the *previous* calendar year, and a
+  // large share of members take a filing extension into August/November. So the
+  // most recent report year is always partially filed: start there for freshness,
+  // then backfill anyone still missing from the year before, which is complete.
+  // Each member's own `disclosureYear` records which one they came from.
+  const now = new Date();
+  const primaryYear = now.getFullYear() - 1;
+  const fallbackYear = primaryYear - 1;
+
+  console.log(`\n   📅 Primary report year: ${primaryYear}`);
+  const primary = await fetchDisclosuresForYear(primaryYear);
+  let join = joinDisclosures(primary, roster);
+  console.log(
+    `   🔗 Matched ${join.matched.length}/${roster.length} members ` +
+    `(${join.unmatched.length} filings unmatched).`
+  );
+
+  const entries = new Map<string, MemberNetWorth>();
+  // Kept alongside the entries so the quality warnings below cover backfilled
+  // members too, not just the ones matched in the primary year.
+  const usedDisclosures: RawDisclosure[] = [];
+
+  for (const { member, disclosure } of join.matched) {
+    entries.set(member.bioguide, toMemberNetWorth(member, disclosure, now));
+    usedDisclosures.push(disclosure);
+  }
+
+  if (join.missing.length > 0) {
+    console.log(
+      `\n   📅 ${join.missing.length} member(s) have no ${primaryYear} report — ` +
+      `backfilling from ${fallbackYear}.`
+    );
+    const fallback = await fetchDisclosuresForYear(fallbackYear);
+    // Join against only the still-missing members so a stale filing can never
+    // overwrite a fresher one that already matched.
+    const backfill = joinDisclosures(fallback, join.missing);
+    for (const { member, disclosure } of backfill.matched) {
+      entries.set(member.bioguide, toMemberNetWorth(member, disclosure, now));
+      usedDisclosures.push(disclosure);
+    }
+    console.log(`   🔗 Backfilled ${backfill.matched.length} member(s) from ${fallbackYear}.`);
+    join = { ...join, missing: backfill.missing };
+  }
+
+  const members = [...entries.values()];
+  if (members.length === 0) {
+    throw new Error(
+      "No disclosures could be matched to any sitting member. Refusing to write an empty " +
+      "cache — the bot would then post nothing rather than post something wrong, but this " +
+      "almost certainly means a source format changed. Check the House ZIP and Senate eFD."
+    );
+  }
+
+  const senateCount = members.filter((m) => m.chamber === "Senate").length;
+  const houseCount = members.length - senateCount;
+  const coverage = members.length / roster.length;
+  const withUnparsed = usedDisclosures.filter((d) => d.unparsedRows > 0).length;
+  const byYear = new Map<number, number>();
+  for (const d of usedDisclosures) byYear.set(d.reportYear, (byYear.get(d.reportYear) ?? 0) + 1);
+
+  const output = {
+    fetchedAt: now.toISOString(),
+    source: "US House Clerk financial disclosures + US Senate eFD (annual reports)",
+    note:
+      "Net worth is a DERIVED ESTIMATE, not a reported figure. Disclosure law requires only " +
+      "bracketed ranges, so each member's netWorthLow/netWorthHigh are the summed bracket " +
+      "bounds (assets minus liabilities) and netWorth is their midpoint. Spouse and joint " +
+      "holdings are included; an open-ended top bracket is counted at one dollar above its " +
+      `threshold. Refresh every ${NET_WORTH_REFRESH_DAYS} days and after the mid-May filing deadline.`,
+    disclosureYear: primaryYear,
+    totalMembers: members.length,
+    rosterSize: roster.length,
+    coverage: Number(coverage.toFixed(4)),
+    membersWithUnparsedRows: withUnparsed,
+    members,
+  };
+
+  fs.writeFileSync(MEMBER_NET_WORTH_FILE, JSON.stringify(output, null, 2));
+
+  console.log(
+    `\n✅ Saved ${members.length} member net worths (${senateCount} Senate, ${houseCount} House) ` +
+    `→ ${MEMBER_NET_WORTH_FILE}`
+  );
+  console.log(`   📊 Roster coverage: ${(coverage * 100).toFixed(1)}%`);
+  for (const [year, count] of [...byYear.entries()].sort((a, b) => b[0] - a[0])) {
+    console.log(`   📅 ${count} member(s) from ${year} disclosures.`);
+  }
+  if (join.missing.length > 0) {
+    console.warn(`   ⚠️  ${join.missing.length} sitting member(s) have no usable disclosure:`);
+    for (const m of join.missing.slice(0, 10)) {
+      console.warn(`      · ${m.name} (${m.chamber}, ${m.state}${m.district ? `-${m.district}` : ""})`);
+    }
+    if (join.missing.length > 10) console.warn(`      … and ${join.missing.length - 10} more.`);
+  }
+  if (withUnparsed > 0) {
+    console.warn(
+      `   ⚠️  ${withUnparsed} member(s) had rows whose value couldn't be parsed — ` +
+      `their totals understate reality.`
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Show cache status
 // ---------------------------------------------------------------------------
 
@@ -311,6 +532,7 @@ function showCacheStatus(): void {
     { label: "District populations", path: DISTRICT_POP_FILE },
     { label: "Member→district map", path: MEMBER_DISTRICT_FILE },
     { label: "Member ages", path: MEMBER_AGE_FILE },
+    { label: "Member net worths", path: MEMBER_NET_WORTH_FILE },
   ];
 
   for (const f of files) {
@@ -342,6 +564,7 @@ async function main(): Promise<void> {
   const refreshCensus = refreshAll || args.includes("--census");
   const refreshMembers = refreshAll || args.includes("--members");
   const refreshAges = refreshAll || args.includes("--ages");
+  const refreshNetWorth = refreshAll || args.includes("--networth");
 
   if (refreshCensus) {
     try {
@@ -370,6 +593,14 @@ async function main(): Promise<void> {
       await refreshMemberAges();
     } catch (err) {
       console.error("❌ Member age refresh failed:", err);
+    }
+  }
+
+  if (refreshNetWorth) {
+    try {
+      await refreshMemberNetWorths();
+    } catch (err) {
+      console.error("❌ Member net worth refresh failed:", err);
     }
   }
 
