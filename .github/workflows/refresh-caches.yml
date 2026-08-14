@@ -40,8 +40,12 @@ jobs:
 
       - run: npm ci
 
-      - name: Refresh all caches
-        run: npm run refresh-cache
+      # Explicit flags rather than a bare `npm run refresh-cache`: the no-arg
+      # form now also rebuilds the net worth cache, which means downloading and
+      # parsing hundreds of disclosure PDFs. That belongs on its own quarterly
+      # schedule (refresh-networth.yml), not on this monthly job.
+      - name: Refresh reference caches
+        run: npm run refresh-cache -- --census --members --ages
         env:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
 

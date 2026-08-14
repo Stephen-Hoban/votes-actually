@@ -1,0 +1,49 @@
+# Net worth bot — posts the average estimated net worth of the members who
+# voted yea vs. nay.
+#
+# Same shape as population-bot.yml and age-bot.yml; see population-bot.yml for
+# why each bot gets its own workflow. Needs no CENSUS_API_KEY — net worth comes
+# from the annual financial disclosures, baked into data/member-networth.json.
+name: Net worth bot
+
+on:
+  schedule:
+    # Staggered five minutes off the age bot (and ten off population) so the
+    # three aren't queued against each other, and off the quarter-hour for the
+    # reason in population-bot.yml.
+    - cron: "12,27,42,57 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: networth-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      # Net worth figures do NOT self-heal at run time the way cached ages do —
+      # they only change when a new financial disclosure is published. The run
+      # warns when the committed cache is past its quarterly re-check date;
+      # refresh-caches.yml is what actually renews it.
+      - name: Fetch votes and post new ones
+        run: npm run post-networth
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BLUESKY_NETWORTH_HANDLE: ${{ secrets.BLUESKY_NETWORTH_HANDLE }}
+          BLUESKY_NETWORTH_APP_PASSWORD: ${{ secrets.BLUESKY_NETWORTH_APP_PASSWORD }}

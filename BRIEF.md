@@ -575,12 +575,275 @@ secrets: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `BLUESKY_POPULATION_HANDLE`,
 
 ---
 
+## Net worth bot (2026-08-11)
+
+The third bot persona (`@networth.votesactually.com`) posts the **average and median net worth
+of the members who voted yea vs. nay**, in the same post shape as the population and age bots.
+
+It reuses the Phase-2 refactor exactly as intended — `voteSources.ts` does the fetching,
+`buildVotePost()` does the layout — so the bot itself is one calc module plus one entry point.
+**Almost all the work in this bot is the data, not the bot.**
+
+### The data problem (this is the important part)
+
+Unlike population (Census API) and age (a `birthday` field sitting in JSON we already fetch),
+**there is no free, machine-readable source of congressional net worth.** Verified 2026-08-05:
+
+- **OpenSecrets**, historically the only organisation publishing pre-computed net worth
+  estimates, returns **HTTP 403** behind a Cloudflare challenge, and its `robots.txt`
+  explicitly disallows `ClaudeBot`/`GPTBot`/`CCBot` plus `/api` and `/export_data`. That is a
+  policy signal, not just a technical one, and was not worked around. Their figures also stop
+  at 2018, so they wouldn't have been current enough anyway.
+- Every congressional-finance repo on GitHub (`house-stock-watcher`, `senate-stock-watcher`,
+  and the various trading trackers) parses **Periodic Transaction Reports** — individual stock
+  trades — never a cumulative holdings figure. They cannot answer "what is this member worth."
+- `congress-legislators` carries `id.opensecrets` (523/537), `id.fec`, `id.govtrack`,
+  `id.icpsr` — good join keys, but no financial data of its own.
+
+So the figures are derived from the primary sources, which do work and need no API key:
+
+| Chamber | Source | Format |
+|---|---|---|
+| House | `disclosures-clerk.house.gov/public_disc/financial-pdfs/{year}FD.zip` → index XML → `{year}/{DocID}.pdf` | Per-filer PDF, text-extractable |
+| Senate | `efdsearch.senate.gov` (CSRF token → ToS POST → session cookie → JSON search → report HTML) | HTML tables |
+
+### Why the House PDFs are parseable at all
+
+Each Schedule A row contains **two** dollar ranges — the asset's value *and* the income it
+produced — and Schedules B/C/D use the same `$X - $Y` format. A regex over flattened text
+double-counts income as assets and silently inflates every member.
+
+They're separable because the columns are at fixed x-coordinates. Measured on Pelosi's 2025
+filing (DocID 10075701):
+
+```
+x=280  "$5,000,001 -"    ← Value of Asset
+x=280  "$25,000,000"
+x=445  "$100,001 -"      ← Income  (must NOT be counted)
+x=445  "$1,000,000"
+```
+
+`pdfjs-dist` exposes those coordinates (`item.transform[4]`/`[5]`); the parser locates the
+column headers per page and assigns each dollar item to the nearest column. Note a bracket is
+routinely **split across two lines** at the same x, so vertically adjacent items in a column
+are rejoined before parsing.
+
+**Rejected: microsoft/markitdown.** It's Python (this project is Node-on-Actions), and its PDF
+path is a plain text extractor — layout-aware extraction requires the paid Azure Document
+Intelligence backend. It would discard exactly the x-coordinates the parse depends on, making
+the job harder, not easier.
+
+### Methodology (decided 2026-08-11) — every number here is an estimate
+
+Disclosure law (Ethics in Government Act) requires only **bracketed ranges**, never exact
+figures, so a "net worth" number is always derived. The choices made:
+
+- **Assets minus liabilities, kept as a range end to end.** `netWorthLow`/`netWorthHigh` are
+  the summed bracket bounds; `netWorth` is their midpoint and is the only place a range
+  collapses to a number. The bounds cross over deliberately (`low = assets.low −
+  liabilities.high`) so the range doesn't look more precise than the source supports.
+- **Spouse and joint holdings are included.** Not optional in practice: nearly every asset on
+  Pelosi's filing is coded `SP` or `JT`, and excluding them would report her as worth roughly
+  nothing. This matches what OpenSecrets did.
+
+  A caveat found while building this, and **corrected before it made it into the design**: the
+  Senate has an "Over $1,000,000 and held independently by spouse or dependent child" category
+  (the 5 U.S.C. app. §102(e) spousal-privacy carve-out), which looked at first like a hard
+  ceiling that would systematically understate senators with wealthy spouses relative to
+  representatives. It isn't. Measured across 298 spouse-owned rows in a six-filer sample, only
+  50 used it — **all belonging to a single filer** — while other senators' spouses had
+  above-$1M holdings reported in ordinary fine-grained brackets. It is an *optional per-asset
+  election*, not a form-imposed cap. Whether House filers have and use the same option is
+  **unverified**; do not reason from a cross-chamber asymmetry here without checking first.
+- **The open-ended top bracket ("Over $50,000,000") counts as $50,000,001.** It has no
+  midpoint, so every figure derived from it is a *floor*, not a central estimate. Members at
+  the top of the scale are therefore systematically understated.
+- **Median is published alongside the average.** Congressional wealth is extremely top-heavy;
+  a mean is dominated by a handful of very rich members and can swing by millions when one
+  changes sides. The gap between the two is itself the signal.
+- **Report-year backfill.** The annual report filed each May covers the *previous* calendar
+  year, and many members take an extension (in the 2025 index: **226 annual originals against
+  714 extensions**). The refresh starts at the most recent year for freshness, then backfills
+  anyone still missing from the year before, which is complete. Each member's own
+  `disclosureYear` records which year they came from.
+
+### Joining filings to votes
+
+Neither chamber keys filings by BioGuide, but the vote XML does (House) or by LIS ID (Senate).
+`disclosureJoin.ts` bridges them, and is deliberately conservative because **a wrong match
+doesn't error — it publishes one member's wealth under another's vote**:
+
+- House filings match on **state + district first** (one seat, one member), then the surname
+  must agree. A district whose surname disagrees is a *former* member's filing (special
+  election) and is dropped, not guessed at.
+- Senate filings match on surname within the chamber, narrowed by given name then state.
+- Anything still ambiguous is reported and dropped. Name normalization folds accents
+  (`Velázquez`/`Velazquez`), strips punctuation and honorifics/suffixes **positionally only**,
+  and matches compound surnames on their final token (`Wasserman Schultz` ↔ `Schultz`).
+  It explicitly does **not** do edit-distance matching — `Miller`/`Milller` being one typo
+  apart is not evidence of identity.
+
+### Five silent-zero bugs, and why they're the whole story of this bot
+
+Every serious bug found while building the disclosure pipeline had the same shape: **a failure
+that produces a plausible number instead of an error.** None crashed, none logged a warning,
+and the two worst were caught only by inspecting the finished cache rather than by reading a
+run that looked clean.
+
+| Bug | Effect | How it was caught |
+|---|---|---|
+| Senate section regex double-escaped (caller pre-escaped, `sectionSlice` escaped again) | **All 95 senators = $0**, reported as "88 parsed, 0 skipped, 0 unparsed rows" | Full-run cache inspection; independently by prototype comparison |
+| Bracket split across a *page* boundary (merge required same page) | Dropped one of Pelosi's Schedule D liabilities | Hand-summing her 11 liability rows against the parser's output |
+| Page furniture ("Filing ID #…", footnote URLs) landing inside column tolerance | 1 phantom unparsed row on ~416 of ~450 filers | Cross-checking sample filers |
+| `parseBracket` rejected exact figures with cents (`"$226,776.00"`) | One filer silently lost 8 liability rows totalling ~$3.67M | Reading the unparsed-row log *after* it was changed to print the offending text |
+| Scanned paper filings extract 0 text items | **33 members counted as genuinely worth $0**, dragging every published average down | Noticing those filers shared an anomalous DocID range (`9116xxx`) |
+
+Two lessons worth keeping:
+
+1. **A count is not a diagnostic.** "1 unparsed row" appeared on nearly every filing and was
+   unactionable — it could equally have been a header artifact or a dropped six-figure asset.
+   Changing the log to print the offending *text* turned an ignorable warning into a bug report
+   within one run, and immediately exposed the cents bug. `sumColumn` returns `unparsedTexts`
+   for this reason; don't reduce it back to a tally.
+2. **"No data" and "zero" must never be the same value.** Three of the five bugs were some
+   variant of a lookup failing and returning `0`. The fixes are all the same shape: fail loudly
+   and drop the filer, so the damage shows up as *lower coverage* (visible, guarded) instead of
+   as a *lower average* (invisible, published). `parseAnnualReportHtml` throws on a missing
+   Part 3 heading; `parseFilingPdf` throws on zero extractable text; `parseBracket` returns
+   `null` rather than a zero bracket.
+
+Note the House filings that legitimately read $0 — Frost, Valadao, García, Crawford — are
+distinguished by having *text* that says "None disclosed." The test is text vs. no text, never
+zero vs. non-zero.
+
+### The coverage guard
+
+Disclosure coverage isn't guaranteed the way birthdays are. `MIN_COVERAGE = 0.8`: if fewer
+than 80% of a vote's yea/nay voters have a figure on file, the bot **skips that vote entirely
+and says why**, rather than publishing an average over half a chamber and calling it "the
+average net worth of the members who voted yea." The skip happens *before* `claimVote()`, so a
+later run with a refreshed cache can still post it.
+
+**Measured coverage as built (2026-08-11):** 460 of 537 sitting members (85.7%) have a usable
+disclosure. Per-vote that lands at **~94.9% on Senate votes** and **~83.4% on House votes** —
+both clear the guard, but the House only by ~3 points. If a future refresh loses ground (more
+paper filers, a format change), the House side goes quiet rather than posting bad numbers.
+That's the intended trade, but it means **a silent bot is a symptom to investigate, not a
+sign nothing is happening.** Check the refresh log's coverage line first.
+
+**The missing ~15% is not a random sample**, and this is the caveat most likely to matter. It
+is disproportionately: members who filed on paper (scanned, unparseable), members who took a
+filing extension and haven't filed yet, and members newly seated. If any of those correlate
+with wealth — and paper filing plausibly correlates with seniority, which correlates with
+wealth — then the published averages carry a selection bias whose direction and size are
+**unmeasured**. Nothing in the pipeline corrects for it and no claim here should be read as
+if it did.
+
+### Cache freshness — the one real difference from the age bot
+
+A stale age recomputes itself from the birthday already on disk. **A stale net worth cannot** —
+it needs a new disclosure. So `member-networth.json` entries carry `validUntil`
+(`NET_WORTH_REFRESH_DAYS = 90`), `findStaleNetWorths()` only *reports*, and the bot warns
+loudly and keeps posting: a quarter-old figure is still the most recent one that exists, and
+going silent would be worse. `refresh-networth.yml` is what actually renews it.
+
+### Key files
+```
+src/disclosureBrackets.ts   — bracket string → numeric range; sum; assets − liabilities
+src/disclosureTypes.ts      — RawDisclosure contract shared by both chamber scrapers
+src/disclosureHouse.ts      — House ZIP index + PDF parsing (pdfjs-dist, column-aware)
+src/disclosureSenate.ts     — Senate eFD session/CSRF flow + report HTML parsing
+src/disclosureJoin.ts       — filing → BioGuide matching (pure, heavily tested)
+src/netWorthCalculations.ts — net worth math, mean/median aggregation, post formatting
+src/fetchNetWorthVotes.ts   — net worth bot pipeline (mirrors fetchAgeVotes.ts)
+src/debug/diagHouse.ts      — dumps one filing's unparseable column cells
+src/debug/dumpPdfText.ts    — dumps one filing's raw extracted text (scanned vs. text)
+data/member-networth.json   — the quarterly cache (committed)
+```
+
+The two `src/debug/` scripts are kept deliberately. When a refresh reports unparsed rows or a
+suspicious zero, pointing them at a single DocID is the fastest way to tell a harmless artifact
+from a real dropped asset — that is exactly how the cents bug and the scanned-filing bug were
+identified. They read `disclosureHouse.ts`'s `__debug__` export, which nothing in `src/` imports.
+
+```bash
+npx tsx src/debug/diagHouse.ts    https://disclosures-clerk.house.gov/public_disc/financial-pdfs/2025/10075701.pdf
+npx tsx src/debug/dumpPdfText.ts  https://disclosures-clerk.house.gov/public_disc/financial-pdfs/2025/9116162.pdf
+```
+
+### npm scripts
+```
+npm run fetch-networth     — fetch + print net worth analysis (no posting)
+npm run post-networth      — fetch + post new votes to Bluesky (one-shot; what Actions runs)
+npm run watch-networth     — same, looping on POLL_INTERVAL_MINUTES
+npm run refresh-networth   — rebuild the net worth cache from the disclosures
+```
+
+### Deployment
+`.github/workflows/networth-bot.yml`, cron `12,27,42,57` — staggered five minutes off the age
+bot and ten off population, same reasoning as those files. Needs `SUPABASE_URL`,
+`SUPABASE_SERVICE_KEY`, `BLUESKY_NETWORTH_HANDLE`, `BLUESKY_NETWORTH_APP_PASSWORD`. No Census
+key.
+
+`.github/workflows/refresh-networth.yml` rebuilds the cache quarterly (Feb/May/Aug/Nov, 120-min
+timeout — it's hundreds of PDFs). `refresh-caches.yml` was changed to pass explicit
+`--census --members --ages` flags, because a bare `npm run refresh-cache` now includes the net
+worth rebuild and that must not run monthly.
+
+### Verification (2026-08-11)
+- `npm run typecheck` clean; `npm test` 211 tests pass (73 pre-existing + 138 new across
+  net worth, brackets, and the join).
+- `npm run refresh-networth` run end-to-end against live sources three times, fixing the bugs
+  above between runs. Final cache: 460 members (95 Senate, 365 House), 85.7% roster coverage,
+  21 members with any unparsed row, 4 legitimate zeros.
+- Spot-checked against independently known facts: Jim Justice ($1.30B) tops the list, then
+  Rick Scott ($479M), Issa ($282M), Ricketts ($271M), Buchanan ($193M), Pelosi ($142M). Median
+  across all members is $1.6M, in line with commonly reported congressional medians. AOC at
+  $16.5K and Sanders at $979K are plausible and correctly ordered.
+- Pelosi's Schedule D liabilities were hand-transcribed from the raw PDF text and summed by
+  hand ($61,250,011–$152,500,000) — matches the parser exactly.
+- `npm run fetch-networth` live against real 119th Congress votes, both chambers: Senate votes
+  ~94.9% coverage, House ~83.4%, every post inside the 300-grapheme limit (longest exactly
+  300, with description shortening and the congress.gov facet both intact), and the Aye/No
+  resolution vote (House #282, 214-208) matches official totals.
+
+### Legal note
+Title I of the Ethics in Government Act (5 U.S.C. app. §105(c)) makes it unlawful to obtain or
+use **Senate** financial disclosure reports for commercial purposes, credit rating, or
+political/charitable solicitation. A non-commercial public-interest bot is the use the statute
+contemplates, but this is statutory rather than boilerplate ToS — it constrains what this
+project may become, not just how it fetches.
+
+---
+
 ## Known issues / future cleanup
 - Senate post text sometimes verbose — question field can duplicate the description field
 - 1 unmatched House member per vote (non-voting delegate) — acceptable, can be noted in posts
 - Age bot uses each member's age **as of the run time**, not as of the vote date. Votes are
   fetched within minutes-to-hours of happening, so this only matters for a hypothetical
   backfill of old votes.
+- Net worth figures are **structurally understated at the top**: the open-ended "over
+  $50,000,000" bracket is counted as $50,000,001, so the wealthiest members — the ones that
+  move an average most — are floored rather than estimated.
+- Disclosed assets are **not** net worth: personal residences (unless income-producing) and
+  federal retirement accounts are excluded from filings entirely, and home mortgages are
+  excluded from the liability side. The figure is "disclosable wealth", not wealth.
+- Net worth is up to ~20 months stale by construction (annual report filed in May covers the
+  previous calendar year, and extensions push some members later still). Fine for a "who is
+  wealthier" comparison, wrong for anything claiming to be current.
+- The Senate eFD scrape depends on an undocumented CSRF/session flow with no API contract, so
+  it can break without notice. Every POST also needs a hand-set same-origin `Referer` header or
+  Django 403s it — `fetch` never sends one. The failure is visible (coverage drops, the bot
+  skips Senate votes) rather than silent.
+- **Heavily-leveraged members can show a large negative midpoint** — Ken Calvert lands at
+  −$38.5M from a range of −$92.6M to +$15.6M. This is partly real (large disclosed mortgages)
+  and partly an artifact: an open-ended *asset* bracket is floored at $50,000,001, while
+  bracketed *liabilities* contribute their full upper bound. So a wealthy borrower's assets are
+  understated while their debts are not. The published range makes this visible; the midpoint
+  alone does not.
+- Coverage is ~15% short of the full roster and **the gap is not random** — see the coverage
+  guard section. Treat cross-chamber comparisons especially carefully, since Senate coverage
+  (94.9%) is much better than House (83.4%).
 
 ---
 
@@ -594,12 +857,14 @@ secrets: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `BLUESKY_POPULATION_HANDLE`,
 - ✅ Format posts per bot persona — population bot done (`buildPopulationPost()` in `fetchVotes.ts`); other personas still need their own post-formatting functions
 - ✅ Add vote polling loop — `--watch` flag (`npm run watch-votes`) re-runs the fetch/post cycle on an interval (`POLL_INTERVAL_MINUTES`, default 15) instead of a separate cron-triggered process
 - ✅ Store seen vote IDs to avoid duplicate posts — `src/seenVotes.ts`, local JSON per bot (`data/seen-votes-{botid}.json`), Supabase migration still open for later
-- Set up remaining Bluesky accounts as each bot is built (one per bot persona)
+- Set up remaining Bluesky accounts as each bot is built (one per bot persona) — population, age, and net worth done; campaign contributions outstanding
 - ✅ ~~Deploy config for population bot — `render.yaml` Blueprint~~ **Superseded 2026-08-03:** `render.yaml` deleted, replaced by one GitHub Actions scheduled workflow per bot. See "Hosting decision" above.
 - ✅ Deployed to Render — live and posting as of 2026-07-27 (deployed in a separate session; confirmed by checking `@population.votesactually.com` directly, e.g. recent posts ~15 min old, including current Senate cloture/nomination votes). **Migrated off Render 2026-08-03.**
 - ✅ Migrated hosting to GitHub Actions + Supabase (2026-08-03) — built and locally verified; production cutover follows the ordering documented above.
 
-**Status (2026-08-03):** Population and age bots both run from GitHub Actions on a ~15-minute schedule, with dedupe and Bluesky sessions in Supabase. Posting, dedupe, polling, post-length safety, and bill linking are all implemented. Remaining bot personas (net worth, campaign contributions) are not yet started — adding one is now a calc module, an entry point, an `.env` pair, and one workflow file.
+**Status (2026-08-11):** Population, age, and net worth bots run from GitHub Actions on a ~15-minute schedule, with dedupe and Bluesky sessions in Supabase. Posting, dedupe, polling, post-length safety, and bill linking are all implemented. The remaining persona (campaign contributions) is not yet started.
+
+The "adding a bot is a calc module, an entry point, an `.env` pair, and one workflow file" claim held up for the net worth bot — but only for the *bot*. Its analysis needed a whole data pipeline of its own (disclosure scraping, PDF parsing, name→BioGuide joining), which was ~5x the code of the bot itself. Worth expecting the same for the campaign-contributions persona: the FEC has an actual API, so it should land closer to the age bot than to this one.
 
 ### Key files (added Phase 2)
 ```

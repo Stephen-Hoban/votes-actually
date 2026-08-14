@@ -20,3 +20,4 @@ data/*
 !data/district-populations.json
 !data/member-districts.json
 !data/member-ages.json
+!data/member-networth.json

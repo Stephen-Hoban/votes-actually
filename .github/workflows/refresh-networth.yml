@@ -1,0 +1,65 @@
+# Rebuilds data/member-networth.json from the annual financial disclosures.
+#
+# Why this is separate from refresh-caches.yml: everything in that workflow is a
+# quick JSON or Census fetch, but this one downloads and parses ~440 House
+# disclosure PDFs (and scrapes ~100 Senate report pages) — potentially for two
+# report years, since members who take a filing extension aren't in the most
+# recent year yet. Folding that into the monthly job would make a fast workflow
+# slow and repeat an expensive scrape eleven times a year for no benefit.
+#
+# The cadence matches NET_WORTH_REFRESH_DAYS (90) in netWorthCalculations.ts:
+# entries stamp themselves valid for a quarter, and the bot warns once they
+# expire. February/May/August/November also straddles the mid-May annual filing
+# deadline, so the May and August runs are the ones that pick up new reports.
+name: Refresh net worth cache
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 04:00 UTC on the 8th of Feb/May/Aug/Nov. The 8th rather than the 1st so a
+    # May run lands after the 15th-of-May deadline has been digested by the
+    # Clerk, and off the hour-zero crush on GitHub's scheduler.
+    - cron: "0 4 8 2,5,8,11 *"
+
+concurrency:
+  group: refresh-networth
+  cancel-in-progress: false
+
+permissions:
+  contents: write # needs to push the refreshed cache back
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    # Two report years x ~440 House PDFs at a polite concurrency, plus ~100
+    # Senate pages. Generous because the failure mode of a timeout here is a
+    # half-written cache, and this runs four times a year.
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Rebuild net worth cache from disclosures
+        run: npm run refresh-networth
+
+      # The refresh throws rather than writing an empty cache if nothing matched,
+      # so reaching this step means we have real data. Committing it is what
+      # makes it available to the ephemeral bot containers.
+      - name: Commit any changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/member-networth.json
+          if git diff --staged --quiet; then
+            echo "Net worth cache unchanged — nothing to commit."
+          else
+            git commit -m "Refresh net worth cache from financial disclosures"
+            git push
+          fi
