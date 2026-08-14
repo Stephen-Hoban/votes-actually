@@ -15,12 +15,67 @@
  */
 
 import { parseStringPromise } from "xml2js";
-import { extractText, computeCongressSession, buildBillUrl, selectRecentSenateVotes } from "./voteCalculations.js";
+import {
+  extractText,
+  computeCongressSession,
+  buildBillUrl,
+  selectRecentSenateVotes,
+  catchUpStart,
+} from "./voteCalculations.js";
 
 const USER_AGENT = "votes-actually (educational project)";
 
-/** How many recent votes per chamber to pull on each run. */
+/** How many recent votes per chamber to pull on each run, regardless of history. */
 export const VOTES_TO_SHOW = 5;
+
+/**
+ * Ceiling on votes fetched per chamber in one run when catching up.
+ *
+ * Sized to cover the worst run gap actually observed (~2.5 hours) at the
+ * fastest rate a chamber votes (~7 roll calls in 38 minutes), with headroom.
+ * The cost of a large window is only XML fetches; the cost of too small a
+ * window is a vote that never gets posted.
+ *
+ * It exists so a bot that has been down for days doesn't wake up and dump a
+ * week of stale votes onto Bluesky. When the cap bites, the newest votes win
+ * and the shortfall is logged loudly — the older ones fall below the bot's
+ * high-water mark once these post, so they are gone for good.
+ */
+export const MAX_CATCH_UP = 30;
+
+/**
+ * Resolves the newest vote number a caller has already handled for a chamber,
+ * given a vote-ID prefix ("house-2026-", "senate-119-2-"); 0 means no history.
+ *
+ * Passed in rather than imported so this module stays free of any per-bot
+ * concern — each bot supplies its own, backed by seenVotes.highestSeenNumber.
+ * Omit it (baselining, or a dev run with no Supabase credentials) to get the
+ * plain newest-VOTES_TO_SHOW window.
+ */
+export type HighWaterFn = (idPrefix: string) => Promise<number>;
+
+// Shared by both chambers: work out the oldest vote number to fetch, and say so
+// when the cap is what decided it.
+async function resolveStart(
+  latest: number,
+  idPrefix: string,
+  chamber: string,
+  highWater?: HighWaterFn
+): Promise<number> {
+  const mark = highWater ? await highWater(idPrefix) : 0;
+  const start = catchUpStart(latest, mark, VOTES_TO_SHOW, MAX_CATCH_UP);
+
+  if (mark > 0 && start > mark + 1) {
+    console.warn(
+      `  ⚠️  ${chamber}: ${start - mark - 1} vote(s) between #${mark + 1} and #${start - 1} ` +
+        `are older than the ${MAX_CATCH_UP}-vote catch-up cap and will NOT be posted.`
+    );
+  } else if (start < latest - VOTES_TO_SHOW + 1) {
+    console.log(`    Catching up from #${start} (last handled #${mark}).`);
+  }
+
+  return start;
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -107,7 +162,11 @@ export async function detectHouseYear(): Promise<number> {
 // Senate votes
 // ---------------------------------------------------------------------------
 
-export async function fetchSenateVotes(congressNum: number, senateSession: number): Promise<RawVote[]> {
+export async function fetchSenateVotes(
+  congressNum: number,
+  senateSession: number,
+  highWater?: HighWaterFn
+): Promise<RawVote[]> {
   console.log(`\n🏛️  Fetching Senate votes (${congressNum}th Congress, Session ${senateSession})...`);
 
   const listUrl =
@@ -122,7 +181,13 @@ export async function fetchSenateVotes(congressNum: number, senateSession: numbe
 
   const allVotes = listData.vote_summary.votes.vote;
   const voteArray: unknown[] = Array.isArray(allVotes) ? allVotes : [allVotes];
-  const recentVotes = selectRecentSenateVotes(voteArray, VOTES_TO_SHOW);
+
+  // The feed is newest-first, so the first entry is the latest vote number and
+  // the count to take from the front is the distance back to `start`.
+  const latestNum = parseInt(String((voteArray[0] as Record<string, unknown>)?.vote_number), 10) || 0;
+  const idPrefix = `senate-${congressNum}-${senateSession}-`;
+  const start = await resolveStart(latestNum, idPrefix, "Senate", highWater);
+  const recentVotes = selectRecentSenateVotes(voteArray, Math.max(1, latestNum - start + 1));
 
   const results: RawVote[] = [];
 
@@ -214,19 +279,19 @@ async function findLatestHouseRollNumber(houseYear: number): Promise<number> {
   return latest;
 }
 
-export async function fetchHouseVotes(houseYear: number): Promise<RawVote[]> {
+export async function fetchHouseVotes(houseYear: number, highWater?: HighWaterFn): Promise<RawVote[]> {
   console.log(`\n🏠  Fetching House votes (${houseYear})...`);
   console.log(`    Finding latest roll call number...`);
 
   const latestRoll = await findLatestHouseRollNumber(houseYear);
   console.log(`    Latest House roll call: #${latestRoll}`);
 
+  const start = await resolveStart(latestRoll, `house-${houseYear}-`, "House", highWater);
+
   const results: RawVote[] = [];
 
-  for (let i = 0; i < VOTES_TO_SHOW; i++) {
-    const rollNum = latestRoll - i;
-    if (rollNum < 1) break;
-
+  // Newest-first, to match the Senate feed's order.
+  for (let rollNum = latestRoll; rollNum >= start; rollNum--) {
     const paddedNum = String(rollNum).padStart(3, "0");
     const url = `https://clerk.house.gov/evs/${houseYear}/roll${paddedNum}.xml`;
 
@@ -289,13 +354,13 @@ export async function fetchHouseVotes(houseYear: number): Promise<RawVote[]> {
 // Convenience: fetch both chambers, tolerating a failure in either
 // ---------------------------------------------------------------------------
 
-export async function fetchAllVotes(): Promise<RawVote[]> {
+export async function fetchAllVotes(highWater?: HighWaterFn): Promise<RawVote[]> {
   const { congress, session } = await detectCongressSession();
   const houseYear = await detectHouseYear();
 
   let senateVotes: RawVote[] = [];
   try {
-    senateVotes = await fetchSenateVotes(congress, session);
+    senateVotes = await fetchSenateVotes(congress, session, highWater);
     console.log(`✅ Retrieved ${senateVotes.length} Senate votes.\n`);
   } catch (err) {
     console.error("❌ Senate fetch failed:", err);
@@ -303,7 +368,7 @@ export async function fetchAllVotes(): Promise<RawVote[]> {
 
   let houseVotes: RawVote[] = [];
   try {
-    houseVotes = await fetchHouseVotes(houseYear);
+    houseVotes = await fetchHouseVotes(houseYear, highWater);
     console.log(`✅ Retrieved ${houseVotes.length} House votes.\n`);
   } catch (err) {
     console.error("❌ House fetch failed:", err);

@@ -120,6 +120,74 @@ export function selectRecentSenateVotes<T>(voteArray: T[], count: number): T[] {
 }
 
 // ---------------------------------------------------------------------------
+// How far back a run reaches
+//
+// Each run used to look at a fixed window of the newest DISPLAY_COUNT votes per
+// chamber. That silently drops votes: the schedule asks for a run every 15
+// minutes, but GitHub defers scheduled workflows heavily under load — in
+// practice runs land roughly hourly, with observed gaps up to ~2.5 hours. A
+// chamber can easily publish more than DISPLAY_COUNT roll calls in that time
+// (the House ran 7 votes in 38 minutes on 2026-07-22; the Senate has had 14 in a
+// day), and anything that fell off the back of the window was never posted and
+// never reported as missing.
+//
+// So the window is anchored to what the bot has already handled — its
+// high-water mark — rather than to a fixed count.
+// ---------------------------------------------------------------------------
+
+/**
+ * Reorder a run's votes oldest-first for posting.
+ *
+ * Both chamber feeds arrive newest-first, which is the right order to *display*
+ * but the wrong order to *post*, for a reason that only exists because of
+ * catchUpStart(): a bot's window now starts above its high-water mark, and that
+ * mark is the highest vote number it has posted.
+ *
+ * If a run dies partway through a batch — claimVote() throws on any non-duplicate
+ * Supabase error, which aborts the run — whatever posted so far is permanent.
+ * Posting newest-first would push the high-water mark straight to the top, so
+ * the votes the run never reached would sit below it and never be fetched again:
+ * silently dropped, the exact failure catchUpStart() exists to prevent. Going
+ * oldest-first advances the mark only as far as the run actually got, leaving
+ * everything unposted above it for the next run to catch.
+ *
+ * So this is a correctness constraint, not presentation. Reversing it reopens
+ * the hole.
+ */
+export function orderForPosting<T>(votes: T[]): T[] {
+  return [...votes].reverse();
+}
+
+/**
+ * The oldest vote number a run should fetch for one chamber.
+ *
+ * - `latest`      newest vote number the chamber has published.
+ * - `highWater`   newest vote number this bot has already handled, or 0 if it
+ *                 has no history for this chamber/session yet.
+ * - `displayCount` how many recent votes to fetch regardless, so console output
+ *                 (and `npm run fetch-votes` with no --post) is unchanged.
+ * - `maxCatchUp`  hard ceiling on votes fetched in one run.
+ *
+ * With no history the result is just the newest `displayCount`: a brand-new bot
+ * must not treat a whole session as unposted backlog and flood Bluesky. That is
+ * also what baselineSeenVotes.ts relies on to seed a bot.
+ */
+export function catchUpStart(
+  latest: number,
+  highWater: number,
+  displayCount: number,
+  maxCatchUp: number
+): number {
+  const displayStart = Math.max(1, latest - displayCount + 1);
+  if (highWater <= 0) return displayStart;
+
+  // Reach back past the display window to the first vote after the high-water
+  // mark, but never further back than the cap allows.
+  const wanted = Math.min(displayStart, highWater + 1);
+  return Math.max(1, wanted, latest - maxCatchUp + 1);
+}
+
+// ---------------------------------------------------------------------------
 // congress.gov bill/resolution URLs
 // ---------------------------------------------------------------------------
 
