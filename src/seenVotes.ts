@@ -72,6 +72,42 @@ export async function releaseVote(botId: string, voteId: string): Promise<void> 
 }
 
 /**
+ * The highest vote number this bot has already handled for one chamber, or 0 if
+ * it has none yet.
+ *
+ * `idPrefix` is the chamber+session part of a vote ID, e.g. "house-2026-" or
+ * "senate-119-2-". Vote IDs zero-pad their trailing number (3 digits House, 5
+ * Senate), so lexicographic ordering in Postgres matches numeric ordering and a
+ * single indexed row answers the question.
+ *
+ * This is what lets a run reach back past its display window to votes published
+ * while no run happened to fire — see catchUpStart() in voteCalculations.ts.
+ * Throws rather than defaulting on error, matching claimVote(): a run that
+ * can't reach Supabase should abort, not quietly narrow its window.
+ */
+export async function highestSeenNumber(botId: string, idPrefix: string): Promise<number> {
+  const { data, error } = await getSupabase()
+    .from(TABLE)
+    .select("vote_id")
+    .eq("bot_id", botId)
+    .like("vote_id", `${idPrefix}%`)
+    .order("vote_id", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    throw new Error(
+      `Failed to read high-water mark for bot "${botId}" (${idPrefix}): ${error.message} (${error.code})`
+    );
+  }
+
+  const newest = data?.[0]?.vote_id as string | undefined;
+  if (!newest) return 0;
+
+  const trailing = /(\d+)$/.exec(newest);
+  return trailing ? parseInt(trailing[1], 10) : 0;
+}
+
+/**
  * Record a vote as posted without claiming it first.
  *
  * Only for the one-time migration of pre-existing local seen-vote files

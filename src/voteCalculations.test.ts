@@ -13,6 +13,8 @@ import {
   fitsInPost,
   truncateToGraphemes,
   selectRecentSenateVotes,
+  catchUpStart,
+  orderForPosting,
   MAX_POST_LENGTH,
   StatePop,
   DistrictPop,
@@ -64,6 +66,64 @@ describe("selectRecentSenateVotes", () => {
   it("returns fewer than count if the array is shorter", () => {
     const votes = [2, 1].map((n) => ({ vote_number: n }));
     expect(selectRecentSenateVotes(votes, 5)).toEqual(votes);
+  });
+});
+
+describe("orderForPosting", () => {
+  it("posts oldest-first, the reverse of the newest-first fetch order", () => {
+    // Not cosmetic. catchUpStart() resumes from the highest vote number already
+    // posted, so if a run dies mid-batch the mark must not have jumped ahead of
+    // votes the run never reached — those would fall below the window forever.
+    // Posting oldest-first keeps anything unposted above the mark.
+    const fetched = [283, 282, 281].map((n) => ({ voteNumber: n }));
+    expect(orderForPosting(fetched)).toEqual([281, 282, 283].map((n) => ({ voteNumber: n })));
+  });
+
+  it("does not mutate the caller's array, which is still displayed newest-first", () => {
+    const fetched = [3, 2, 1];
+    orderForPosting(fetched);
+    expect(fetched).toEqual([3, 2, 1]);
+  });
+});
+
+describe("catchUpStart", () => {
+  const DISPLAY = 5;
+  const CAP = 30;
+
+  it("shows just the newest window when the bot has no history", () => {
+    // A brand-new bot must not read an entire session as unposted backlog.
+    expect(catchUpStart(283, 0, DISPLAY, CAP)).toBe(279);
+  });
+
+  it("stays on the display window when the bot is already caught up", () => {
+    // Steady state, and the recess case: nothing new, so nothing extra fetched.
+    expect(catchUpStart(283, 283, DISPLAY, CAP)).toBe(279);
+  });
+
+  it("stays on the display window when fewer than DISPLAY votes are new", () => {
+    expect(catchUpStart(283, 281, DISPLAY, CAP)).toBe(279);
+  });
+
+  it("reaches back past the display window to the first unhandled vote", () => {
+    // The bug this exists for: 12 roll calls landed between runs, so a fixed
+    // 5-vote window would have dropped #272-#278 with no error.
+    expect(catchUpStart(283, 271, DISPLAY, CAP)).toBe(272);
+  });
+
+  it("caps a long backlog to the newest MAX_CATCH_UP votes", () => {
+    // Bot down for days: post the 30 most recent rather than a week of stale ones.
+    expect(catchUpStart(283, 100, DISPLAY, CAP)).toBe(254);
+  });
+
+  it("never reaches below vote #1", () => {
+    expect(catchUpStart(3, 0, DISPLAY, CAP)).toBe(1);
+    expect(catchUpStart(3, 1, DISPLAY, CAP)).toBe(1);
+    expect(catchUpStart(40, 1, DISPLAY, CAP)).toBe(11);
+  });
+
+  it("treats a high-water mark ahead of the feed as caught up", () => {
+    // Defensive: a stale/lagging feed must not make the window run backwards.
+    expect(catchUpStart(283, 290, DISPLAY, CAP)).toBe(279);
   });
 });
 

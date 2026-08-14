@@ -24,9 +24,9 @@ import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
 import { postToBluesky } from "./bluesky.js";
-import { claimVote, releaseVote } from "./seenVotes.js";
+import { claimVote, releaseVote, highestSeenNumber } from "./seenVotes.js";
 import { RawVote, fetchAllVotes } from "./voteSources.js";
-import { graphemeLength } from "./voteCalculations.js";
+import { graphemeLength, orderForPosting } from "./voteCalculations.js";
 import {
   MemberNetWorth,
   MemberNetWorthIndex,
@@ -156,7 +156,10 @@ async function postNewVotes(allVotes: NetWorthVoteResult[]): Promise<void> {
   let skippedCount = 0;
   let lowCoverageCount = 0;
 
-  for (const v of allVotes) {
+  // Oldest-first: a partly-completed batch must leave the unposted votes ABOVE
+  // the bot's high-water mark so the next run still finds them. See
+  // orderForPosting() in voteCalculations.ts.
+  for (const v of orderForPosting(allVotes)) {
     // An average taken over too few of the voters isn't the number this bot
     // claims to publish. Bail before claiming the vote, so a later run with a
     // refreshed cache can still post it.
@@ -217,7 +220,13 @@ async function runOnce(): Promise<void> {
   const netWorths = buildMemberNetWorthIndex(memberNetWorths);
   console.log();
 
-  const rawVotes = await fetchAllVotes();
+  // Reach back past the newest few votes to anything published while no run
+  // happened to fire. Only when posting: a plain fetch run must keep working
+  // with no Supabase credentials, and baselining deliberately wants the
+  // narrow window. See catchUpStart() in voteCalculations.ts.
+  const rawVotes = await fetchAllVotes(
+    SHOULD_POST ? (prefix) => highestSeenNumber(BOT_ID, prefix) : undefined
+  );
 
   if (rawVotes.length === 0) {
     console.log("No votes retrieved. Check network connection and congress/session numbers.");

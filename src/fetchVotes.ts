@@ -18,7 +18,7 @@ import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
 import { postToBluesky } from "./bluesky.js";
-import { claimVote, releaseVote } from "./seenVotes.js";
+import { claimVote, releaseVote, highestSeenNumber } from "./seenVotes.js";
 import { RawVote, fetchAllVotes } from "./voteSources.js";
 import {
   StatePop,
@@ -31,6 +31,7 @@ import {
   formatPct,
   buildPopulationPost,
   graphemeLength,
+  orderForPosting,
 } from "./voteCalculations.js";
 
 dotenv.config();
@@ -173,7 +174,10 @@ async function postNewVotes(allVotes: VoteResult[]): Promise<void> {
   let postedCount = 0;
   let skippedCount = 0;
 
-  for (const v of allVotes) {
+  // Oldest-first: a partly-completed batch must leave the unposted votes ABOVE
+  // the bot's high-water mark so the next run still finds them. See
+  // orderForPosting() in voteCalculations.ts.
+  for (const v of orderForPosting(allVotes)) {
     // Claim first, post second. The seen_votes primary key — not this loop — is
     // what guarantees a vote is never posted twice, even if two scheduled runs
     // overlap. claimVote throws if Supabase is unreachable, which aborts the
@@ -226,7 +230,13 @@ async function runOnce(): Promise<void> {
 
   console.log();
 
-  const rawVotes = await fetchAllVotes();
+  // Reach back past the newest few votes to anything published while no run
+  // happened to fire. Only when posting: a plain fetch run must keep working
+  // with no Supabase credentials, and baselining deliberately wants the
+  // narrow window. See catchUpStart() in voteCalculations.ts.
+  const rawVotes = await fetchAllVotes(
+    SHOULD_POST ? (prefix) => highestSeenNumber(BOT_ID, prefix) : undefined
+  );
 
   if (rawVotes.length === 0) {
     console.log("No votes retrieved. Check network connection and congress/session numbers.");
