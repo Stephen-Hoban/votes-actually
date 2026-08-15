@@ -9,9 +9,10 @@
  * `vote.members`, so a fix to XML parsing or vote detection benefits every bot
  * instead of being duplicated per persona.
  *
- * Data sources (no API key needed for either):
+ * Data sources (no API key needed for any):
  *   - Senate votes:  senate.gov XML feeds
  *   - House votes:   clerk.house.gov XML feeds
+ *   - Bill titles:   govinfo BILLSTATUS bulk data, via billTitles.ts
  */
 
 import { parseStringPromise } from "xml2js";
@@ -19,9 +20,12 @@ import {
   extractText,
   computeCongressSession,
   buildBillUrl,
+  parseBillDesignation,
+  formatBillDesignation,
   selectRecentSenateVotes,
   catchUpStart,
 } from "./voteCalculations.js";
+import { BillRef, billKey, fetchBillTitles } from "./billTitles.js";
 
 const USER_AGENT = "votes-actually (educational project)";
 
@@ -111,6 +115,15 @@ export interface RawVote {
   url: string;
   /** congress.gov URL for the underlying bill/resolution, or "" (e.g. nominations). */
   billUrl: string;
+  /** Congress the underlying bill belongs to, or 0 when there is no bill. */
+  billCongress: number;
+  /** Display designation of that bill, e.g. "H.R. 5334", or "". */
+  billDesignation: string;
+  /**
+   * That bill's common name, filled in by fetchAllVotes(); "" when the vote has
+   * no bill or govinfo couldn't resolve one. See billTitles.ts.
+   */
+  billTitle: string;
   members: RawMemberVote[];
 }
 
@@ -224,8 +237,9 @@ export async function fetchSenateVotes(
     const documentNumber = extractText(document?.document_number);
     const amendment = rc.amendment as Record<string, unknown> | undefined;
     const amendmentToDocument = extractText(amendment?.amendment_to_document_number);
-    const billDesignation = documentNumber ? `${documentType} ${documentNumber}` : amendmentToDocument;
-    const billUrl = billDesignation ? buildBillUrl(congressNum, billDesignation) : "";
+    const rawDesignation = documentNumber ? `${documentType} ${documentNumber}` : amendmentToDocument;
+    const billUrl = rawDesignation ? buildBillUrl(congressNum, rawDesignation) : "";
+    const bill = rawDesignation ? parseBillDesignation(rawDesignation) : null;
 
     const membersRaw = (rc.members as Record<string, unknown>)?.member;
     const members: unknown[] = Array.isArray(membersRaw) ? membersRaw : [membersRaw];
@@ -255,6 +269,9 @@ export async function fetchSenateVotes(
         `roll_call_vote_cfm.cfm?congress=${congressNum}&session=${senateSession}` +
         `&vote=${v.vote_number}`,
       billUrl,
+      billCongress: bill ? congressNum : 0,
+      billDesignation: bill ? formatBillDesignation(bill) : "",
+      billTitle: "",
       members: memberVotes,
     });
   }
@@ -315,6 +332,7 @@ export async function fetchHouseVotes(houseYear: number, highWater?: HighWaterFn
     const legisNum = extractText(meta["legis-num"]);
     const voteCongress = parseInt(extractText(meta["congress"]), 10);
     const billUrl = legisNum && voteCongress ? buildBillUrl(voteCongress, legisNum) : "";
+    const bill = legisNum && voteCongress ? parseBillDesignation(legisNum) : null;
 
     const recordedRaw = voteData["recorded-vote"];
     const members: unknown[] = Array.isArray(recordedRaw) ? recordedRaw : [recordedRaw];
@@ -343,11 +361,46 @@ export async function fetchHouseVotes(houseYear: number, highWater?: HighWaterFn
       nays,
       url: `https://clerk.house.gov/Votes/${houseYear}${paddedNum}`,
       billUrl,
+      billCongress: bill ? voteCongress : 0,
+      billDesignation: bill ? formatBillDesignation(bill) : "",
+      billTitle: "",
       members: memberVotes,
     });
   }
 
   return results;
+}
+
+// ---------------------------------------------------------------------------
+// Bill titles
+// ---------------------------------------------------------------------------
+
+/**
+ * Fills in `billTitle` for every vote that has an underlying bill.
+ *
+ * Done here, across both chambers at once, rather than inside each fetch: the
+ * lookup batches by (congress, bill type), and the House and Senate vote on the
+ * same bills, so one combined pass is fewer requests than two. Mutates in place
+ * and never throws — a vote whose title can't be resolved keeps "" and its post
+ * falls back to the chamber's description.
+ */
+async function attachBillTitles(votes: RawVote[]): Promise<void> {
+  const refs: BillRef[] = [];
+  for (const vote of votes) {
+    if (!vote.billCongress || !vote.billDesignation) continue;
+    const bill = parseBillDesignation(vote.billDesignation);
+    if (bill) refs.push({ ...bill, congress: vote.billCongress });
+  }
+  if (refs.length === 0) return;
+
+  const titles = await fetchBillTitles(refs);
+
+  for (const vote of votes) {
+    if (!vote.billCongress || !vote.billDesignation) continue;
+    const bill = parseBillDesignation(vote.billDesignation);
+    if (!bill) continue;
+    vote.billTitle = titles.get(billKey({ ...bill, congress: vote.billCongress })) ?? "";
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -374,5 +427,8 @@ export async function fetchAllVotes(highWater?: HighWaterFn): Promise<RawVote[]>
     console.error("❌ House fetch failed:", err);
   }
 
-  return [...senateVotes, ...houseVotes];
+  const allVotes = [...senateVotes, ...houseVotes];
+  await attachBillTitles(allVotes);
+
+  return allVotes;
 }

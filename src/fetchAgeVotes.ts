@@ -24,7 +24,7 @@ import * as path from "path";
 import { postToBluesky } from "./bluesky.js";
 import { claimVote, releaseVote, highestSeenNumber } from "./seenVotes.js";
 import { RawVote, fetchAllVotes } from "./voteSources.js";
-import { graphemeLength, orderForPosting } from "./voteCalculations.js";
+import { billLine, graphemeLength, orderForPosting } from "./voteCalculations.js";
 import {
   MemberAge,
   MemberAgeIndex,
@@ -122,7 +122,8 @@ function printVoteResult(v: AgeVoteResult): void {
   console.log("─".repeat(60));
   console.log(`${v.chamber.toUpperCase()} VOTE #${v.voteNumber}  |  ${v.date}`);
   console.log(`📋 ${v.question}`);
-  if (v.description) console.log(`   ${v.description}`);
+  const bill = billLine(v);
+  if (bill) console.log(`   ${bill}`);
   console.log(`🗳️  Result: ${v.result}  (Yeas: ${v.yeas} | Nays: ${v.nays})`);
   console.log();
   console.log(`🎂 Average age:`);
