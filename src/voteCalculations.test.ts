@@ -9,6 +9,9 @@ import {
   formatPct,
   buildPopulationPost,
   buildBillUrl,
+  parseBillDesignation,
+  formatBillDesignation,
+  billLine,
   graphemeLength,
   fitsInPost,
   truncateToGraphemes,
@@ -321,6 +324,66 @@ describe("buildBillUrl", () => {
   });
 });
 
+describe("parseBillDesignation / formatBillDesignation", () => {
+  it("parses every spelling the two chambers use", () => {
+    // The House writes "H R 8595", the Senate "H.R. 8595" — same bill.
+    expect(parseBillDesignation("H R 8595")).toEqual({ type: "HR", number: 8595 });
+    expect(parseBillDesignation("H.R. 8595")).toEqual({ type: "HR", number: 8595 });
+    expect(parseBillDesignation("H J RES 139")).toEqual({ type: "HJRES", number: 139 });
+    expect(parseBillDesignation("S.J.Res. 187")).toEqual({ type: "SJRES", number: 187 });
+    expect(parseBillDesignation("S.Con.Res. 33")).toEqual({ type: "SCONRES", number: 33 });
+    expect(parseBillDesignation("S. 5271")).toEqual({ type: "S", number: 5271 });
+  });
+
+  it("returns null for anything that isn't a bill or resolution", () => {
+    expect(parseBillDesignation("PN1078")).toBeNull(); // nomination
+    expect(parseBillDesignation("S.Amdt. 6715")).toBeNull(); // amendment
+    expect(parseBillDesignation("")).toBeNull();
+  });
+
+  it("renders one canonical spelling regardless of which chamber supplied it", () => {
+    expect(formatBillDesignation({ type: "HR", number: 5334 })).toBe("H.R. 5334");
+    expect(formatBillDesignation({ type: "HJRES", number: 139 })).toBe("H.J.Res. 139");
+    expect(formatBillDesignation({ type: "S", number: 5271 })).toBe("S. 5271");
+    expect(formatBillDesignation({ type: "SCONRES", number: 33 })).toBe("S.Con.Res. 33");
+  });
+});
+
+describe("billLine", () => {
+  const base = {
+    id: "senate-119-2-00224",
+    chamber: "Senate" as const,
+    question: "On Passage of the Bill H.R. 5334",
+    description: "H.R. 5334, as amended",
+    result: "Bill Passed",
+    yeas: 86,
+    nays: 11,
+    billUrl: "https://www.congress.gov/bill/119th-congress/house-bill/5334",
+    billDesignation: "H.R. 5334",
+    billTitle: "Lindsey O. Graham Sanctioning Russia and Iran Act of 2026",
+  };
+
+  it("names the bill instead of restating its number", () => {
+    // The whole point: "H.R. 5334, as amended" told a reader nothing.
+    expect(billLine(base)).toBe(
+      "H.R. 5334: Lindsey O. Graham Sanctioning Russia and Iran Act of 2026"
+    );
+  });
+
+  it("falls back to the chamber's description when no title was resolved", () => {
+    // Nominations and procedural votes have no bill, and govinfo can be down.
+    expect(billLine({ ...base, billTitle: "" })).toBe("H.R. 5334, as amended");
+    expect(billLine({ ...base, billTitle: "", billDesignation: "", description: "Confirmation" }))
+      .toBe("Confirmation");
+  });
+
+  it("shows a bare title if there's somehow no designation to pair with it", () => {
+    expect(billLine({ ...base, billDesignation: "" })).toBe(
+      "Lindsey O. Graham Sanctioning Russia and Iran Act of 2026"
+    );
+  });
+});
+
 describe("buildPopulationPost", () => {
   const baseVote: VoteResult = {
     id: "house-2026-100",
@@ -339,6 +402,8 @@ describe("buildPopulationPost", () => {
     pctNay: 0.4229,
     url: "https://example.com",
     billUrl: "https://www.congress.gov/bill/119th-congress/house-bill/100",
+    billDesignation: "H.R. 100",
+    billTitle: "",
   };
 
   it("builds the full post with description", () => {
@@ -351,6 +416,54 @@ describe("buildPopulationPost", () => {
         "✅ YES: 150.0M (45.3%)\n" +
         "❌  NO: 140.0M (42.3%)"
     );
+  });
+
+  it("puts the bill's number and common name in the post, not just its number", () => {
+    // The real Senate vote that motivated this: the post used to read
+    // "H.R. 5334, as amended", which no reader could identify.
+    const post = buildPopulationPost({
+      ...baseVote,
+      id: "senate-119-2-00224",
+      chamber: "Senate",
+      question: "On Passage of the Bill H.R. 5334",
+      description: "H.R. 5334, as amended",
+      result: "Bill Passed",
+      yeas: 86,
+      nays: 11,
+      billUrl: "https://www.congress.gov/bill/119th-congress/house-bill/5334",
+      billDesignation: "H.R. 5334",
+      billTitle: "Lindsey O. Graham Sanctioning Russia and Iran Act of 2026",
+    });
+
+    expect(post.text).toContain(
+      "H.R. 5334: Lindsey O. Graham Sanctioning Russia and Iran Act of 2026"
+    );
+    expect(post.text).not.toContain("H.R. 5334, as amended");
+    expect(fitsInPost(post.text)).toBe(true);
+    // The bill name is what carries the congress.gov link.
+    expect(facetText(post.text, post.facets[0])).toBe(
+      "H.R. 5334: Lindsey O. Graham Sanctioning Russia and Iran Act of 2026"
+    );
+  });
+
+  it("keeps the bill number visible even when the title has to be shortened", () => {
+    const post = buildPopulationPost({
+      ...baseVote,
+      question: "On Motion to Suspend the Rules and Pass",
+      description: "",
+      billDesignation: "H.R. 5362",
+      billTitle:
+        "To name the Department of Veterans Affairs multispecialty clinic in Marietta, " +
+        "Georgia, as the “Colonel Michael H. Boyce Department of Veterans Affairs " +
+        "Multispecialty Clinic”, and for a great many other purposes besides that one",
+    });
+
+    expect(fitsInPost(post.text)).toBe(true);
+    // The number leads the line, so truncation can never take it.
+    expect(post.text).toContain("H.R. 5362: To name the Department of Veterans Affairs");
+    expect(post.text).toContain("…");
+    expect(post.text).toContain("Result: Passed (220-210)");
+    expect(post.text).toContain("✅ YES: 150.0M (45.3%)");
   });
 
   it("links the description text to the bill instead of appending the URL", () => {

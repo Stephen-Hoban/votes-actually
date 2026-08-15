@@ -77,11 +77,17 @@ unlimited on public repos, so running this on every PR costs nothing.
   from Census cache), non-voting codes (Present), missing bioguide IDs
 - `computeCongressSession` — Congress/session rollover at year boundaries
 - `formatPop`, `formatPct`, `buildPopulationPost` — output formatting, including the exact
-  Bluesky post string, description shortening, and bill-link facet placement
+  Bluesky post string, bill-line shortening, and bill-link facet placement
 - `graphemeLength` / `fitsInPost` / `truncateToGraphemes` — grapheme-cluster-aware length
   checks (see "Bluesky post length & bill links" below)
 - `buildBillUrl` — congress.gov URL mapping for all House/Senate bill/resolution types,
   including the ordinal-suffix edge case (11th/12th/13th vs. 21st/22nd/23rd)
+- `parseBillDesignation` / `formatBillDesignation` / `billLine` — both chambers' spellings of a
+  designation parse to the same bill and render one canonical way; the bill line names the bill
+  and falls back to the chamber's description when no title resolved (see "Bill titles in posts")
+- `pickBillTitle` / `billKey` — Display Title selection out of a BILLSTATUS `<titles>` block
+  (including the omnibus case, and xml2js collapsing a single title to a bare object), and the
+  cache key that keeps H.R. 100 and S. 100 apart
 - `selectRecentSenateVotes` — Senate vote list ordering (see below)
 
 Not covered yet: the XML-fetching/parsing layer in `fetchVotes.ts` itself (would need
@@ -94,6 +100,7 @@ recorded HTTP fixtures) — deferred until it becomes a real pain point.
 | Data | Source | Why |
 |---|---|---|
 | Vote detection + member votes | senate.gov + clerk.house.gov XML | Direct source, no API key, no rate limits |
+| Bill titles (the name a bill is known by) | govinfo BILLSTATUS bulk data (GPO) | Neither vote feed carries a usable one — see "Bill titles in posts" |
 | Bill context / enrichment | ProPublica Congress API (Phase 3) | Reserved for website — richer metadata |
 | District populations | Census ACS5 2022, variable `B01003_001E` | State + congressional district level |
 | Member→district lookup | congress-legislators, gh-pages branch | BioGuide IDs, updated by CircleCI |
@@ -816,8 +823,112 @@ project may become, not just how it fetches.
 
 ---
 
+## Bill titles in posts (2026-08-15)
+
+**Problem:** posts named the bill but never said what it was. A real population-bot post read:
+
+```
+Senate Vote: On Passage of the Bill H.R. 5334
+H.R. 5334, as amended
+Result: Bill Passed (86-11)
+```
+
+That bill is the *Lindsey O. Graham Sanctioning Russia and Iran Act of 2026*, and a reader had
+no way to learn that without leaving Bluesky. The second line — the only free-form line in the
+post — was spending itself restating the number from the first line.
+
+### Why this needed a second data source
+Neither roll call feed carries a usable title:
+- The **Senate** vote XML has a `document_short_title` field, but it is not maintained. On the
+  H.R. 5334 passage vote it held the short title of an unrelated bill (an educator expense
+  deduction), because H.R. 5334 was a shell the Senate amended. Its `document_title` is the
+  long official title ("An act to impose sanctions and other measures with respect to the
+  Russian Federation…"), never the common name. `vote_title` is just `"H.R. 5334, as amended"`.
+- The **House** `vote-desc` is often the short title, but is blank on amendment votes and on
+  some passage votes.
+
+So titles come from **govinfo's BILLSTATUS bulk data**, published by GPO:
+```
+https://www.govinfo.gov/bulkdata/BILLSTATUS/119/hr/BILLSTATUS-119hr5334.xml
+```
+No API key, no third party — the same tier of source as the senate.gov and clerk.house.gov
+vote feeds this project already reads. The chain is: bill sponsor → Congress.gov (official
+record) → govinfo.
+
+**GovTrack was the first implementation and was dropped.** Its API can batch (one request per
+congress+bill-type group via `number__in`, versus one request per bill here), so it was
+cheaper — but it turned out to be a pass-through: GovTrack's `title_without_number` *is*
+Congress.gov's Display Title. Checked against 13 bills spanning all eight bill/resolution
+types, the two sources agreed on every one, so the aggregator was buying nothing but a
+dependency. Same output, primary source, no API key.
+
+### Which title, exactly
+The `<titles>` entry whose `titleType` is **"Display Title"** — Congress.gov's own choice of
+what to call the bill, which resolves to the sponsor-given short title of the bill's *current
+version* when there is one and the official title when there isn't. Every bill and resolution
+type checked carries one.
+
+Deliberately **not** "the most recent short title", which was tried first and is worse despite
+looking more precise. A bill can carry several short titles at once, one per division of an
+omnibus: H.R. 6500 lists "AGOA Extension Act", "Continuing Appropriations Act, 2027" *and*
+"Surface Transportation Extension Act of 2026". Taking the last named the whole continuing
+resolution after its highway division. Naming a bill wrongly in public is a worse failure than
+naming it verbosely, and Congress.gov has already made this judgment.
+
+The cost of that choice: a bill whose short title applies only to an earlier version falls
+back to the long official title (H.R. 4541 reads "To reauthorize the Young Women's Breast
+Health Education and Awareness Requires Learning Young Act of 2009." rather than "EARLY Act
+Reauthorization"). Accurate but wordy; `buildVotePost()` shortens it to fit.
+
+### Keeping the request count down
+The constraint was to add as few requests as possible. Three things do that, in `billTitles.ts`:
+- A **module-level cache** means a bill is fetched at most once per process — this is what
+  stops `--watch` runs from re-asking every poll, and why the two H.R. 7008 votes in one run
+  (passage and motion to recommit) cost one lookup between them.
+- Votes with **no bill** (nominations, unresolvable amendments) are never looked up at all.
+- Enrichment runs once in `fetchAllVotes()` over both chambers together rather than inside
+  each chamber's fetch, so House and Senate votes on the same bill share a request.
+
+A typical 10-vote run across both chambers touches ~6 distinct bills and costs **6 requests**
+— against the ~15-40 XML fetches the run already makes for the votes themselves. Requests go
+out 5 at a time (`CONCURRENCY`) so a catch-up run doesn't serialize dozens of round trips.
+BILLSTATUS records are 8-110 KB each, larger than GovTrack's trimmed JSON; that is the price
+of dropping the aggregator, and it is paid in bandwidth rather than in round trips.
+
+A 404 (a bill voted on before its record is published) is treated as a miss, not an error.
+
+### Post shape
+`buildVotePost()`'s second line is now `billLine(v)`: `"H.R. 5334: Lindsey O. Graham Sanctioning
+Russia and Iran Act of 2026"`. It falls back to the chamber's own description whenever there's
+no title — nominations, procedural votes, or a govinfo outage — so the post degrades to
+exactly how it read before rather than failing. `fetchBillTitles()` never throws for the same
+reason.
+
+The bill designation is rendered from a canonical table (`formatBillDesignation`) rather than
+passed through: the House writes `"H R 8595"` and the Senate `"H.R. 8595"` for the same bill.
+Putting the number first also means truncation can never eat it.
+
+`parseBillDesignation()` was extracted from `buildBillUrl()` so the URL and the title come from
+one parser rather than two copies of the same regex.
+
+### Verified
+- The exact vote from the report (Senate #224, H.R. 5334) replayed through the real fetch →
+  title → post path now renders `H.R. 5334: Lindsey O. Graham Sanctioning Russia and Iran Act
+  of 2026`, still linked to congress.gov, 200 graphemes.
+- `npm run fetch-votes`, `fetch-ages` and `fetch-networth` live against both chambers: 10
+  votes, 6 bills, every post inside 300 graphemes. Nominations correctly fall back
+  ("Confirmation: Todd Blanche, of Florida, to be Attorney General"), and amendment votes pick
+  up the underlying bill's title.
+- govinfo and GovTrack produce byte-identical post text across the live sample, which is what
+  established the aggregator was redundant.
+- Typecheck + 233 tests pass.
+
+---
+
 ## Known issues / future cleanup
-- Senate post text sometimes verbose — question field can duplicate the description field
+- Senate post text sometimes verbose — the `question` field repeats the bill number that the
+  bill line also carries ("Senate Vote: On Passage of the Bill H.R. 5334" above "H.R. 5334:
+  …"). Now that the bill line names the bill, the number could be stripped from the header.
 - 1 unmatched House member per vote (non-voting delegate) — acceptable, can be noted in posts
 - Age bot uses each member's age **as of the run time**, not as of the vote date. Votes are
   fetched within minutes-to-hours of happening, so this only matters for a hypothetical

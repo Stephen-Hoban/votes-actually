@@ -30,6 +30,7 @@ import {
   formatPop,
   formatPct,
   buildPopulationPost,
+  billLine,
   graphemeLength,
   orderForPosting,
 } from "./voteCalculations.js";
@@ -151,7 +152,8 @@ function printVoteResult(v: VoteResult): void {
   console.log("─".repeat(60));
   console.log(`${v.chamber.toUpperCase()} VOTE #${v.voteNumber}  |  ${v.date}`);
   console.log(`📋 ${v.question}`);
-  if (v.description) console.log(`   ${v.description}`);
+  const bill = billLine(v);
+  if (bill) console.log(`   ${bill}`);
   console.log(`🗳️  Result: ${v.result}  (Yeas: ${v.yeas} | Nays: ${v.nays})`);
   console.log();
   console.log(`🇺🇸 Population represented:`);

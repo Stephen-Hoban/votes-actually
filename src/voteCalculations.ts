@@ -48,6 +48,10 @@ export interface VoteResult {
   url: string;
   /** congress.gov URL for the bill/resolution this vote is on, or "" if it couldn't be resolved (e.g. nominations). */
   billUrl: string;
+  /** Display designation of that bill, e.g. "H.R. 5334", or "". */
+  billDesignation: string;
+  /** That bill's common name, or "" if unresolved. */
+  billTitle: string;
 }
 
 /** A link over a byte range of post text, in the form Bluesky's rich-text facets expect. */
@@ -202,6 +206,49 @@ const BILL_TYPE_SLUGS: Record<string, string> = {
   SCONRES: "senate-concurrent-resolution",
 };
 
+// How each type is written for readers. The chambers are not consistent with
+// each other — the House writes "H R 8595" and "H J RES 139", the Senate
+// "H.R. 8595" — so posts render this canonical form instead of whichever
+// spelling the source feed happened to use.
+const BILL_TYPE_LABELS: Record<string, string> = {
+  HR: "H.R.",
+  HRES: "H.Res.",
+  HJRES: "H.J.Res.",
+  HCONRES: "H.Con.Res.",
+  S: "S.",
+  SRES: "S.Res.",
+  SJRES: "S.J.Res.",
+  SCONRES: "S.Con.Res.",
+};
+
+/** A bill or resolution identified by its type key ("HR", "SJRES") and number. */
+export interface BillDesignation {
+  /** Normalized, punctuation-free type key — a key of BILL_TYPE_SLUGS. */
+  type: string;
+  number: number;
+}
+
+/**
+ * Parses a raw bill/resolution designation as it appears in congressional data,
+ * e.g. "H.R. 5103", "H R 5103", "H J RES 139", "S.Con.Res. 33".
+ *
+ * Returns null for anything that isn't a bill or resolution — nominations
+ * ("PN615-2"), amendments ("S.Amdt. 5235"), or an empty designation.
+ */
+export function parseBillDesignation(rawDesignation: string): BillDesignation | null {
+  const normalized = rawDesignation.replace(/[.\s]/g, "").toUpperCase();
+  const match = normalized.match(/^([A-Z]+)(\d+)$/);
+  if (!match) return null;
+  const [, type, number] = match;
+  if (!(type in BILL_TYPE_SLUGS)) return null;
+  return { type, number: parseInt(number, 10) };
+}
+
+/** Renders a parsed designation the way readers see it, e.g. "H.R. 5334". */
+export function formatBillDesignation(bill: BillDesignation): string {
+  return `${BILL_TYPE_LABELS[bill.type]} ${bill.number}`;
+}
+
 function ordinal(n: number): string {
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
@@ -218,13 +265,10 @@ function ordinal(n: number): string {
 // Returns "" if it doesn't map to a congress.gov bill page (e.g. nominations,
 // or an amendment with no underlying bill to fall back to).
 export function buildBillUrl(congress: number, rawDesignation: string): string {
-  const normalized = rawDesignation.replace(/[.\s]/g, "").toUpperCase();
-  const match = normalized.match(/^([A-Z]+)(\d+)$/);
-  if (!match) return "";
-  const [, type, number] = match;
-  const slug = BILL_TYPE_SLUGS[type];
-  if (!slug) return "";
-  return `https://www.congress.gov/bill/${ordinal(congress)}-congress/${slug}/${number}`;
+  const bill = parseBillDesignation(rawDesignation);
+  if (!bill) return "";
+  const slug = BILL_TYPE_SLUGS[bill.type];
+  return `https://www.congress.gov/bill/${ordinal(congress)}-congress/${slug}/${bill.number}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -328,11 +372,11 @@ function utf16IndexToByteIndex(text: string, utf16Index: number): number {
   return Buffer.byteLength(text.slice(0, utf16Index), "utf-8");
 }
 
-// When the description is too long to fit, shorten it — never the
+// When the bill line is too long to fit, shorten it — never the
 // Result/Population lines, which are the whole point of the post.
-function shortenDescription(description: string, budget: number): string {
+function shortenBillLine(billLine: string, budget: number): string {
   if (budget < 2) return "";
-  return truncateToGraphemes(description, budget - 1) + "…";
+  return truncateToGraphemes(billLine, budget - 1) + "…";
 }
 
 // Every buildPopulationPost exit path funnels through here so nothing ever
@@ -348,12 +392,12 @@ function finalizePost(voteId: string, text: string, facets: PostFacet[]): Post {
   return { text: truncateToGraphemes(text, MAX_POST_LENGTH - 1) + "…", facets: [] };
 }
 
-function linkFacet(text: string, descriptionStart: number, descriptionText: string, billUrl: string): PostFacet[] {
+function linkFacet(text: string, billLineStart: number, billLineText: string, billUrl: string): PostFacet[] {
   if (!billUrl) return [];
   return [
     {
-      byteStart: utf16IndexToByteIndex(text, descriptionStart),
-      byteEnd: utf16IndexToByteIndex(text, descriptionStart + descriptionText.length),
+      byteStart: utf16IndexToByteIndex(text, billLineStart),
+      byteEnd: utf16IndexToByteIndex(text, billLineStart + billLineText.length),
       uri: billUrl,
     },
   ];
@@ -367,41 +411,65 @@ export interface VotePostMeta {
   id: string;
   chamber: "Senate" | "House";
   question: string;
+  /** The chamber's own words for the vote, used when there's no bill title. */
   description: string;
   result: string;
   yeas: number;
   nays: number;
   billUrl: string;
+  /** Display designation of the bill this vote is on, e.g. "H.R. 5334", or "". */
+  billDesignation: string;
+  /** The bill's common name, e.g. "Value Over Cost Act of 2026", or "" if unresolved. */
+  billTitle: string;
 }
 
 /**
- * Assembles a bot post: shared header/description/result lines, then the
- * bot-specific `statBlock` (e.g. population represented, average age).
+ * The line under the header, naming what was actually voted on.
  *
- * The header, result line, and stat block are fixed — only the description is
+ * Readers can't identify a bill from the chamber's own words: the Senate calls
+ * this vote "H.R. 5334, as amended" and the House often leaves it blank, so the
+ * post used to say nothing a reader could recognize without opening the link.
+ * When we know the bill's common name it goes here with its number
+ * ("H.R. 5334: Lindsey O. Graham Sanctioning Russia and Iran Act of 2026").
+ *
+ * Falls back to the chamber's description when there's no title to show —
+ * nominations and procedural votes have no bill, and a govinfo outage must
+ * degrade the post, not block it.
+ */
+export function billLine(v: VotePostMeta): string {
+  if (!v.billTitle) return v.description;
+  return v.billDesignation ? `${v.billDesignation}: ${v.billTitle}` : v.billTitle;
+}
+
+/**
+ * Assembles a bot post: shared header/bill/result lines, then the bot-specific
+ * `statBlock` (e.g. population represented, average age).
+ *
+ * The header, result line, and stat block are fixed — only the bill line is
  * shortened to fit, and it carries the congress.gov link facet when there is one.
  * Every bot shares this so post-length and facet handling only lives in one place.
  */
 export function buildVotePost(v: VotePostMeta, statBlock: string): Post {
   const header = `${v.chamber} Vote: ${v.question}`;
   const resultLine = `Result: ${v.result} (${v.yeas}-${v.nays})`;
+  const bill = billLine(v);
 
-  const withoutDescription = `${header}\n${resultLine}\n\n${statBlock}`;
-  if (!v.description) return finalizePost(v.id, withoutDescription, []);
+  const withoutBillLine = `${header}\n${resultLine}\n\n${statBlock}`;
+  if (!bill) return finalizePost(v.id, withoutBillLine, []);
 
-  const descriptionStart = header.length + 1; // after "header\n"
+  const billLineStart = header.length + 1; // after "header\n"
 
-  const fullDescriptionText = `${header}\n${v.description}\n${resultLine}\n\n${statBlock}`;
-  if (fitsInPost(fullDescriptionText)) {
-    return finalizePost(v.id, fullDescriptionText, linkFacet(fullDescriptionText, descriptionStart, v.description, v.billUrl));
+  const fullText = `${header}\n${bill}\n${resultLine}\n\n${statBlock}`;
+  if (fitsInPost(fullText)) {
+    return finalizePost(v.id, fullText, linkFacet(fullText, billLineStart, bill, v.billUrl));
   }
 
-  const fixedLength = graphemeLength(withoutDescription) + 1; // +1 for the description line's own newline
-  const shortened = shortenDescription(v.description, MAX_POST_LENGTH - fixedLength);
-  if (!shortened) return finalizePost(v.id, withoutDescription, []);
+  const fixedLength = graphemeLength(withoutBillLine) + 1; // +1 for the bill line's own newline
+  const shortened = shortenBillLine(bill, MAX_POST_LENGTH - fixedLength);
+  if (!shortened) return finalizePost(v.id, withoutBillLine, []);
 
   const text = `${header}\n${shortened}\n${resultLine}\n\n${statBlock}`;
-  return finalizePost(v.id, text, linkFacet(text, descriptionStart, shortened, v.billUrl));
+  return finalizePost(v.id, text, linkFacet(text, billLineStart, shortened, v.billUrl));
 }
 
 export function buildPopulationPost(v: VoteResult): Post {
