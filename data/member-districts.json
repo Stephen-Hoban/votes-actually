@@ -1,8 +1,8 @@
 {
-  "fetchedAt": "2026-03-23T02:54:49.069Z",
+  "fetchedAt": "2026-09-01T11:02:33.129Z",
   "source": "unitedstates/congress-legislators (gh-pages branch)",
   "note": "Refresh at start of each Congress (every 2 years) and after special elections",
-  "totalMembers": 483,
+  "totalMembers": 480,
   "members": {
     "C000127": {
       "districtKey": "WA-01",
@@ -31,13 +31,6 @@
       "state": "IL",
       "district": 20,
       "party": "Democrat"
-    },
-    "G000359": {
-      "districtKey": "SC-03",
-      "name": "Lindsey Graham",
-      "state": "SC",
-      "district": 3,
-      "party": "Republican"
     },
     "R000122": {
       "districtKey": "RI-02",
@@ -641,13 +634,6 @@
       "district": 8,
       "party": "Republican"
     },
-    "S001157": {
-      "districtKey": "GA-13",
-      "name": "David Scott",
-      "state": "GA",
-      "district": 13,
-      "party": "Democrat"
-    },
     "S000185": {
       "districtKey": "VA-03",
       "name": "Robert C. \"Bobby\" Scott",
@@ -907,13 +893,6 @@
       "district": 6,
       "party": "Democrat"
     },
-    "S001193": {
-      "districtKey": "CA-14",
-      "name": "Eric Swalwell",
-      "state": "CA",
-      "district": 14,
-      "party": "Democrat"
-    },
     "B001285": {
       "districtKey": "CA-26",
       "name": "Julia Brownley",
@@ -1024,13 +1003,6 @@
       "name": "David P. Joyce",
       "state": "OH",
       "district": 14,
-      "party": "Republican"
-    },
-    "M001190": {
-      "districtKey": "OK-02",
-      "name": "Markwayne Mullin",
-      "state": "OK",
-      "district": 2,
       "party": "Republican"
     },
     "P000605": {
@@ -2244,13 +2216,6 @@
       "district": 22,
       "party": "Republican"
     },
-    "G000594": {
-      "districtKey": "TX-23",
-      "name": "Tony Gonzales",
-      "state": "TX",
-      "district": 23,
-      "party": "Republican"
-    },
     "V000134": {
       "districtKey": "TX-24",
       "name": "Beth Van Duyne",
@@ -2335,13 +2300,6 @@
       "district": 15,
       "party": "Republican"
     },
-    "C001127": {
-      "districtKey": "FL-20",
-      "name": "Sheila Cherfilus-McCormick",
-      "state": "FL",
-      "district": 20,
-      "party": "Democrat"
-    },
     "F000474": {
       "districtKey": "NE-01",
       "name": "Mike Flood",
@@ -2403,7 +2361,7 @@
       "name": "Kevin Kiley",
       "state": "CA",
       "district": 3,
-      "party": "Republican"
+      "party": "Independent"
     },
     "M001225": {
       "districtKey": "CA-15",
@@ -3380,10 +3338,31 @@
     },
     "M001245": {
       "districtKey": "TX-18",
-      "name": "Christian Menefee",
+      "name": "Christian D. Menefee",
       "state": "TX",
       "district": 18,
       "party": "Democrat"
+    },
+    "F000485": {
+      "districtKey": "GA-14",
+      "name": "Clay Fuller",
+      "state": "GA",
+      "district": 14,
+      "party": "Republican"
+    },
+    "M001246": {
+      "districtKey": "NJ-11",
+      "name": "Analilia Mejia",
+      "state": "NJ",
+      "district": 11,
+      "party": "Democrat"
+    },
+    "G000607": {
+      "districtKey": "CA-01",
+      "name": "James Gallagher",
+      "state": "CA",
+      "district": 1,
+      "party": "Republican"
     }
   }
 }
