@@ -7,3 +7,4 @@
 - average representative net worth
 - average representative age
 - campaign contributions
+- tenure (job duration)

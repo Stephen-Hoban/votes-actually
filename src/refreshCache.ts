@@ -8,6 +8,7 @@
  *   district-populations.json  → After each decennial Census (next: ~2031)
  *   member-districts.json      → Start of each Congress + after special elections
  *   member-ages.json           → Start of each Congress + after special elections
+ *   member-tenure.json         → Start of each Congress + after special elections
  *   member-networth.json       → Quarterly (NET_WORTH_REFRESH_DAYS), and after
  *                                the mid-May annual financial disclosure filing
  *
@@ -16,6 +17,7 @@
  *   npm run refresh-cache -- --members   — refresh member→district map only
  *   npm run refresh-cache -- --census    — refresh district populations only
  *   npm run refresh-cache -- --ages      — refresh member ages only
+ *   npm run refresh-cache -- --tenure    — refresh member tenures only
  *   npm run refresh-cache -- --networth  — refresh member net worths only
  */
 
@@ -24,6 +26,12 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { buildMemberAge, type MemberAge } from "./ageCalculations.js";
+import {
+  buildMemberTenure,
+  summarizeService,
+  type MemberTenure,
+  type ServiceTerm,
+} from "./tenureCalculations.js";
 import {
   buildMemberNetWorth,
   NET_WORTH_REFRESH_DAYS,
@@ -48,6 +56,7 @@ const MEMBER_DISTRICT_FILE = path.join(DATA_DIR, "member-districts.json");
 const STATE_POP_FILE = path.join(DATA_DIR, "state-populations.json");
 const MEMBER_AGE_FILE = path.join(DATA_DIR, "member-ages.json");
 const MEMBER_NET_WORTH_FILE = path.join(DATA_DIR, "member-networth.json");
+const MEMBER_TENURE_FILE = path.join(DATA_DIR, "member-tenure.json");
 
 // ---------------------------------------------------------------------------
 // State FIPS lookup
@@ -314,6 +323,99 @@ async function refreshMemberAges(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Refresh member tenures
+//
+// Same source and shape as the age refresh, reading `terms` instead of `bio`.
+// Only days inside a term are counted, so a member who left Congress and came
+// back is credited for the time served, not the time since they first arrived.
+// ---------------------------------------------------------------------------
+
+async function refreshMemberTenures(): Promise<void> {
+  console.log("⏳ Fetching member tenures from congress-legislators...");
+
+  const resp = await fetch(LEGISLATORS_URL, {
+    headers: { "User-Agent": "votes-actually (educational project)" },
+  });
+  if (!resp.ok) throw new Error(`Legislators fetch error: ${resp.status} ${resp.statusText}`);
+
+  const legislators = (await resp.json()) as Array<{
+    id: { bioguide: string; lis?: string };
+    name: { official_full?: string; first: string; last: string };
+    terms: Array<{ type: string; state: string; party?: string; start: string; end?: string }>;
+  }>;
+
+  const now = new Date();
+  const members: MemberTenure[] = [];
+  let senateCount = 0;
+  let houseCount = 0;
+  let skipped = 0;
+
+  for (const leg of legislators) {
+    const bioguide = leg.id.bioguide;
+    const terms = leg.terms ?? [];
+    const lastTerm = terms[terms.length - 1];
+    if (!bioguide || !lastTerm) {
+      skipped++;
+      continue;
+    }
+
+    // Skipping rather than defaulting: a member with no term covering today has
+    // no time in office to report, and a zero would quietly drag the averages
+    // down instead of showing up as an unmatched voter in the bot's output.
+    const service = summarizeService(terms as ServiceTerm[], now);
+    if (!service) {
+      skipped++;
+      continue;
+    }
+
+    const lisId = leg.id.lis ?? "";
+    const state = lastTerm.state;
+    const party = lastTerm.party ?? "Unknown";
+    const chamber = lastTerm.type === "sen" ? "Senate" : "House";
+    const name = leg.name.official_full ?? `${leg.name.first} ${leg.name.last}`;
+
+    members.push(
+      buildMemberTenure(
+        {
+          bioguide,
+          lisId,
+          name,
+          state,
+          party,
+          chamber,
+          priorServiceDays: service.priorServiceDays,
+          currentTermStart: service.currentTermStart,
+        },
+        now
+      )
+    );
+
+    if (chamber === "Senate") senateCount++;
+    else houseCount++;
+  }
+
+  if (skipped > 0) {
+    console.warn(`⚠️  Skipped ${skipped} legislator(s) missing bioguide or a current term`);
+  }
+
+  const output = {
+    fetchedAt: now.toISOString(),
+    source: "unitedstates/congress-legislators (gh-pages branch)",
+    note:
+      "Tenure is total time served in Congress (both chambers, gaps in service excluded), " +
+      "in whole years per member. Values auto-recompute from the stored term dates at run " +
+      "time; refresh when the roster changes (new Congress, special elections).",
+    totalMembers: members.length,
+    members,
+  };
+
+  fs.writeFileSync(MEMBER_TENURE_FILE, JSON.stringify(output, null, 2));
+  console.log(
+    `✅ Saved ${members.length} member tenures (${senateCount} Senate, ${houseCount} House) → ${MEMBER_TENURE_FILE}`
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Refresh member net worths
 //
 // This is by far the heaviest refresh, and the only one whose source doesn't
@@ -532,6 +634,7 @@ function showCacheStatus(): void {
     { label: "District populations", path: DISTRICT_POP_FILE },
     { label: "Member→district map", path: MEMBER_DISTRICT_FILE },
     { label: "Member ages", path: MEMBER_AGE_FILE },
+    { label: "Member tenures", path: MEMBER_TENURE_FILE },
     { label: "Member net worths", path: MEMBER_NET_WORTH_FILE },
   ];
 
@@ -564,6 +667,7 @@ async function main(): Promise<void> {
   const refreshCensus = refreshAll || args.includes("--census");
   const refreshMembers = refreshAll || args.includes("--members");
   const refreshAges = refreshAll || args.includes("--ages");
+  const refreshTenure = refreshAll || args.includes("--tenure");
   const refreshNetWorth = refreshAll || args.includes("--networth");
 
   if (refreshCensus) {
@@ -593,6 +697,14 @@ async function main(): Promise<void> {
       await refreshMemberAges();
     } catch (err) {
       console.error("❌ Member age refresh failed:", err);
+    }
+  }
+
+  if (refreshTenure) {
+    try {
+      await refreshMemberTenures();
+    } catch (err) {
+      console.error("❌ Member tenure refresh failed:", err);
     }
   }
 

@@ -45,7 +45,7 @@ jobs:
       # parsing hundreds of disclosure PDFs. That belongs on its own quarterly
       # schedule (refresh-networth.yml), not on this monthly job.
       - name: Refresh reference caches
-        run: npm run refresh-cache -- --census --members --ages
+        run: npm run refresh-cache -- --census --members --ages --tenure
         env:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
 

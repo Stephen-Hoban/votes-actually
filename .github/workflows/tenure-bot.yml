@@ -1,0 +1,50 @@
+# Tenure bot — posts the average time in office of the members who voted yea
+# vs. nay.
+#
+# Same shape as population-bot.yml and age-bot.yml; see population-bot.yml for
+# why each bot gets its own workflow. Needs no CENSUS_API_KEY — congressional
+# terms come from congress-legislators, which is a plain public JSON fetch baked
+# into data/member-tenure.json.
+name: Tenure bot
+
+on:
+  schedule:
+    # The other three bots already sit on the :2/:7/:12 stagger, so this one
+    # takes the gap between population (:2) and age (:7) rather than extending
+    # the run further past the quarter-hour. Off :00/:15/:30/:45 for the reason
+    # in population-bot.yml.
+    - cron: "4,19,34,49 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: tenure-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      # Cached tenures self-heal from each member's stored term dates at run
+      # time, so the committed data/member-tenure.json only needs a real refresh
+      # when the roster changes. See refresh-caches.yml.
+      - name: Fetch votes and post new ones
+        run: npm run post-tenure
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BLUESKY_TENURE_HANDLE: ${{ secrets.BLUESKY_TENURE_HANDLE }}
+          BLUESKY_TENURE_APP_PASSWORD: ${{ secrets.BLUESKY_TENURE_APP_PASSWORD }}
