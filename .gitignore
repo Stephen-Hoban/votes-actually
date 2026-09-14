@@ -6,7 +6,7 @@ npm-debug.log*
 
 # data/ is an allowlist, deliberately.
 #
-# The four reference caches below are committed: scheduled GitHub Actions runs
+# The reference caches below are committed: scheduled GitHub Actions runs
 # get a fresh, empty container every 15 minutes, and rebuilding these from the
 # Census API on every run would be slow, pointless, and rate-limited. They're
 # slow-changing build artifacts (refresh with the `refresh-*` scripts and commit
@@ -20,4 +20,5 @@ data/*
 !data/district-populations.json
 !data/member-districts.json
 !data/member-ages.json
+!data/member-tenure.json
 !data/member-networth.json

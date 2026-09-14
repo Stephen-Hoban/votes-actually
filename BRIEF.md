@@ -925,6 +925,86 @@ one parser rather than two copies of the same regex.
 
 ---
 
+## Tenure bot (2026-09-03)
+
+Fourth bot: the average **time in office** of the members who voted yea vs. nay. Same question
+as the age bot, asked of a different clock — does seniority track how a chamber splits?
+
+Deliberately the *cheapest* bot in the family. It reuses the age bot's shape end to end
+(`voteSources.ts` → pure calculations → `buildVotePost`), and its data comes from a source the
+repo already fetches: the `terms` array in congress-legislators, the same JSON the age refresh
+reads `bio.birthday` out of. No new API, no new key, no scraping.
+
+### What "tenure" counts
+
+Total days served in Congress, **both chambers combined, gaps excluded**. Only days inside a
+term are summed, so a member who left and came back is credited with time served rather than
+time since first sworn in. That distinction is not academic — 19 sitting members have a break of
+more than 60 days in their record, and for Maria Cantwell (House 1993-95, Senate 2001-) the two
+definitions differ by six years: 27 served vs. 33 since first arrival.
+
+Service in state legislatures, governorships, or any other office is **not** counted.
+congress-legislators only publishes congressional terms, and inventing a broader definition off
+a source we don't have would make the number unfalsifiable.
+
+### Tenure caching — the same self-healing trick as ages
+
+Tenure has the same shape as age: a pure function of dates already on disk plus the clock. So
+each `data/member-tenure.json` entry stores the two immutable inputs — `priorServiceDays`
+(days in terms that have already ended) and `currentTermStart` — plus a derived whole-year
+`tenureYears` and the date it stops being right (`tenureValidUntil`, the member's next service
+anniversary). `refreshStaleTenures()` recomputes just the expired entries at run time and writes
+them back, so the cache only needs a real refresh when the **roster** changes.
+
+Two details worth keeping:
+
+- **Whole years per member, decimals in the average** — exactly as ages are counted. Caching a
+  fractional figure would make every entry stale every single day, which would make the cache
+  pointless. A first-year member reads as 0; the averages across a few hundred members carry the
+  precision.
+- **Anniversaries are computed from the term start, not from "now"** — a member crosses n+1
+  years once `priorServiceDays` plus days elapsed in the current term reach (n+1) × 365.25. Days
+  rather than calendar anniversaries, because once service has gaps in it there is no single
+  anniversary date to count from.
+
+A member with no term covering today is **skipped**, not defaulted to zero. A zero would quietly
+drag both averages down; a skip shows up as an unmatched voter in the run's output.
+
+### Key files
+```
+src/tenureCalculations.ts       — service math, cache invalidation, aggregation, post formatting
+src/tenureCalculations.test.ts  — unit tests (pure; no network, no filesystem)
+src/fetchTenureVotes.ts         — tenure bot pipeline (mirrors fetchAgeVotes.ts)
+data/member-tenure.json         — the roster cache (committed)
+```
+
+### npm scripts
+```
+npm run fetch-tenure     — fetch + print tenure analysis (no posting)
+npm run post-tenure      — fetch + post new votes to Bluesky (one-shot; what Actions runs)
+npm run watch-tenure     — same, looping on POLL_INTERVAL_MINUTES
+npm run refresh-tenure   — rebuild the tenure cache from congress-legislators
+```
+
+### Deployment
+`.github/workflows/tenure-bot.yml`, cron `4,19,34,49`. The other three bots already hold the
+`:2` / `:7` / `:12` stagger, so this one takes the gap between population and age rather than
+pushing further past the quarter-hour. Needs `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`,
+`BLUESKY_TENURE_HANDLE`, `BLUESKY_TENURE_APP_PASSWORD`. No Census key.
+
+`refresh-caches.yml` now passes `--census --members --ages --tenure` monthly.
+
+### Verified (2026-09-03)
+- Cache built: 539 members (100 Senate, 439 House), zero missing BioGuide, zero senators missing
+  an LIS ID — so both chambers' vote feeds match 100%.
+- Spot-checked against known service: Grassley 51y (House 1975 + Senate 1981), Markey 51y,
+  Hoyer / Rogers / C. Smith 45y. Mean tenure across the sitting roster: 10.6 years.
+- Gap handling verified against the raw source for all 19 members with a break in service.
+- `npm run fetch-tenure` over 10 live votes: every yea/nay voter matched in both chambers, posts
+  188-231 graphemes, congress.gov link facet intact.
+
+---
+
 ## Known issues / future cleanup
 - Senate post text sometimes verbose — the `question` field repeats the bill number that the
   bill line also carries ("Senate Vote: On Passage of the Bill H.R. 5334" above "H.R. 5334:
