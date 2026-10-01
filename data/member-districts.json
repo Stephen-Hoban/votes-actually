@@ -1,8 +1,8 @@
 {
-  "fetchedAt": "2026-09-01T11:02:33.129Z",
+  "fetchedAt": "2026-10-01T12:22:47.796Z",
   "source": "unitedstates/congress-legislators (gh-pages branch)",
   "note": "Refresh at start of each Congress (every 2 years) and after special elections",
-  "totalMembers": 480,
+  "totalMembers": 482,
   "members": {
     "C000127": {
       "districtKey": "WA-01",
@@ -3363,6 +3363,20 @@
       "state": "CA",
       "district": 1,
       "party": "Republican"
+    },
+    "B001328": {
+      "districtKey": "GA-13",
+      "name": "Everton Blair Jr.",
+      "state": "GA",
+      "district": 13,
+      "party": "Democrat"
+    },
+    "W000832": {
+      "districtKey": "CA-14",
+      "name": "Aisha Wahab",
+      "state": "CA",
+      "district": 14,
+      "party": "Democrat"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T19:27:24.515Z",
+  "fetchedAt": "2026-10-01T12:22:47.874Z",
   "source": "unitedstates/congress-legislators (gh-pages branch)",
   "note": "Tenure is total time served in Congress (both chambers, gaps in service excluded), in whole years per member. Values auto-recompute from the stored term dates at run time; refresh when the roster changes (new Congress, special elections).",
   "totalMembers": 539,
@@ -1657,8 +1657,8 @@
       "chamber": "House",
       "priorServiceDays": 4858,
       "currentTermStart": "2025-01-03",
-      "tenureYears": 14,
-      "tenureValidUntil": "2026-09-16"
+      "tenureYears": 15,
+      "tenureValidUntil": "2027-09-16"
     },
     {
       "bioguide": "B001278",
@@ -2545,8 +2545,8 @@
       "chamber": "House",
       "priorServiceDays": 3396,
       "currentTermStart": "2025-01-03",
-      "tenureYears": 10,
-      "tenureValidUntil": "2026-09-17"
+      "tenureYears": 11,
+      "tenureValidUntil": "2027-09-17"
     },
     {
       "bioguide": "D000626",
@@ -3073,8 +3073,8 @@
       "chamber": "House",
       "priorServiceDays": 2312,
       "currentTermStart": "2025-01-03",
-      "tenureYears": 7,
-      "tenureValidUntil": "2026-09-05"
+      "tenureYears": 8,
+      "tenureValidUntil": "2027-09-06"
     },
     {
       "bioguide": "H001082",
@@ -3745,8 +3745,8 @@
       "chamber": "House",
       "priorServiceDays": 1935,
       "currentTermStart": "2025-01-03",
-      "tenureYears": 6,
-      "tenureValidUntil": "2026-09-17"
+      "tenureYears": 7,
+      "tenureValidUntil": "2027-09-17"
     },
     {
       "bioguide": "M000687",
@@ -4501,8 +4501,8 @@
       "chamber": "House",
       "priorServiceDays": 843,
       "currentTermStart": "2025-01-03",
-      "tenureYears": 3,
-      "tenureValidUntil": "2026-09-13"
+      "tenureYears": 4,
+      "tenureValidUntil": "2027-09-14"
     },
     {
       "bioguide": "Y000067",
@@ -5449,8 +5449,8 @@
       "chamber": "House",
       "priorServiceDays": 107,
       "currentTermStart": "2025-01-03",
-      "tenureYears": 1,
-      "tenureValidUntil": "2026-09-19"
+      "tenureYears": 2,
+      "tenureValidUntil": "2027-09-19"
     },
     {
       "bioguide": "W000829",
@@ -6349,8 +6349,8 @@
       "chamber": "House",
       "priorServiceDays": 0,
       "currentTermStart": "2025-09-10",
-      "tenureYears": 0,
-      "tenureValidUntil": "2026-09-11"
+      "tenureYears": 1,
+      "tenureValidUntil": "2027-09-11"
     },
     {
       "bioguide": "G000606",
