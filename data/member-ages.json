@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-01T12:22:47.834Z",
+  "fetchedAt": "2026-11-01T12:38:01.601Z",
   "source": "unitedstates/congress-legislators (gh-pages branch)",
   "note": "Ages auto-recompute from birthdays at run time; refresh when the roster changes (new Congress, special elections)",
   "totalMembers": 539,
@@ -12,8 +12,8 @@
       "party": "Democrat",
       "chamber": "Senate",
       "birthday": "1958-10-13",
-      "age": 67,
-      "ageValidUntil": "2026-10-13"
+      "age": 68,
+      "ageValidUntil": "2027-10-13"
     },
     {
       "bioguide": "K000367",
@@ -45,8 +45,8 @@
       "party": "Democrat",
       "chamber": "Senate",
       "birthday": "1955-10-20",
-      "age": 70,
-      "ageValidUntil": "2026-10-20"
+      "age": 71,
+      "ageValidUntil": "2027-10-20"
     },
     {
       "bioguide": "B001261",
@@ -122,8 +122,8 @@
       "party": "Democrat",
       "chamber": "Senate",
       "birthday": "1956-10-24",
-      "age": 69,
-      "ageValidUntil": "2026-10-24"
+      "age": 70,
+      "ageValidUntil": "2027-10-24"
     },
     {
       "bioguide": "R000122",
@@ -320,8 +320,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1974-10-16",
-      "age": 51,
-      "ageValidUntil": "2026-10-16"
+      "age": 52,
+      "ageValidUntil": "2027-10-16"
     },
     {
       "bioguide": "C001051",
@@ -386,8 +386,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1944-10-26",
-      "age": 81,
-      "ageValidUntil": "2026-10-26"
+      "age": 82,
+      "ageValidUntil": "2027-10-26"
     },
     {
       "bioguide": "C000537",
@@ -540,8 +540,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1946-10-06",
-      "age": 79,
-      "ageValidUntil": "2026-10-06"
+      "age": 80,
+      "ageValidUntil": "2027-10-06"
     },
     {
       "bioguide": "F000459",
@@ -551,8 +551,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1962-10-11",
-      "age": 63,
-      "ageValidUntil": "2026-10-11"
+      "age": 64,
+      "ageValidUntil": "2027-10-11"
     },
     {
       "bioguide": "F000450",
@@ -661,8 +661,8 @@
       "party": "Democrat",
       "chamber": "Senate",
       "birthday": "1971-10-17",
-      "age": 54,
-      "ageValidUntil": "2026-10-17"
+      "age": 55,
+      "ageValidUntil": "2027-10-17"
     },
     {
       "bioguide": "H001047",
@@ -727,8 +727,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1954-10-02",
-      "age": 71,
-      "ageValidUntil": "2026-10-02"
+      "age": 72,
+      "ageValidUntil": "2027-10-02"
     },
     {
       "bioguide": "J000293",
@@ -1013,8 +1013,8 @@
       "party": "Democrat",
       "chamber": "Senate",
       "birthday": "1950-10-11",
-      "age": 75,
-      "ageValidUntil": "2026-10-11"
+      "age": 76,
+      "ageValidUntil": "2027-10-11"
     },
     {
       "bioguide": "N000002",
@@ -1057,8 +1057,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1951-10-30",
-      "age": 74,
-      "ageValidUntil": "2026-10-30"
+      "age": 75,
+      "ageValidUntil": "2027-10-30"
     },
     {
       "bioguide": "P000603",
@@ -1112,8 +1112,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1958-10-17",
-      "age": 67,
-      "ageValidUntil": "2026-10-17"
+      "age": 68,
+      "ageValidUntil": "2027-10-17"
     },
     {
       "bioguide": "R000395",
@@ -1145,8 +1145,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1965-10-06",
-      "age": 60,
-      "ageValidUntil": "2026-10-06"
+      "age": 61,
+      "ageValidUntil": "2027-10-06"
     },
     {
       "bioguide": "S001145",
@@ -1244,8 +1244,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1954-10-24",
-      "age": 71,
-      "ageValidUntil": "2026-10-24"
+      "age": 72,
+      "ageValidUntil": "2027-10-24"
     },
     {
       "bioguide": "S001148",
@@ -1530,8 +1530,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1954-10-14",
-      "age": 71,
-      "ageValidUntil": "2026-10-14"
+      "age": 72,
+      "ageValidUntil": "2027-10-14"
     },
     {
       "bioguide": "D000617",
@@ -1563,8 +1563,8 @@
       "party": "Democrat",
       "chamber": "Senate",
       "birthday": "1972-10-20",
-      "age": 53,
-      "ageValidUntil": "2026-10-20"
+      "age": 54,
+      "ageValidUntil": "2027-10-20"
     },
     {
       "bioguide": "F000454",
@@ -1574,8 +1574,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1955-10-07",
-      "age": 70,
-      "ageValidUntil": "2026-10-07"
+      "age": 71,
+      "ageValidUntil": "2027-10-07"
     },
     {
       "bioguide": "T000468",
@@ -2124,8 +2124,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1978-10-24",
-      "age": 47,
-      "ageValidUntil": "2026-10-24"
+      "age": 48,
+      "ageValidUntil": "2027-10-24"
     },
     {
       "bioguide": "M001194",
@@ -2311,8 +2311,8 @@
       "party": "Republican",
       "chamber": "Senate",
       "birthday": "1954-10-24",
-      "age": 71,
-      "ageValidUntil": "2026-10-24"
+      "age": 72,
+      "ageValidUntil": "2027-10-24"
     },
     {
       "bioguide": "K000388",
@@ -2619,8 +2619,8 @@
       "party": "Republican",
       "chamber": "Senate",
       "birthday": "1971-10-21",
-      "age": 54,
-      "ageValidUntil": "2026-10-21"
+      "age": 55,
+      "ageValidUntil": "2027-10-21"
     },
     {
       "bioguide": "B001298",
@@ -2696,8 +2696,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1966-10-08",
-      "age": 59,
-      "ageValidUntil": "2026-10-08"
+      "age": 60,
+      "ageValidUntil": "2027-10-08"
     },
     {
       "bioguide": "G000581",
@@ -2905,8 +2905,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1978-10-28",
-      "age": 47,
-      "ageValidUntil": "2026-10-28"
+      "age": 48,
+      "ageValidUntil": "2027-10-28"
     },
     {
       "bioguide": "N000191",
@@ -3004,8 +3004,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1986-10-04",
-      "age": 39,
-      "ageValidUntil": "2026-10-04"
+      "age": 40,
+      "ageValidUntil": "2027-10-04"
     },
     {
       "bioguide": "B001307",
@@ -3037,8 +3037,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1973-10-27",
-      "age": 52,
-      "ageValidUntil": "2026-10-27"
+      "age": 53,
+      "ageValidUntil": "2027-10-27"
     },
     {
       "bioguide": "P000617",
@@ -3103,8 +3103,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1981-10-04",
-      "age": 44,
-      "ageValidUntil": "2026-10-04"
+      "age": 45,
+      "ageValidUntil": "2027-10-04"
     },
     {
       "bioguide": "S001212",
@@ -3180,8 +3180,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1989-10-13",
-      "age": 36,
-      "ageValidUntil": "2026-10-13"
+      "age": 37,
+      "ageValidUntil": "2027-10-13"
     },
     {
       "bioguide": "D000631",
@@ -3444,8 +3444,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1948-10-24",
-      "age": 77,
-      "ageValidUntil": "2026-10-24"
+      "age": 78,
+      "ageValidUntil": "2027-10-24"
     },
     {
       "bioguide": "T000165",
@@ -3488,8 +3488,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1953-11-01",
-      "age": 72,
-      "ageValidUntil": "2026-11-01"
+      "age": 73,
+      "ageValidUntil": "2027-11-01"
     },
     {
       "bioguide": "S000250",
@@ -3576,8 +3576,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1962-10-18",
-      "age": 63,
-      "ageValidUntil": "2026-10-18"
+      "age": 64,
+      "ageValidUntil": "2027-10-18"
     },
     {
       "bioguide": "J000305",
@@ -3631,8 +3631,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1978-10-28",
-      "age": 47,
-      "ageValidUntil": "2026-10-28"
+      "age": 48,
+      "ageValidUntil": "2027-10-28"
     },
     {
       "bioguide": "G000593",
@@ -3653,8 +3653,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1961-11-01",
-      "age": 64,
-      "ageValidUntil": "2026-11-01"
+      "age": 65,
+      "ageValidUntil": "2027-11-01"
     },
     {
       "bioguide": "W000788",
@@ -3741,8 +3741,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1978-10-06",
-      "age": 47,
-      "ageValidUntil": "2026-10-06"
+      "age": 48,
+      "ageValidUntil": "2027-10-06"
     },
     {
       "bioguide": "M000871",
@@ -4049,8 +4049,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1963-10-26",
-      "age": 62,
-      "ageValidUntil": "2026-10-26"
+      "age": 63,
+      "ageValidUntil": "2027-10-26"
     },
     {
       "bioguide": "S001218",
@@ -4148,8 +4148,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1961-11-01",
-      "age": 64,
-      "ageValidUntil": "2026-11-01"
+      "age": 65,
+      "ageValidUntil": "2027-11-01"
     },
     {
       "bioguide": "B001319",
@@ -4346,8 +4346,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1968-10-07",
-      "age": 57,
-      "ageValidUntil": "2026-10-07"
+      "age": 58,
+      "ageValidUntil": "2027-10-07"
     },
     {
       "bioguide": "C001129",
@@ -4511,8 +4511,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1963-10-04",
-      "age": 62,
-      "ageValidUntil": "2026-10-04"
+      "age": 63,
+      "ageValidUntil": "2027-10-04"
     },
     {
       "bioguide": "B001316",
@@ -4522,8 +4522,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1976-10-02",
-      "age": 49,
-      "ageValidUntil": "2026-10-02"
+      "age": 50,
+      "ageValidUntil": "2027-10-02"
     },
     {
       "bioguide": "E000235",
@@ -4896,8 +4896,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1962-10-18",
-      "age": 63,
-      "ageValidUntil": "2026-10-18"
+      "age": 64,
+      "ageValidUntil": "2027-10-18"
     },
     {
       "bioguide": "R000618",
@@ -4962,8 +4962,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1976-10-20",
-      "age": 49,
-      "ageValidUntil": "2026-10-20"
+      "age": 50,
+      "ageValidUntil": "2027-10-20"
     },
     {
       "bioguide": "F000480",
@@ -4973,8 +4973,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1979-10-24",
-      "age": 46,
-      "ageValidUntil": "2026-10-24"
+      "age": 47,
+      "ageValidUntil": "2027-10-24"
     },
     {
       "bioguide": "R000619",
@@ -5094,8 +5094,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1977-10-21",
-      "age": 48,
-      "ageValidUntil": "2026-10-21"
+      "age": 49,
+      "ageValidUntil": "2027-10-21"
     },
     {
       "bioguide": "F000481",
@@ -5479,8 +5479,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1970-10-02",
-      "age": 55,
-      "ageValidUntil": "2026-10-02"
+      "age": 56,
+      "ageValidUntil": "2027-10-02"
     },
     {
       "bioguide": "F000482",
@@ -5655,8 +5655,8 @@
       "party": "Republican",
       "chamber": "House",
       "birthday": "1968-10-03",
-      "age": 57,
-      "ageValidUntil": "2026-10-03"
+      "age": 58,
+      "ageValidUntil": "2027-10-03"
     },
     {
       "bioguide": "G000603",
@@ -5743,8 +5743,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1985-10-30",
-      "age": 40,
-      "ageValidUntil": "2026-10-30"
+      "age": 41,
+      "ageValidUntil": "2027-10-30"
     },
     {
       "bioguide": "M001235",
@@ -5820,8 +5820,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1982-10-22",
-      "age": 43,
-      "ageValidUntil": "2026-10-22"
+      "age": 44,
+      "ageValidUntil": "2027-10-22"
     },
     {
       "bioguide": "G000606",
@@ -5831,8 +5831,8 @@
       "party": "Democrat",
       "chamber": "House",
       "birthday": "1970-10-30",
-      "age": 55,
-      "ageValidUntil": "2026-10-30"
+      "age": 56,
+      "ageValidUntil": "2027-10-30"
     },
     {
       "bioguide": "V000139",

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-01T12:22:47.874Z",
+  "fetchedAt": "2026-11-01T12:38:01.628Z",
   "source": "unitedstates/congress-legislators (gh-pages branch)",
   "note": "Tenure is total time served in Congress (both chambers, gaps in service excluded), in whole years per member. Values auto-recompute from the stored term dates at run time; refresh when the roster changes (new Congress, special elections).",
   "totalMembers": 539,
